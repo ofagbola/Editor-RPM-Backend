@@ -5,20 +5,7 @@ import logger from './utils/logger';
 const PORT = process.env.RPC_PORT || 5000;
 const signals = ['SIGINT', 'SIGTERM'];
 
-// const interceptor = function (options: any, nextCall: any) {
-//   // return new grpc.ServerInterceptingCall(nextCall(options), {});
-//   console.log(nextCall);
-//   return {
 
-//   }
-// } as any;
-
-// {
-//     start: (metadata, listner, next) => {
-//       console.log(listner, metadata);
-//       next(metadata, options);
-//     },
-//   }
 
 export const app = () => {
   try {
