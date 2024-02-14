@@ -3,7 +3,7 @@
  */
 
 
-import { ProjectModel } from '../models/auth.model';
+import { ProjectModel } from '../models/questionnaire.model';
 import * as utils from '../utils/utils';
 import { RequestError } from '../utils/errors';
 

@@ -1,5 +1,5 @@
 import { JSONSchemaType } from 'ajv';
-import { ISignupRequest } from '../interfaces/auth.interface';
+import { ISignupRequest } from '../interfaces/questionnaire.interface';
 
 export const SignUpSchema: JSONSchemaType<ISignupRequest> = {
   type: 'object',

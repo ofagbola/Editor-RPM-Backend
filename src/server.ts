@@ -1,5 +1,5 @@
 import { app } from './app';
-import { authRpcService } from './rpc-services/auth.rpc.service';
+import { authRpcService } from './rpc-services/questionnaire.rpc.service';
 
 const grpc = app();
 

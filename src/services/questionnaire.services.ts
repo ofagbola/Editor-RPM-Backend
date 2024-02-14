@@ -3,7 +3,7 @@
  */
 
 
-import * as repo from '../repositories/auth.repositories';
+import * as repo from '../repositories/questionnaire.repositories';
 
 /**
  * Sign up.
