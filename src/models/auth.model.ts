@@ -8,8 +8,11 @@ export class AuthModel {
     project: any
   ): Promise<void> {
     try {
-      await sql.begin(async (sql) => {
-        await sql`INSERT INTO projects ${sql(project, columns)}`;
+      const { user } = await sql.begin(async (sql) => {
+        const user = await sql`SELECT * FROM users`;
+        return {
+          user,
+        };
       });
     } catch (error) {
       throw new DataBaseError({

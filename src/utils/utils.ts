@@ -1,40 +1,47 @@
-import Ajv, { DefinedError, AnySchema } from 'ajv';
 import * as grpc from '@grpc/grpc-js';
-
-
-const ajv = new Ajv({
-  allErrors: true,
-});
+import Joi from 'joi';
 
 /**
  * Validate schema middleware.
  * @param  {AnySchema} schema
  */
-export const validateSchema = (schema: AnySchema) => {
+export const validateSchema = (schema: Joi.ObjectSchema<any>) => {
   return function (call: any, callback: any, next: any) {
-    
-    const payload = {};
-    const validate = ajv.compile(schema);
+    try {
+      const payload = call.request;
+      const { error } = schema.validate(payload) as any;
 
-    if (!validate(payload)) {
-      const errors: string[] = [];
-      for (const err of validate.errors as DefinedError[]) {
-        if (err.message) {
-          errors.push(err.message);
+      if (error) {
+        const errors: string[] = [];
+
+        for (const err of error.details) {
+          if (err.message) {
+            errors.push(err.message);
+          }
         }
+
+        const res = buildErrorResponse(errors, grpc.status.INVALID_ARGUMENT);
+        callback({
+          code: res.code,
+          details: res.details,
+        });
       }
-      const res = buildErrorResponse(errors, grpc.status.INVALID_ARGUMENT);
+
+      return next(call);
+    } catch (error) {
+      const res = buildErrorResponse('Server error', grpc.status.INTERNAL);
       callback({
         code: res.code,
         details: res.details,
       });
     }
-
-    return next(call);
   };
 };
 
-export const buildSuccessResponse = (data: object | [] | null, status: grpc.status) => {
+export const buildSuccessResponse = (
+  data: object | [] | null,
+  status: number
+) => {
   return new grpc.StatusBuilder()
     .withCode(status)
     .withDetails(
@@ -46,10 +53,9 @@ export const buildSuccessResponse = (data: object | [] | null, status: grpc.stat
     .build();
 };
 
-
 export const buildErrorResponse = (
-  errors: string[] | object,
-  status: grpc.status
+  errors: string[] | object | string,
+  status: number
 ) => {
   return new grpc.StatusBuilder()
     .withCode(status)
@@ -61,4 +67,3 @@ export const buildErrorResponse = (
     )
     .build();
 };
-

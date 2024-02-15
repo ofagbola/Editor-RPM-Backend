@@ -1,11 +1,5 @@
-import { JSONSchemaType } from 'ajv';
-import { ISignupRequest } from '../interfaces/auth.interface';
+import Joi from 'joi';
 
-export const SignUpSchema: JSONSchemaType<ISignupRequest> = {
-  type: 'object',
-  properties: {
-    phone_number: { type: 'string' },
-  },
-  required: ['phone_number'],
-  additionalProperties: false,
-};
+export const SignUpSchema = Joi.object({
+  email: Joi.string().email(),
+});

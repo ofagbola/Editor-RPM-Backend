@@ -1,6 +1,7 @@
-import { ResponseData } from '../protos/auth';
 import * as utils from '../utils/utils';
-
+import * as auth_services from '../services/auth.services';
+import { DataBaseError, RequestError } from '../utils/errors';
+import * as grpc from '@grpc/grpc-js';
 /**
  * SIGNUP  Controller.
  * @param  {grpc.Call} call
@@ -8,24 +9,50 @@ import * as utils from '../utils/utils';
  *
  */
 
-const message = ResponseData.create({
-  data: {
-    testing: 'ok',
-    testingg: 'g',
-  },
-});
-
-export const signup = (call: any, callback: any) => {
+export const signup = async (call: any, callback: any) => {
   try {
-    //console.log(call.metadata);
+    const { email } = call.request;
+
+    const payload = {
+      email,
+    };
+
+    const response = await auth_services.signUp(payload);
+
     callback(null, {
-      message: 'okk',
-      statusCode: 200,
-      testing: [message.data],
+      message: 'Successfully signed up',
+      statusCode: grpc.status.OK,
+      data: JSON.stringify(response),
     });
   } catch (error) {
-    console.log(error);
-    callback(error);
+    if (error instanceof DataBaseError) {
+      const errorResponse = utils.buildErrorResponse(
+        'Server error',
+        grpc.status.INTERNAL
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    } else if (error instanceof RequestError) {
+      const errorResponse = utils.buildErrorResponse(
+        error,
+        error.code ?? grpc.status.OK
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    } else {
+      const errorResponse = utils.buildErrorResponse(
+        'Server error',
+        grpc.status.INTERNAL
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    }
   }
 };
 

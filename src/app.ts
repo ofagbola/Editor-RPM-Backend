@@ -2,7 +2,7 @@ import * as grpc from '@grpc/grpc-js';
 import 'dotenv/config';
 import logger from './utils/logger';
 
-const PORT = process.env.RPC_PORT || 5000;
+const PORT = process.env.RPC_PORT || 4000;
 const signals = ['SIGINT', 'SIGTERM'];
 
 
