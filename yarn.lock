@@ -187,6 +187,11 @@
   dependencies:
     undici-types "~5.26.4"
 
+"@types/otp-generator@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/otp-generator/-/otp-generator-4.0.2.tgz#b1efdb53cfba356f13465d10fa513d1b7ae42b85"
+  integrity sha512-9+qqWzuFb332hXPbLgjUyOXlbcaTQkmkmqQjTduvNuOmPV5fW+iLv70JsVEhdUy0DWi4kY34++HDCaWl6N0AYg==
+
 "@types/require-from-string@^1.2.3":
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/@types/require-from-string/-/require-from-string-1.2.3.tgz#454ffa447f6556d7641d86684407d7b62e4430bd"

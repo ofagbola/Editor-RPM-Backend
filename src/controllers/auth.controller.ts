@@ -1,15 +1,16 @@
 import * as utils from '../utils/utils';
-import * as auth_services from '../services/auth.services';
+import * as services from '../services/auth.services';
 import { DataBaseError, RequestError } from '../utils/errors';
 import * as grpc from '@grpc/grpc-js';
+
 /**
- * SIGNUP  Controller.
+ * Signup  Controller.
  * @param  {grpc.Call} call
- *  * @param  {NextCall} callback
+ * @param  {grpc.requestCallback} callback
  *
  */
 
-export const signup = async (call: any, callback: any) => {
+export const signup = async (call: any, callback: any): Promise<void> => {
   try {
     const { email } = call.request;
 
@@ -17,12 +18,12 @@ export const signup = async (call: any, callback: any) => {
       email,
     };
 
-    const response = await auth_services.signUp(payload);
+    const response = await services.signUp(payload);
 
     callback(null, {
-      message: 'Successfully signed up',
-      statusCode: grpc.status.OK,
-      data: JSON.stringify(response),
+      message: response.message,
+      statusCode: response.code,
+      data: JSON.stringify(response.data),
     });
   } catch (error) {
     if (error instanceof DataBaseError) {
@@ -59,7 +60,7 @@ export const signup = async (call: any, callback: any) => {
 /**
  * Verify Account Controller.
  * @param  {grpc.Call} call
- *  * @param  {NextCall} callback
+ * @param  {grpc.requestCallback} callback
  *
  */
 
@@ -76,7 +77,7 @@ export const verifyAccount = (call: any, callback: any): void => {
 /**
  * Finish Up Account  Controller.
  * @param  {grpc.Call} call
- *  * @param  {NextCall} callback
+ * @param  {grpc.requestCallback} callback
  *
  */
 

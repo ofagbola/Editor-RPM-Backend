@@ -1,5 +1,6 @@
 import * as grpc from '@grpc/grpc-js';
 import Joi from 'joi';
+import * as otpGenerator from 'otp-generator';
 
 /**
  * Validate schema middleware.
@@ -66,4 +67,13 @@ export const buildErrorResponse = (
       })
     )
     .build();
+};
+
+export const generateOTP = async (): Promise<string> => {
+  return await otpGenerator.generate(6, {
+    upperCaseAlphabets: true,
+    lowerCaseAlphabets: false,
+    digits: true,
+    specialChars: false,
+  });
 };

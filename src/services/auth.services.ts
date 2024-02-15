@@ -1,17 +1,14 @@
-import { ISignupRequest } from 'src/interfaces/auth.interface';
-import * as auth_repository from '../repositories/auth.repositories';
-
-/**
- * @file auth service.
- */
+import { IResponse } from '../interfaces';
+import { ISignupRequest } from '../interfaces/auth.interface';
+import * as repository from '../repositories/auth.repositories';
 
 /**
  * Sign up.
  * @returns Promise
  */
-export const signUp = async (payload: ISignupRequest) => {
+export const signUp = async (payload: ISignupRequest): Promise<IResponse> => {
   try {
-    await auth_repository.signUp(payload);
+    return await repository.signUp(payload);
   } catch (error) {
     throw error;
   }
