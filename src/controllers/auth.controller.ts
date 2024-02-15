@@ -61,32 +61,174 @@ export const signup = async (call: any, callback: any): Promise<void> => {
  * Verify Account Controller.
  * @param  {grpc.Call} call
  * @param  {grpc.requestCallback} callback
- *
  */
 
-export const verifyAccount = (call: any, callback: any): void => {
+export const verifyAccount = async (
+  call: any,
+  callback: any
+): Promise<void> => {
   try {
-    console.log(call.request);
-    callback(null, {});
+    const { email, code } = call.request;
+
+    const payload = {
+      email,
+      code,
+    };
+
+    const response = await services.verifyAccount(payload);
+
+    callback(null, {
+      message: response.message,
+      statusCode: response.code,
+      data: JSON.stringify(response.data),
+    });
   } catch (error) {
-    console.log(error);
-    callback(error);
+    if (error instanceof DataBaseError) {
+      const errorResponse = utils.buildErrorResponse(
+        'Server error',
+        grpc.status.INTERNAL
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    } else if (error instanceof RequestError) {
+      const errorResponse = utils.buildErrorResponse(
+        error,
+        error.code ?? grpc.status.OK
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    } else {
+      const errorResponse = utils.buildErrorResponse(
+        'Server error',
+        grpc.status.INTERNAL
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    }
   }
 };
 
 /**
- * Finish Up Account  Controller.
+ * Finish Up Account Controller.
  * @param  {grpc.Call} call
  * @param  {grpc.requestCallback} callback
  *
  */
 
-export const finishUpAccount = (call: any, callback: any): void => {
+export const finishUpAccount = async (
+  call: any,
+  callback: any
+): Promise<void> => {
   try {
-    console.log(call.request);
-    callback(null, {});
+    const { first_name, last_name, email, date_of_birth, password } =
+      call.request;
+
+    const payload = {
+      first_name,
+      last_name,
+      email,
+      date_of_birth,
+      password,
+    };
+
+    const response = await services.updateAccount(payload);
+
+    callback(null, {
+      message: response.message,
+      statusCode: response.code,
+      data: JSON.stringify(response.data),
+    });
   } catch (error) {
-    console.log(error);
-    callback(error);
+    if (error instanceof DataBaseError) {
+      const errorResponse = utils.buildErrorResponse(
+        'Server error',
+        grpc.status.INTERNAL
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    } else if (error instanceof RequestError) {
+      const errorResponse = utils.buildErrorResponse(
+        error,
+        error.code ?? grpc.status.OK
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    } else {
+      const errorResponse = utils.buildErrorResponse(
+        'Server error',
+        grpc.status.INTERNAL
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    }
+  }
+};
+
+
+
+/**
+ * Login Controller.
+ * @param  {grpc.Call} call
+ * @param  {grpc.requestCallback} callback
+ *
+ */
+
+export const login = async (call: any, callback: any): Promise<void> => {
+  try {
+    const { email, password } = call.request;
+
+    const payload = {
+      email,
+      password,
+    };
+
+    const response = await services.login(payload);
+
+    callback(null, {
+      message: response.message,
+      statusCode: response.code,
+      data: JSON.stringify(response.data),
+    });
+  } catch (error) {
+    if (error instanceof DataBaseError) {
+      const errorResponse = utils.buildErrorResponse(
+        'Server error',
+        grpc.status.INTERNAL
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    } else if (error instanceof RequestError) {
+      const errorResponse = utils.buildErrorResponse(
+        error,
+        error.code ?? grpc.status.OK
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    } else {
+      const errorResponse = utils.buildErrorResponse(
+        'Server error',
+        grpc.status.INTERNAL
+      );
+      callback({
+        code: errorResponse.code,
+        message: errorResponse.details,
+      });
+    }
   }
 };

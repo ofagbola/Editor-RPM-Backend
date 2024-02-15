@@ -6,6 +6,11 @@ message SignupPayload {
 }
 
 
+message LoginPayload {
+   string email = 1;
+   string password = 2;
+}
+
 
 message FinishSignUpPayload {
    string first_name = 1;
@@ -17,7 +22,7 @@ message FinishSignUpPayload {
 
 message VerifyAccountPayload {
    string code = 1;
-   string phone_number = 2;
+   string email = 2;
 }
 
 message Response{
@@ -28,6 +33,7 @@ message Response{
 
 service AuthServices  {
    rpc Signup(SignupPayload) returns (Response){}
+   rpc Login(LoginPayload) returns (Response){}
    rpc VerifyAccount(VerifyAccountPayload) returns (Response){}
    rpc FinishUpAccount(FinishSignUpPayload) returns (Response){}
 }
