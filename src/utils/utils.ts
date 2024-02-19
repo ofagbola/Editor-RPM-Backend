@@ -10,6 +10,7 @@ import * as otpGenerator from 'otp-generator';
  */
 export const validateSchema = (schema: Joi.ObjectSchema<any>) => {
   return function (call: any, callback: any, next: any) {
+    console.log(call.request);
     try {
       const payload = call.request;
       const { error } = schema.validate(payload) as any;

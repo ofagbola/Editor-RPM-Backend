@@ -5,10 +5,16 @@ import { authProtoDefinition } from '../protos';
 import { applyMiddleware, authorizer } from '../middlewares/app.middleware';
 import { validateSchema } from '../utils/utils';
 import {
+  ClinicianSignUpSchema,
+  CreatePasswordSchema,
+  ForgotPasswordSchema,
   LoginSchema,
-  SignUpSchema,
+  PatientSignUpSchema,
+  ResetPasswordSchema,
   UpdateAccountSchema,
+  UpdatePatientInsuranceSchema,
   VerifyAccountSchema,
+  VerifyOtpSchema,
 } from '../schemas/auth.schema';
 
 /**
@@ -20,20 +26,49 @@ import {
 export const authRpcService = (server: grpc.Server | undefined): void => {
   try {
     server!.addService(authProtoDefinition.AuthServices.service, {
-      signup: applyMiddleware([
-        validateSchema(SignUpSchema),
-        controller.signup,
+      patientSignup: applyMiddleware([
+        validateSchema(PatientSignUpSchema),
+        controller.patientSignup,
       ]),
       verifyAccount: applyMiddleware([
         validateSchema(VerifyAccountSchema),
         controller.verifyAccount,
       ]),
 
-      finishUpAccount: applyMiddleware([
-        validateSchema(UpdateAccountSchema),
-        controller.finishUpAccount,
-      ]),
+      // finishUpAccount: applyMiddleware([
+      //   validateSchema(UpdateAccountSchema),
+      //   controller.finishUpAccount,
+      // ]),
+
       login: applyMiddleware([validateSchema(LoginSchema), controller.login]),
+
+      verifyOneTimePassword: applyMiddleware([
+        validateSchema(VerifyOtpSchema),
+        controller.verifyOneTimePassword,
+      ]),
+      resetPassword: applyMiddleware([
+        validateSchema(ResetPasswordSchema),
+        controller.resetPassword,
+      ]),
+      forgotPassword: applyMiddleware([
+        validateSchema(ForgotPasswordSchema),
+        controller.forgotPassword,
+      ]),
+
+      createPassword: applyMiddleware([
+        validateSchema(CreatePasswordSchema),
+        controller.createPassword,
+      ]),
+
+      updateInsurance: applyMiddleware([
+        validateSchema(UpdatePatientInsuranceSchema),
+        controller.updateInsurance,
+      ]),
+
+      clinicianSignup: applyMiddleware([
+        validateSchema(ClinicianSignUpSchema),
+        controller.clinicianSignup,
+      ]),
     });
   } catch (error) {
     logger.error(`Auth services failed to load ${error}`);
