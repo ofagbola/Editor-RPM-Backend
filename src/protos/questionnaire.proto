@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package questionnaire;
+
+import "google/protobuf/timestamp.proto";
+
+message Question {
+  string id = 1;
+  string question = 2;
+  repeated string answers = 3;
+  string type = 4;
+  string status = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message QuestionResponse { 
+  Question questionniare = 1; 
+}
+
+message GenericResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message DataResponse {
+  int32 code = 1;
+  repeated QuestionResponse data = 2;
+}

@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package questionnaire;
+
+import "questionnaire.proto";
+
+service QestionnaireService {
+  rpc GetQestionnaires(GetAllInput) returns (DataResponse) {}
+  rpc GetQestionnaire(GetOneInput) returns (DataResponse) {}
+  rpc CreateQestionnaire(CreateInput) returns (GenericResponse) {}
+  rpc UpdateQestionnaire(UpdateInput) returns (GenericResponse) {}
+  rpc DeleteQestionnaire(DeleteInput) returns (GenericResponse) {}
+}
+
+message GetAllInput { 
+    string access_token = 1; 
+}
+
+message GetOneInput { 
+    string access_token = 1; 
+    string id = 2;
+}
+
+message CreateInput { 
+    string access_token = 1; 
+    string question = 2;
+    repeated string answers = 3;
+    string type = 4;
+    string status = 5;
+}
+
+message UpdateInput { 
+    string access_token = 1; 
+    string question = 2;
+    repeated string answers = 3;
+    string type = 4;
+    string status = 5;
+    string id = 6;
+}
+
+message DeleteInput { 
+    string access_token = 1; 
+    string id = 2;
+}
