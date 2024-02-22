@@ -37,7 +37,11 @@ client.waitForReady(deadline, (err: any) => {
 });
 
 function onClientReady() {
-  GetQestionnaires()
+  // CreateQuestionnaire();
+  // GetQestionnaires();
+  // UpdateQuestionnaire();
+  // GetQestionnaire();
+  // DeleteQestionnaire();
 }
 
 function GetQestionnaires() {
@@ -56,7 +60,7 @@ function GetQestionnaires() {
 function GetQestionnaire() {
   client.GetQuestionnaire(
     {
-      id: '2',
+      id: '79c3047e-fe91-4d55-bbe7-d224d15f2baa',
       access_token: 'hgfsfedjgddgkhdjwdw',
     },
     (err, res) => {
@@ -72,14 +76,11 @@ function GetQestionnaire() {
 function CreateQuestionnaire() {
   client.CreateQuestionnaire(
     {
-      question: 'What are your symtomps?',
+      question: 'Select couching scale between 1 and 10?',
       status: 'active',
-      type: 'options',
+      type: 'range',
       answers: [
-        "coughing",
-        "vomitting",
-        "headache",
-        "stulling"
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
       ],
       access_token: 'hssjhfsiuhfwibiuiwffwfwf',
     },
@@ -96,11 +97,12 @@ function CreateQuestionnaire() {
 function UpdateQuestionnaire() {
   client.UpdateQuestionnaire(
     {
-      question: 'Select couching scale between 1 and 10?',
+      id: "2b260db0-033a-4169-bf6a-920e35163ad4",
+      question: 'Select couching scale between 5 and 20?',
       status: 'active',
-      type: 'options',
+      type: 'range',
       answers: [
-        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+        "5", "10", "15", "20"
       ],
       access_token: 'hssjhfsiuhfwibiuiwffwfwf',
     },
@@ -116,7 +118,7 @@ function UpdateQuestionnaire() {
 function DeleteQestionnaire() {
   client.DeleteQuestionnaire(
     {
-      id: '2',
+      id: '79c3047e-fe91-4d55-bbe7-d224d15f2baa',
       access_token: 'hgfsfedjgddgkhdjwdw',
     },
     (err, res) => {

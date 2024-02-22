@@ -37,7 +37,8 @@ client.waitForReady(deadline, (err: any) => {
 });
 
 function onClientReady() {
-  GetQestionnaires()
+  // CreateAnswer();
+  GetQestionnaires();
 }
 
 function GetQestionnaires() {
@@ -72,7 +73,7 @@ function GetQestionnaire() {
 function CreateAnswer() {
   client.CreateAnswer(
     {
-      question: '2',
+      question: '2b260db0-033a-4169-bf6a-920e35163ad4',
       status: 'active',
       answer: 3,
       access_token: 'hssjhfsiuhfwibiuiwffwfwf',

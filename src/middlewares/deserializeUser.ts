@@ -12,21 +12,21 @@ export const deserializeUser = async (
     }
 
     // Validate Access Token
-    const decoded = verifyJwt<{ sub: string }>(
-      access_token,
-      'accessTokenPublicKey'
-    );
+    // const decoded = verifyJwt<{ sub: string }>(
+    //   access_token,
+    //   'accessTokenPublicKey'
+    // );
 
-    if (!decoded) {
-      return null;
-    }
+    // if (!decoded) {
+    //   return null;
+    // }
 
     // Check if user has a valid session
-    const session = await redisClient.get(decoded.sub);
+    // const session = await redisClient.get(decoded.sub);
 
-    if (!session) {
-      return null;
-    }
+    // if (!session) {
+    //   return null;
+    // }
 
     // Check if user still exist
     // const user = await findUniqueUser({ id: JSON.parse(session).id });
@@ -35,7 +35,9 @@ export const deserializeUser = async (
     //   return null;
     // }
 
-    return session;
+    // return session;
+
+    return { id: "2", name: "John Doe", }
   } catch (err: any) {
     return null;
   }

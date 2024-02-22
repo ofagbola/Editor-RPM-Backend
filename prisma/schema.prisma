@@ -27,9 +27,9 @@ model Answer {
   @@map(name: "answers")
 
   id String  @id @default(uuid())
-  question String @db.Uuid
+  question String @db.VarChar(255)
   answer Int @db.SmallInt
-  user String @db.Uuid
+  user String @db.VarChar(255)
   status String @db.VarChar(255)
 
   created_at DateTime @default(now())

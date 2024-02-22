@@ -39,7 +39,8 @@
     "start": "npm install && ts-node --esm ./src/server.ts",
     "start:watch": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node --esm ./src/server.ts\"",
     "start:server": "ts-node-dev --respawn --transpile-only ./src/server.ts",
-    "start:client": "ts-node-dev --transpile-only ./src/tests/questionnaire.tests.ts"
+    "test:question": "ts-node-dev --transpile-only ./src/tests/questionnaire.tests.ts",
+    "test:answer": "ts-node-dev --transpile-only ./src/tests/answer.tests.ts"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.5",

@@ -51,7 +51,7 @@ export const CreateQuestionnaire = async (
       });
     }
 
-    res({ code: grpc.status.INTERNAL, message: err.message });
+    res({ code: grpc.status.INTERNAL, message: err.message.details });
   }
 };
 
@@ -71,6 +71,7 @@ export const GetQuestionnaires = async (
     }
 
     const questions = await findQuestion({ ...req.request.request_query });
+
     const formattedQuestions = questions.map(question => ({
       ...question,
       created_at: { 
@@ -112,6 +113,14 @@ export const GetQuestionnaire = async (
 
     const question = await findUniqueQuestion({ id: req.request.id });
 
+    if(!question) {
+      res({
+        code: grpc.status.NOT_FOUND,
+        message: 'Question not found!',
+      });
+      return;
+    }
+
     res(null, {
       code: grpc.status.OK,
       data: {
@@ -133,7 +142,7 @@ export const GetQuestionnaire = async (
   } catch (err: any) {
     res({
       code: grpc.status.INTERNAL,
-      message: err.message,
+      message: err.message.details,
     });
   }
 };
@@ -169,7 +178,7 @@ export const UpdateQuestionnaire = async (
       });
     }
 
-    res({ code: grpc.status.INTERNAL, message: err.message });
+    res({ code: grpc.status.INTERNAL, message: err.message.details });
   }
 };
 
@@ -197,7 +206,7 @@ export const DeleteQuestionnaire = async (
   } catch (err: any) {
     res({
       code: grpc.status.INTERNAL,
-      message: err.message,
+      message: err.message.details,
     });
   }
 };
