@@ -22,3 +22,16 @@ model Question {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
+
+model Answer {
+  @@map(name: "answers")
+
+  id String  @id @default(uuid())
+  question String @db.Uuid
+  answer Int @db.SmallInt
+  user String @db.Uuid
+  status String @db.VarChar(255)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}

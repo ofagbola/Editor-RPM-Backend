@@ -26,7 +26,7 @@ export const validateSchema = (schema: AnySchema) => {
       const res = buildErrorResponse(errors, grpc.status.INVALID_ARGUMENT);
       callback({
         code: res.code,
-        details: res.details,
+        message: res.details,
       });
     }
 

@@ -11,13 +11,13 @@ export const createQuestion = async (input: Prisma.QuestionCreateInput) => {
 };
 
 export const findQuestion = async (
-  where: Partial<Prisma.QuestionCreateInput>,
+  where: Prisma.QuestionWhereInput,
   select?: Prisma.QuestionSelect
 ) => {
-  return (await prisma.question.findFirst({
+  return (await prisma.question.findMany({
     where,
     select,
-  })) as Question;
+  })) as Question[];
 };
 
 export const findUniqueQuestion = async (
@@ -31,11 +31,18 @@ export const findUniqueQuestion = async (
 };
 
 export const updateQuestion = async (
-  where: Partial<Prisma.QuestionWhereUniqueInput>,
+  where: Prisma.QuestionWhereUniqueInput,
   data: Prisma.QuestionUpdateInput,
   select?: Prisma.QuestionSelect
 ) => {
   return (await prisma.question.update({ where, data, select })) as Question;
+};
+
+export const deleteQuestion = async (
+  where: Prisma.QuestionWhereUniqueInput,
+  select?: Prisma.QuestionSelect
+) => {
+  return (await prisma.question.delete({ where, select })) as Question;
 };
 
 // export const signTokens = async (user: Prisma.QuestionCreateInput) => {

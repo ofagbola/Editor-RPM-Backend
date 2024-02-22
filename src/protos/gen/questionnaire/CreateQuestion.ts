@@ -1,20 +1,18 @@
-// Original file: src/protos/services.proto
+// Original file: src/protos/questionnaire.proto
 
 
-export interface UpdateInput {
+export interface CreateQuestion {
   'access_token'?: (string);
   'question'?: (string);
   'answers'?: (string)[];
   'type'?: (string);
   'status'?: (string);
-  'id'?: (string);
 }
 
-export interface UpdateInput__Output {
+export interface CreateQuestion__Output {
   'access_token': (string);
   'question': (string);
   'answers': (string)[];
   'type': (string);
   'status': (string);
-  'id': (string);
 }

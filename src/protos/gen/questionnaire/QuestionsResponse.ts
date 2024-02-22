@@ -2,12 +2,12 @@
 
 import type { Question as _questionnaire_Question, Question__Output as _questionnaire_Question__Output } from '../questionnaire/Question';
 
-export interface QuestionResponse {
+export interface QuestionsResponse {
   'code'?: (number);
-  'data'?: (_questionnaire_Question | null);
+  'data'?: (_questionnaire_Question)[];
 }
 
-export interface QuestionResponse__Output {
+export interface QuestionsResponse__Output {
   'code': (number);
-  'data': (_questionnaire_Question__Output | null);
+  'data': (_questionnaire_Question__Output)[];
 }

@@ -1,5 +1,4 @@
 import { Question } from '@prisma/client';
-import { findUniqueQuestion } from '../services/questionnaire.service';
 import redisClient from '../utils/connectRedis';
 import { verifyJwt } from '../utils/jwt';
 
