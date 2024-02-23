@@ -1,0 +1,18 @@
+{
+  "name": "editor-rpm-backend",
+  "version": "1.0.0",
+  "description": "### Branching Strategy: 1. **Master Branch:**    - The `master` branch is considered the stable and production-ready branch.    - Direct commits to `master` are restricted; changes should be merged through pull requests (PRs).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "request": "^2.88.2"
+  }
+}
