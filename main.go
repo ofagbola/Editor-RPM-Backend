@@ -13,17 +13,21 @@ import (
 // var redisClient *redis.Client
 
 func main() {
-
+	
 	// connect to Database
-	dboperations.ConnectToDatabase(constants.PostgresConnectionString)
+	db,db_err :=dboperations.ConnectToDatabase(constants.PostgresConnectionString)
 
+	if db_err != nil {
+		log.Fatal("Failed to start Database", db_err)
+	}
 	// for setting up user connection
 
 	ucm := services.NewUserConnectionManager()
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		services.HandleWebSocketConnections(ucm, w, r)
+		services.HandleWebSocketConnections(ucm, w, r,db)
 	})
+	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {services.HandleFileUpload(ucm, w, r,db)})
 
 	log.Println("Starting WebSocket server on port 8080...")
 	// start http server

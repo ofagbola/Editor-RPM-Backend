@@ -1,11 +1,20 @@
 package services
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
 	"sync"
+	"time"
+	"websocket-chat/dboperations"
+	"websocket-chat/models"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -21,7 +30,6 @@ type UserConnectionManager struct {
 	connections map[string]*websocket.Conn
 	mutex       sync.Mutex
 }
-
 
 func NewUserConnectionManager() *UserConnectionManager {
 
@@ -51,9 +59,10 @@ func (ucm *UserConnectionManager) GetConnection(userID string) *websocket.Conn {
 	return ucm.connections[userID]
 }
 
-func (ucm *UserConnectionManager) SendMessage(userID string, message string) error {
+func (ucm *UserConnectionManager) SendMessage(userID string, message string, db *sql.DB, message_model models.Message, fileContent ...[]byte) error {
 	conn := ucm.GetConnection(userID)
 	// save to database
+	dboperations.InsertOrUpdateMessage(db, message_model)
 	// dboperations.ConnectToDatabase(constants.)
 	// connectionString := dboperations.
 
@@ -67,6 +76,16 @@ func (ucm *UserConnectionManager) SendMessage(userID string, message string) err
 		}
 	}
 
+	// Send the file content as binary data
+	// Conditionally send the file content as binary data
+	// Conditionally send the file content as binary data
+	if len(fileContent) > 0 {
+		err := conn.WriteMessage(websocket.BinaryMessage, fileContent[0])
+		if err != nil {
+			log.Println("Failed to send file content over WebSocket:", err)
+			return err
+		}
+	}
 	return nil
 }
 
@@ -75,7 +94,7 @@ func (ucm *UserConnectionManager) IsUserOnline(userID string) bool {
 	return conn != nil
 }
 
-func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request) {
+func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// Upgrade the HTTP connection to a WebSocket connection
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -111,7 +130,8 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 			// Define a struct to match the structure of the JSON data
 			type Bit struct {
 				Message      string   `json:"message"`
-				UserID       string   `json:"userID"`
+				RecipientID  string   `json:"recipient_id"`
+				SenderID     string   `json:"sender_id"`
 				IsGroupChat  bool     `json:"isGroupChat"`
 				GroupUserIDs []string `json:"groupUserIDs"`
 			}
@@ -126,28 +146,113 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 			}
 			// Extract individual data
 			messageValue := parsedBit.Message
-			userID := parsedBit.UserID
+			RecipientID := parsedBit.RecipientID
+			SenderID := parsedBit.SenderID
 			isGroupChat := parsedBit.IsGroupChat
 			groupUserIDs := parsedBit.GroupUserIDs
+
+			recipient_id, err := strconv.ParseInt(RecipientID, 10, 64)
+			if err != nil {
+				// Handle error
+				fmt.Println("Invalid RecipientID format")
+				return
+			}
+			sender_id, err := strconv.ParseInt(SenderID, 10, 64)
+			if err != nil {
+				// Handle error
+				fmt.Println("Invalid RecipientID format")
+				return
+			}
+
+			// define the message structure
+			// Insert or append a message to the chat table
+			message := models.Message{
+				MessageSent:       messageValue,
+				DocOrAttachmentID: 123,
+				RecipientID:       int(recipient_id),
+				SenderID:          int(sender_id),
+				CreatedAt:         time.Now().UTC(),
+				MessageType:       "text",
+			}
 
 			// save to database
 
 			if isGroupChat {
 				// Handle group chat message
 				for _, groupUserID := range groupUserIDs {
-					ucm.SendMessage(groupUserID, messageValue)
+					ucm.SendMessage(groupUserID, messageValue, db, message)
 				}
 			} else {
 				// Handle individual chat message
-				ucm.SendMessage(userID, messageValue)
+				ucm.SendMessage(userID, messageValue, db, message)
 			}
 
-			log.Printf("Received message from user ID %s: %s", userID, string(message))
+			log.Printf("Received message from user ID %s: %s", userID, string(message.MessageSent))
 
 			// Process the received message or perform any required actions
 			// ...
 		}
 	}
+}
+
+func HandleFileUpload(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	file, fileHeader, err := r.FormFile("file") // Assuming file is uploaded using a form field with name "file"
+	if err != nil {
+		http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	fileContent, err := io.ReadAll(file)
+	if err != nil {
+		http.Error(w, "Failed to read file content", http.StatusInternalServerError)
+		return
+	}
+
+	// Save the file to a folder called "fileUploads"
+	fileName := fileHeader.Filename
+	filePath := filepath.Join("fileUploads", fileName)
+	err = os.WriteFile(filePath, fileContent, 0644)
+	if err != nil {
+		http.Error(w, "Failed to save file", http.StatusInternalServerError)
+		return
+	}
+
+	// Generate the file URL
+	fileURL := fmt.Sprintf("http://localhost:8080/%s", filePath)
+
+	// Create a message with the file details
+	message := models.Message{
+		MessageSent:       "File uploaded",
+		DocOrAttachmentID: 0,   // Set the appropriate ID for the document
+		RecipientID:       789, // Set the recipient ID
+		SenderID:          456, // Set the sender ID
+		CreatedAt:         time.Now().UTC(),
+		MessageType:       "file",
+		DocumentURL:       fileURL,
+	}
+
+	// Write the file details to the table
+	fileDetails := models.FileDetails{
+		FileURL:      fileURL,
+		FileLocation: filePath,
+		FileType:     fileHeader.Header.Get("Content-Type"),
+		CreatedAt:    time.Now().UTC(),
+		Deleted:      false,
+	}
+
+	// Call the function to save the file details to the table
+	err = dboperations.WriteToFileTable(fileDetails, db)
+	if err != nil {
+		http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
+		return
+	}
+
+	// Send the message over WebSocket
+	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message,fileContent)
+
+	// Respond with success message
+	w.Write([]byte("File uploaded successfully"))
 }
 
 // request example

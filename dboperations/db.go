@@ -31,12 +31,7 @@ func ConnectToDatabase(connStr string) (*sql.DB, error) {
 	return db, nil
 }
 
-func SaveMessage(msg models.Message, recipientID string, connectionID string) {
-	fmt.Println("send message")
-}
-func CreateNewRowAndSaveMessage(msg models.Message, recipientID string, connectionID string) {
-	fmt.Println("create new message")
-}
+// the message is saved based on created_at
 func InsertOrUpdateMessage(db *sql.DB, message models.Message) error {
 	// Check if a record with the same created_at exists for the user
 	query := `
@@ -110,4 +105,20 @@ func FetchMessages(db *sql.DB, userID int) ([]models.Message, error) {
 	}
 
 	return messages, nil
+}
+
+func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) error{
+	query := `
+		INSERT INTO file_table (file_url, file_location, file_type, created_at, deleted, deleted_at)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id`
+
+	var fileID int
+	err := db.QueryRow(query, fileDetails.FileURL, fileDetails.FileLocation, fileDetails.FileType, fileDetails.CreatedAt, fileDetails.Deleted, fileDetails.DeletedAt).Scan(&fileID)
+	if err != nil {
+		return err
+	}
+
+	fileDetails.ID = fileID
+	return nil
 }
