@@ -124,7 +124,7 @@ func FetchMessages(db *sql.DB, userID int) ([]models.Message, error) {
 	return messages, nil
 }
 
-func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) error {
+func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) (fileId int,fileUploadError error) {
 	query := `
 		INSERT INTO file (file_url, file_location, file_type, created_at, deleted, deleted_at)
 		VALUES ($1, $2, $3, $4, $5, $6)
@@ -133,9 +133,9 @@ func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) error {
 	var fileID int
 	err := db.QueryRow(query, fileDetails.FileURL, fileDetails.FileLocation, fileDetails.FileType, fileDetails.CreatedAt, fileDetails.Deleted, fileDetails.DeletedAt).Scan(&fileID)
 	if err != nil {
-		return err
+		return 0,err
 	}
 
 	fileDetails.ID = fileID
-	return nil
+	return fileID,err
 }

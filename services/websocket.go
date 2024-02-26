@@ -60,7 +60,7 @@ func (ucm *UserConnectionManager) GetConnection(userID string) *websocket.Conn {
 	return ucm.connections[userID]
 }
 
-func (ucm *UserConnectionManager) SendMessage(userID string, message string, db *sql.DB, message_model models.Message, fileContent ...[]byte) error {
+func (ucm *UserConnectionManager) SendMessage(userID string, message string, db *sql.DB, message_model models.Message, fileContent ...string) error {
 	conn := ucm.GetConnection(userID)
 	// save to database
 	err:=dboperations.SaveMessageToDb(db, message_model)
@@ -85,7 +85,7 @@ func (ucm *UserConnectionManager) SendMessage(userID string, message string, db 
 	// Conditionally send the file content as binary data
 	// Conditionally send the file content as binary data
 	if len(fileContent) > 0 {
-		err := conn.WriteMessage(websocket.BinaryMessage, fileContent[0])
+		err := conn.WriteMessage(websocket.TextMessage, []byte(fileContent[0]))
 		if err != nil {
 			log.Println("Failed to send file content over WebSocket:", err)
 			return err
@@ -217,65 +217,65 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 	}
 }
 
-func HandleFileUpload0(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	file, fileHeader, err := r.FormFile("file") // Assuming file is uploaded using a form field with name "file"
-	if err != nil {
-		http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
+// func HandleFileUpload0(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
+// 	file, fileHeader, err := r.FormFile("file") // Assuming file is uploaded using a form field with name "file"
+// 	if err != nil {
+// 		http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
+// 		return
+// 	}
+// 	defer file.Close()
 
-	fileContent, err := io.ReadAll(file)
-	if err != nil {
-		http.Error(w, "Failed to read file content", http.StatusInternalServerError)
-		return
-	}
+// 	fileContent, err := io.ReadAll(file)
+// 	if err != nil {
+// 		http.Error(w, "Failed to read file content", http.StatusInternalServerError)
+// 		return
+// 	}
 
-	// Save the file to a folder called "fileUploads"
-	fileName := fileHeader.Filename
-	filePath := filepath.Join("fileUploads", fileName)
-	err = os.WriteFile(filePath, fileContent, 0644)
-	if err != nil {
-		http.Error(w, "Failed to save file", http.StatusInternalServerError)
-		return
-	}
+// 	// Save the file to a folder called "fileUploads"
+// 	fileName := fileHeader.Filename
+// 	filePath := filepath.Join("fileUploads", fileName)
+// 	err = os.WriteFile(filePath, fileContent, 0644)
+// 	if err != nil {
+// 		http.Error(w, "Failed to save file", http.StatusInternalServerError)
+// 		return
+// 	}
 
-	// Generate the file URL
-	fileURL := fmt.Sprintf("http://localhost:8080/%s", filePath)
+// 	// Generate the file URL
+// 	fileURL := fmt.Sprintf("http://localhost:8080/%s", filePath)
 
-	// Create a message with the file details
-	message := models.Message{
-		MessageSent:       "File uploaded",
-		DocOrAttachmentID: 0,   // Set the appropriate ID for the document
-		RecipientID:       789, // Set the recipient ID
-		SenderID:          456, // Set the sender ID
-		CreatedAt:         time.Now().UTC(),
-		MessageType:       "file",
-		DocumentURL:       fileURL,
-	}
+// 	// Create a message with the file details
+// 	message := models.Message{
+// 		MessageSent:       "File uploaded",
+// 		DocOrAttachmentID: 0,   // Set the appropriate ID for the document
+// 		RecipientID:       789, // Set the recipient ID
+// 		SenderID:          456, // Set the sender ID
+// 		CreatedAt:         time.Now().UTC(),
+// 		MessageType:       "file",
+// 		DocumentURL:       fileURL,
+// 	}
 
-	// Write the file details to the table
-	fileDetails := models.FileDetails{
-		FileURL:      fileURL,
-		FileLocation: filePath,
-		FileType:     fileHeader.Header.Get("Content-Type"),
-		CreatedAt:    time.Now().UTC(),
-		Deleted:      false,
-	}
+// 	// Write the file details to the table
+// 	fileDetails := models.FileDetails{
+// 		FileURL:      fileURL,
+// 		FileLocation: filePath,
+// 		FileType:     fileHeader.Header.Get("Content-Type"),
+// 		CreatedAt:    time.Now().UTC(),
+// 		Deleted:      false,
+// 	}
 
-	// Call the function to save the file details to the table
-	err = dboperations.WriteToFileTable(fileDetails, db)
-	if err != nil {
-		http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
-		return
-	}
+// 	// Call the function to save the file details to the table
+// 	err = dboperations.WriteToFileTable(fileDetails, db)
+// 	if err != nil {
+// 		http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
+// 		return
+// 	}
 
-	// Send the message over WebSocket
-	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileContent)
+// 	// Send the message over WebSocket
+// 	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileContent)
 
-	// Respond with success message
-	w.Write([]byte("File uploaded successfully"))
-}
+// 	// Respond with success message
+// 	w.Write([]byte("File uploaded successfully"))
+// }
 
 func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("File Upload Endpoint Hit")
@@ -328,34 +328,33 @@ func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Reque
     fileURL := fmt.Sprintf("%s/uploads/%s", constants.BaseURL, fileName)
     fmt.Fprintf(w, "File uploaded successfully. You can access it at: %s", fileURL)
 
-	// // Write the file details to the table
-	// fileDetails := models.FileDetails{
-	// 	FileURL:      fileURL,
-	// 	FileLocation: filePath,
-	// 	FileType:     handler.Header.Get("Content-Type"),
-	// 	CreatedAt:    time.Now().UTC(),
-	// 	Deleted:      false,
-	// }
+	// Write the file details to the table
+	fileDetails := models.FileDetails{
+		FileURL:      fileURL,
+		FileLocation: filePath,
+		FileType:     handler.Header.Get("Content-Type"),
+		CreatedAt:    time.Now().UTC(),
+		Deleted:      false,
+	}
 	
 
 
-	// // Call the function to save the file details to the table
-	// err = dboperations.WriteToFileTable(fileDetails, db)
-	// if err != nil {
-	// 	http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
-	// 	return
-	// }
+	// Call the function to save the file details to the table
+	fileId,err := dboperations.WriteToFileTable(fileDetails, db)
+	if err != nil {
+		http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
+		return
+	}
 
-	// message := models.Message{
-	// 	MessageSent:       "File uploaded",
-	// 	DocOrAttachmentID: 0,   // Set the appropriate ID for the document
-	// 	RecipientID:       789, // Set the recipient ID
-	// 	SenderID:          456, // Set the sender ID
-	// 	CreatedAt:         time.Now().UTC(),
-	// 	MessageType:       "file",
-	// 	DocumentURL:       fileURL,
-	// }
-
+	message := models.Message{
+		MessageSent:       "File uploaded",
+		DocOrAttachmentID: fileId,   // Set the appropriate ID for the document
+		RecipientID:       789, // Set the recipient ID
+		SenderID:          456, // Set the sender ID
+		CreatedAt:         time.Now().UTC(),
+		MessageType:       "file",
+		DocumentURL:       fileURL,
+	}
 
 	// // get file content
 	// fileContent, err := io.ReadAll(file)
@@ -365,81 +364,13 @@ func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Reque
 	// }
 
 	// // Send the message over WebSocket
-	// ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileContent)
-
-	// // Respond with success message
-	// w.Write([]byte("File uploaded successfully"))
-
-}
-
-func HandleFileUpload(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	// Parse the multipart form
-	err := r.ParseMultipartForm(10 << 20) // Limit the file size to 10MB
-	if err != nil {
-		http.Error(w, "Failed to parse multipart form", http.StatusInternalServerError)
-		return
-	}
-
-	// Get the file from the form
-	file, fileHeader, err := r.FormFile("file")
-	if err != nil {
-		http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
-
-	// Read the file content
-	fileContent, err := io.ReadAll(file)
-	if err != nil {
-		http.Error(w, "Failed to read file content", http.StatusInternalServerError)
-		return
-	}
-
-	// Save the file to a folder called "fileUploads"
-	fileName := filepath.Base(fileHeader.Filename) // Get only the file name
-	filePath := filepath.Join("fileUploads", fileName)
-	err = os.WriteFile(filePath, fileContent, 0644)
-	if err != nil {
-		http.Error(w, "Failed to save file", http.StatusInternalServerError)
-		return
-	}
-
-	// Generate the file URL
-	fileURL := fmt.Sprintf("%s/%s", constants.BaseURL, filePath)
-
-	// Create a message with the file details
-	message := models.Message{
-		MessageSent:       "File uploaded",
-		DocOrAttachmentID: 0,   // Set the appropriate ID for the document
-		RecipientID:       789, // Set the recipient ID
-		SenderID:          456, // Set the sender ID
-		CreatedAt:         time.Now().UTC(),
-		MessageType:       "file",
-		DocumentURL:       fileURL,
-	}
-
-	// Write the file details to the table
-	fileDetails := models.FileDetails{
-		FileURL:      fileURL,
-		FileLocation: filePath,
-		FileType:     fileHeader.Header.Get("Content-Type"),
-		CreatedAt:    time.Now().UTC(),
-		Deleted:      false,
-	}
-
-	// Call the function to save the file details to the table
-	err = dboperations.WriteToFileTable(fileDetails, db)
-	if err != nil {
-		http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
-		return
-	}
-
-	// Send the message over WebSocket
-	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileContent)
+	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileURL)
 
 	// Respond with success message
 	w.Write([]byte("File uploaded successfully"))
+
 }
+
 
 // request example
 // {
