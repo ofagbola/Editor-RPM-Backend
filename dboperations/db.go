@@ -37,12 +37,11 @@ func ConnectToDatabase(connStr string) (*sql.DB, error) {
 func SaveMessageToDb(db *sql.DB, message models.Message) error {
 	// Get the current date
 	currentDate := time.Now().Truncate(24 * time.Hour)
-	  // Convert message struct to JSON
-	  messageJSON, errr := json.Marshal(message)
-	  if errr != nil {
-		  log.Fatal(errr)
-	  }
-  
+	// Convert message struct to JSON
+	messageJSON, errr := json.Marshal(message)
+	if errr != nil {
+		log.Fatal(errr)
+	}
 
 	// Check if a record exists for the given user_id_1 and user_id_2
 	var createdAt time.Time
@@ -60,26 +59,35 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 	case err != nil:
 		log.Fatal(err)
 	default:
-		if createdAt.Truncate(24 * time.Hour).Equal(currentDate) {
+		fmt.Println(currentDate)
+		fmt.Println(createdAt.Truncate(24 * time.Hour))
+		createdAtDate := createdAt.Truncate(24 * time.Hour)
+		currentDateDate := currentDate.Truncate(24 * time.Hour)
+		equal := createdAtDate.Year() == currentDateDate.Year() &&
+			createdAtDate.Month() == currentDateDate.Month() &&
+			createdAtDate.Day() == currentDateDate.Day()
+		fmt.Println(equal)	
+
+		if equal {
 
 			// Unmarshal the existing message_array into a slice of Message structs
 			var existingMessages []models.Message
 			if unmarshal_err := json.Unmarshal(messageArray, &existingMessages); err != nil {
 				log.Fatal(unmarshal_err)
 			}
-			
+
 			// Append the new message to the existing messages
 			existingMessages = append(existingMessages, message)
-			
+
 			// Marshal the updated messages back to JSON
 			updatedMessageArray, errr := json.Marshal(existingMessages)
 			if errr != nil {
 				log.Fatal(errr)
 			}
-				
+
 			// Update the existing record by appending the current message
 			_, err := db.Exec("UPDATE chat SET message_array = message_array || $1, updated_at = $2 WHERE user_id_1 = $3 AND user_id_2 = $4",
-			updatedMessageArray, time.Now(), message.SenderID, message.RecipientID)
+				updatedMessageArray, time.Now(), message.SenderID, message.RecipientID)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -124,7 +132,7 @@ func FetchMessages(db *sql.DB, userID int) ([]models.Message, error) {
 	return messages, nil
 }
 
-func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) (fileId int,fileUploadError error) {
+func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) (fileId int, fileUploadError error) {
 	query := `
 		INSERT INTO file (file_url, file_location, file_type, created_at, deleted, deleted_at)
 		VALUES ($1, $2, $3, $4, $5, $6)
@@ -133,9 +141,9 @@ func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) (fileId int,fi
 	var fileID int
 	err := db.QueryRow(query, fileDetails.FileURL, fileDetails.FileLocation, fileDetails.FileType, fileDetails.CreatedAt, fileDetails.Deleted, fileDetails.DeletedAt).Scan(&fileID)
 	if err != nil {
-		return 0,err
+		return 0, err
 	}
 
 	fileDetails.ID = fileID
-	return fileID,err
+	return fileID, err
 }
