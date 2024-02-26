@@ -277,6 +277,101 @@ func HandleFileUpload0(ucm *UserConnectionManager, w http.ResponseWriter, r *htt
 	w.Write([]byte("File uploaded successfully"))
 }
 
+func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	fmt.Println("File Upload Endpoint Hit")
+
+	// Parse our multipart form, 10 << 20 specifies a maximum
+	// upload of 10 MB files.
+	r.ParseMultipartForm(10 << 20)
+	// FormFile returns the first file for the given key `myFile`
+	// it also returns the FileHeader so we can get the Filename,
+	// the Header and the size of the file
+	file, handler, err := r.FormFile("myFile")
+	if err != nil {
+		fmt.Println("Error Retrieving the File")
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
+	fmt.Printf("File Size: %+v\n", handler.Size)
+	fmt.Printf("MIME Header: %+v\n", handler.Header)
+
+
+    // Create a folder for file uploads if it doesn't exist
+    uploadsDir := "./uploads"
+    err = os.MkdirAll(uploadsDir, os.ModePerm)
+    if err != nil {
+        http.Error(w, "Failed to create uploads directory", http.StatusInternalServerError)
+        return
+    }
+
+    // Save the file to the uploads directory
+    fileName := handler.Filename
+    filePath := filepath.Join(uploadsDir, fileName)
+    newFile, err := os.Create(filePath)
+    if err != nil {
+        http.Error(w, "Failed to save file", http.StatusInternalServerError)
+        return
+    }
+    defer newFile.Close()
+
+    // Copy the file content to the newly created file
+    _, err = io.Copy(newFile, file)
+    if err != nil {
+        http.Error(w, "Failed to copy file content", http.StatusInternalServerError)
+        return
+    }
+
+    // Respond with the URL to access the uploaded file
+    // fileURL := fmt.Sprintf("http://localhost:8009/uploads/%s", fileName)
+    fileURL := fmt.Sprintf("%s/uploads/%s", constants.BaseURL, fileName)
+    fmt.Fprintf(w, "File uploaded successfully. You can access it at: %s", fileURL)
+
+	// // Write the file details to the table
+	// fileDetails := models.FileDetails{
+	// 	FileURL:      fileURL,
+	// 	FileLocation: filePath,
+	// 	FileType:     handler.Header.Get("Content-Type"),
+	// 	CreatedAt:    time.Now().UTC(),
+	// 	Deleted:      false,
+	// }
+	
+
+
+	// // Call the function to save the file details to the table
+	// err = dboperations.WriteToFileTable(fileDetails, db)
+	// if err != nil {
+	// 	http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// message := models.Message{
+	// 	MessageSent:       "File uploaded",
+	// 	DocOrAttachmentID: 0,   // Set the appropriate ID for the document
+	// 	RecipientID:       789, // Set the recipient ID
+	// 	SenderID:          456, // Set the sender ID
+	// 	CreatedAt:         time.Now().UTC(),
+	// 	MessageType:       "file",
+	// 	DocumentURL:       fileURL,
+	// }
+
+
+	// // get file content
+	// fileContent, err := io.ReadAll(file)
+	// if err != nil {
+	// 	http.Error(w, "Failed to read file content", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// // Send the message over WebSocket
+	// ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileContent)
+
+	// // Respond with success message
+	// w.Write([]byte("File uploaded successfully"))
+
+}
+
 func HandleFileUpload(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// Parse the multipart form
 	err := r.ParseMultipartForm(10 << 20) // Limit the file size to 10MB

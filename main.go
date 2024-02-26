@@ -25,9 +25,9 @@ func main() {
 
 	ucm := services.NewUserConnectionManager()
 
-	// http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-	// 	services.HandleWebSocketConnections(ucm, w, r, db)
-	// })
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		services.HandleWebSocketConnections(ucm, w, r, db)
+	})
 	
 
 	go func() {
@@ -36,9 +36,13 @@ func main() {
 			log.Fatal("WebSocket server error:", err)
 		}
 	}()
-	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) { services.HandleFileUpload(ucm, w, r, db) })
+	// http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) { services.HandleFileUpload(ucm, w, r, db) })
+	http.HandleFunc("/upload/", func(w http.ResponseWriter, r *http.Request) { services.UploadFile(ucm, w, r, db) })
 
 	http.HandleFunc("/", handleHTTP)
+
+	// Serve files in the uploads directory
+	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
 
 	log.Println("Starting WebSocket server on port 8080...")
 	// start http server
