@@ -25,7 +25,7 @@ type Message struct {
 	VideoDuration    int       `json:"video_duration"`
 	SenderID         int       `json:"id_of_sender"`
 	RecipientID         int       `json:"recipient_id"`
-	ReadAt           time.Time  `json:"read_at,omitempty"`
+	ReadAt           time.Time  `json:"read_at"`
 	CreatedAt        time.Time `json:"created_at"`
 	MessageType      string    `json:"message_type"`
 }

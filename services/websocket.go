@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"websocket-chat/constants"
 	"websocket-chat/dboperations"
 	"websocket-chat/models"
 
@@ -62,7 +63,11 @@ func (ucm *UserConnectionManager) GetConnection(userID string) *websocket.Conn {
 func (ucm *UserConnectionManager) SendMessage(userID string, message string, db *sql.DB, message_model models.Message, fileContent ...[]byte) error {
 	conn := ucm.GetConnection(userID)
 	// save to database
-	dboperations.InsertOrUpdateMessage(db, message_model)
+	err:=dboperations.SaveMessageToDb(db, message_model)
+	if err != nil {
+		fmt.Println(err)
+		return  err
+	}
 	// dboperations.ConnectToDatabase(constants.)
 	// connectionString := dboperations.
 
@@ -123,7 +128,7 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 
 		// Check if the message is valid JSON
 		if !json.Valid(message) {
-			fmt.Println("Received message is not valid JSON.")
+			fmt.Println("Received message is not valid JSON.", message)
 			return
 		} else {
 
@@ -151,28 +156,12 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 			isGroupChat := parsedBit.IsGroupChat
 			groupUserIDs := parsedBit.GroupUserIDs
 
-			recipient_id, err := strconv.ParseInt(RecipientID, 10, 64)
-			if err != nil {
-				// Handle error
-				fmt.Println("Invalid RecipientID format")
-				return
-			}
 			sender_id, err := strconv.ParseInt(SenderID, 10, 64)
 			if err != nil {
 				// Handle error
-				fmt.Println("Invalid RecipientID format")
+				fmt.Println("am here")
+				fmt.Println(err)
 				return
-			}
-
-			// define the message structure
-			// Insert or append a message to the chat table
-			message := models.Message{
-				MessageSent:       messageValue,
-				DocOrAttachmentID: 123,
-				RecipientID:       int(recipient_id),
-				SenderID:          int(sender_id),
-				CreatedAt:         time.Now().UTC(),
-				MessageType:       "text",
 			}
 
 			// save to database
@@ -180,14 +169,47 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 			if isGroupChat {
 				// Handle group chat message
 				for _, groupUserID := range groupUserIDs {
+					// get the recipient id and format it to int
+					recipient_id, err := strconv.ParseInt(groupUserID, 10, 64)
+					if err != nil {
+						fmt.Println("am here index")
+						// Handle error
+						fmt.Println(err)
+						return
+					}
+					message := models.Message{
+						MessageSent:       messageValue,
+						DocOrAttachmentID: 0,
+						RecipientID:       int(recipient_id),
+						SenderID:          int(sender_id),
+						CreatedAt:         time.Now().UTC(),
+						MessageType:       "text",
+					}
 					ucm.SendMessage(groupUserID, messageValue, db, message)
+					log.Printf("Seng message to user ID %s: %s", groupUserID, string(message.MessageSent))
 				}
 			} else {
-				// Handle individual chat message
-				ucm.SendMessage(userID, messageValue, db, message)
-			}
 
-			log.Printf("Received message from user ID %s: %s", userID, string(message.MessageSent))
+				recipient_id, err := strconv.ParseInt(RecipientID, 10, 64)
+				if err != nil {
+					// Handle error
+					fmt.Println(err)
+					return
+				}
+				// define the message structure
+				// Insert or append a message to the chat table
+				message := models.Message{
+					MessageSent:       messageValue,
+					DocOrAttachmentID: 0,
+					RecipientID:       int(recipient_id),
+					SenderID:          int(sender_id),
+					CreatedAt:         time.Now().UTC(),
+					MessageType:       "text",
+				}
+				// Handle individual chat message
+				ucm.SendMessage(RecipientID, messageValue, db, message)
+				log.Printf("Received message from user ID %s: %s", SenderID, string(message.MessageSent))
+			}
 
 			// Process the received message or perform any required actions
 			// ...
@@ -195,7 +217,7 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 	}
 }
 
-func HandleFileUpload(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func HandleFileUpload0(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	file, fileHeader, err := r.FormFile("file") // Assuming file is uploaded using a form field with name "file"
 	if err != nil {
 		http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
@@ -249,7 +271,76 @@ func HandleFileUpload(ucm *UserConnectionManager, w http.ResponseWriter, r *http
 	}
 
 	// Send the message over WebSocket
-	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message,fileContent)
+	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileContent)
+
+	// Respond with success message
+	w.Write([]byte("File uploaded successfully"))
+}
+
+func HandleFileUpload(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	// Parse the multipart form
+	err := r.ParseMultipartForm(10 << 20) // Limit the file size to 10MB
+	if err != nil {
+		http.Error(w, "Failed to parse multipart form", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the file from the form
+	file, fileHeader, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	// Read the file content
+	fileContent, err := io.ReadAll(file)
+	if err != nil {
+		http.Error(w, "Failed to read file content", http.StatusInternalServerError)
+		return
+	}
+
+	// Save the file to a folder called "fileUploads"
+	fileName := filepath.Base(fileHeader.Filename) // Get only the file name
+	filePath := filepath.Join("fileUploads", fileName)
+	err = os.WriteFile(filePath, fileContent, 0644)
+	if err != nil {
+		http.Error(w, "Failed to save file", http.StatusInternalServerError)
+		return
+	}
+
+	// Generate the file URL
+	fileURL := fmt.Sprintf("%s/%s", constants.BaseURL, filePath)
+
+	// Create a message with the file details
+	message := models.Message{
+		MessageSent:       "File uploaded",
+		DocOrAttachmentID: 0,   // Set the appropriate ID for the document
+		RecipientID:       789, // Set the recipient ID
+		SenderID:          456, // Set the sender ID
+		CreatedAt:         time.Now().UTC(),
+		MessageType:       "file",
+		DocumentURL:       fileURL,
+	}
+
+	// Write the file details to the table
+	fileDetails := models.FileDetails{
+		FileURL:      fileURL,
+		FileLocation: filePath,
+		FileType:     fileHeader.Header.Get("Content-Type"),
+		CreatedAt:    time.Now().UTC(),
+		Deleted:      false,
+	}
+
+	// Call the function to save the file details to the table
+	err = dboperations.WriteToFileTable(fileDetails, db)
+	if err != nil {
+		http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
+		return
+	}
+
+	// Send the message over WebSocket
+	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileContent)
 
 	// Respond with success message
 	w.Write([]byte("File uploaded successfully"))
@@ -259,4 +350,12 @@ func HandleFileUpload(ucm *UserConnectionManager, w http.ResponseWriter, r *http
 // {
 // 	"userID": "30",
 // 	"message": "Testing"
+//   }
+
+// {
+// 	"recipient_id": "20",
+// 	"message": "checking morning",
+//   "sender_id":"34",
+//   "isGroupChat":true,
+//   "groupUserIDs":["20","44"]
 //   }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -13,21 +14,31 @@ import (
 // var redisClient *redis.Client
 
 func main() {
-	
+
 	// connect to Database
-	db,db_err :=dboperations.ConnectToDatabase(constants.PostgresConnectionString)
+	db, db_err := dboperations.ConnectToDatabase(constants.PostgresConnectionString)
 
 	if db_err != nil {
 		log.Fatal("Failed to start Database", db_err)
 	}
-	// for setting up user connection
+	// // for setting up user connection
 
 	ucm := services.NewUserConnectionManager()
 
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		services.HandleWebSocketConnections(ucm, w, r,db)
-	})
-	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {services.HandleFileUpload(ucm, w, r,db)})
+	// http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	// 	services.HandleWebSocketConnections(ucm, w, r, db)
+	// })
+	
+
+	go func() {
+		log.Println("Starting HTTP server on :8082")
+		if err := http.ListenAndServe(":8082", nil); err != nil {
+			log.Fatal("WebSocket server error:", err)
+		}
+	}()
+	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) { services.HandleFileUpload(ucm, w, r, db) })
+
+	http.HandleFunc("/", handleHTTP)
 
 	log.Println("Starting WebSocket server on port 8080...")
 	// start http server
@@ -35,6 +46,10 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to start WebSocket server:", err)
 	}
+}
+
+func handleHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hello, HTTP!")
 }
 
 // var upgrader = websocket.Upgrader{

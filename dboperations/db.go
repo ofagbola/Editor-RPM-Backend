@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
+	"time"
 	"websocket-chat/models"
 
 	_ "github.com/lib/pq"
@@ -32,59 +34,74 @@ func ConnectToDatabase(connStr string) (*sql.DB, error) {
 }
 
 // the message is saved based on created_at
-func InsertOrUpdateMessage(db *sql.DB, message models.Message) error {
-	// Check if a record with the same created_at exists for the user
-	query := `
-		SELECT message_array
-		FROM messages
-		WHERE user_id = $1 AND created_at::date = $2::date
-	`
+func SaveMessageToDb(db *sql.DB, message models.Message) error {
+	// Get the current date
+	currentDate := time.Now().Truncate(24 * time.Hour)
+	  // Convert message struct to JSON
+	  messageJSON, errr := json.Marshal(message)
+	  if errr != nil {
+		  log.Fatal(errr)
+	  }
+  
 
-	date := message.CreatedAt.Format("2006-01-02")
-	rows, err := db.Query(query, message.SenderID, date)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	var messageArray []models.Message
-	for rows.Next() {
-		err := rows.Scan(&messageArray)
+	// Check if a record exists for the given user_id_1 and user_id_2
+	var createdAt time.Time
+	var messageArray []byte
+	err := db.QueryRow("SELECT created_at, message_array FROM chat WHERE (user_id_1 = $1 AND user_id_2 = $2) OR (user_id_1 = $2 AND user_id_2 = $1)", message.SenderID, message.RecipientID).Scan(&createdAt, &messageArray)
+	switch {
+	case err == sql.ErrNoRows:
+		// Create a new record if no record found
+		_, err := db.Exec("INSERT INTO chat (user_id_1, user_id_2, message_array, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
+			message.SenderID, message.RecipientID, messageJSON /* initial empty JSON array */, currentDate, currentDate)
 		if err != nil {
-			return err
+			log.Fatal(err)
+		}
+		fmt.Println("New record created.")
+	case err != nil:
+		log.Fatal(err)
+	default:
+		if createdAt.Truncate(24 * time.Hour).Equal(currentDate) {
+
+			// Unmarshal the existing message_array into a slice of Message structs
+			var existingMessages []models.Message
+			if unmarshal_err := json.Unmarshal(messageArray, &existingMessages); err != nil {
+				log.Fatal(unmarshal_err)
+			}
+			
+			// Append the new message to the existing messages
+			existingMessages = append(existingMessages, message)
+			
+			// Marshal the updated messages back to JSON
+			updatedMessageArray, errr := json.Marshal(existingMessages)
+			if errr != nil {
+				log.Fatal(errr)
+			}
+				
+			// Update the existing record by appending the current message
+			_, err := db.Exec("UPDATE chat SET message_array = message_array || $1, updated_at = $2 WHERE user_id_1 = $3 AND user_id_2 = $4",
+			updatedMessageArray, time.Now(), message.SenderID, message.RecipientID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("Message appended to existing record.")
+		} else {
+			// Create a new record if the existing record is not for the current date
+			_, err := db.Exec("INSERT INTO chat (user_id_1, user_id_2, message_array, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
+				message.SenderID, message.RecipientID, messageJSON /* initial empty JSON array */, currentDate, currentDate)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("New record created.")
 		}
 	}
-
-	if len(messageArray) > 0 {
-		// Append the new message to the existing message_array
-		messageArray = append(messageArray, message)
-	} else {
-		// Create a new record for the message
-		messageArray = []models.Message{message}
-	}
-
-	// Upsert the message_array into the chat table
-	query = `
-		INSERT INTO messages (user_id, recipient_id, message_array, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5)
-		ON CONFLICT (user_id, created_at::date) DO UPDATE
-		SET message_array = $3, updated_at = $5
-	`
-
-	messageArrayJSON, err := json.Marshal(messageArray)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec(query, message.SenderID, message.RecipientID, messageArrayJSON, message.CreatedAt, message.CreatedAt)
 	return err
 }
 
 func FetchMessages(db *sql.DB, userID int) ([]models.Message, error) {
 	query := `
 		SELECT message_array
-		FROM messages
-		WHERE user_id = $1
+		FROM chat
+		WHERE user_id_1 = $1 OR user_id_2 = $1
 	`
 
 	rows, err := db.Query(query, userID)
@@ -107,9 +124,9 @@ func FetchMessages(db *sql.DB, userID int) ([]models.Message, error) {
 	return messages, nil
 }
 
-func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) error{
+func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) error {
 	query := `
-		INSERT INTO file_table (file_url, file_location, file_type, created_at, deleted, deleted_at)
+		INSERT INTO file (file_url, file_location, file_type, created_at, deleted, deleted_at)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id`
 
