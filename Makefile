@@ -1,6 +1,4 @@
 
-
-
 DB_URL=postgres://go_user:gofindP123@__@localhost:5432/go_db?sslmode=disable
 
 network:
@@ -30,3 +28,9 @@ server:
 
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine
+mac_proto:
+	brew install protobuf
+linux_proto:
+	sudo apt install protobuf-compiler
+
+

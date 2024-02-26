@@ -41,3 +41,9 @@ type FileDetails struct {
 	Deleted     bool
 	DeletedAt   time.Time
 }
+
+type FileUploadResponse struct {
+	FileID     int    `json:"file_id"`
+	SuccessMsg string `json:"success_message"`
+	FileURL    string `json:"file_url"`
+}
