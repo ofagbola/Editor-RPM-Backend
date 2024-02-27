@@ -385,3 +385,5 @@ func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Reque
 //   "isGroupChat":true,
 //   "groupUserIDs":["20","44"]
 //   }
+// when connecing user id must be sent like this
+// ws://localhost:8080/ws?userID=20
