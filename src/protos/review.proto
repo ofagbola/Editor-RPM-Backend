@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package scheduler;
+
+import "google/protobuf/timestamp.proto";
+
+message ReviewRequest {
+  string id = 1;
+  string sessionId = 2;
+  string doctorId = 3;
+  double rating = 4;
+  string review = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message ReviewMessage {
+  int32 code = 1;
+  string message = 2;
+}
+
+message ReviewsResponse {
+  int32 code = 1;
+  repeated ReviewRequest data = 2;
+}
+
+message ReviewResponse {
+  int32 code = 1;
+  ReviewRequest data = 2;
+}
+
+message GetDoctorReviews { 
+  string access_token = 1; 
+  map<string, string> request_query = 2;
+  string doctorId = 3;
+}
+
+message GetSessionReviews { 
+  string access_token = 1; 
+  map<string, string> request_query = 2;
+  string sessionId = 3;
+}
+
+message CreateReview { 
+  string sessionId = 1;
+  string doctorId = 2;
+  double rating = 3;
+  string review = 4;
+  string access_token = 5; 
+}
+
+message UpdateReview { 
+  string access_token = 1; 
+  double rating = 2;
+  string review = 3;
+  string id = 4;
+}
+
+message DeleteReview { 
+  string access_token = 1; 
+  string id = 2;
+}

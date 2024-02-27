@@ -10,28 +10,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Question {
-  @@map(name: "questions")
+model SubscriptionRequest {
+  @@map(name: "subscriptions")
 
-  id String  @id @default(uuid())
-  question String  @db.VarChar(255)
-  answers String[] @db.VarChar(255)
-  type String @db.VarChar(255)
-  status String @db.VarChar(255)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id            String     @id @default(uuid())
+  name          String     @db.VarChar(255)
+  status        String     @db.VarChar(255) @default("active")
+  amount        Int        @db.SmallInt
+  currency      String     @db.VarChar(255)
+  discount      Int        @db.SmallInt
+  billing       String[]   @db.VarChar(255)
+  paymentMethod String[]   @db.VarChar(255)
+  benefits      Json[]     @db.Json
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 }
 
-model Answer {
-  @@map(name: "answers")
+model UserSubscriptionRequest {
+  @@map(name: "userSubscriptions")
 
-  id String  @id @default(uuid())
-  question String @db.VarChar(255)
-  answer Int @db.SmallInt
-  user String @db.VarChar(255)
-  status String @db.VarChar(255)
+  id             String     @id @default(uuid())
+  subscriptionId String     @db.VarChar(255)
+  userId         String     @db.VarChar(255)
+  paid           Int        @db.Integer
+  outstanding    Int        @db.Integer
+  discount       Int        @db.SmallInt
+  billing        String     @db.VarChar(255)
+  paymentMethod String      @db.VarChar(255)
+  paymentInfo    Json       @db.Json
+  status         String     @db.VarChar(255) @default("active")
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+}
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model ScheduleRequest {
+  @@map(name: "schedules")
+
+  id                String     @id @default(uuid())
+  title             String     @db.VarChar(255)
+  description       String     @db.VarChar(255)
+  schedule          Json       @db.Json
+  reschedule        Json[]     @db.Json
+  userSubscriptionId String    @db.VarChar(255)
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
+}
+
+model ReviewRequest {
+  @@map(name: "reviews")
+
+  id        String     @id @default(uuid())
+  sessionId String     @db.VarChar(255)
+  doctorId  String     @db.VarChar(255)
+  rating    Int        @db.SmallInt
+  review    String     @db.VarChar(255)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 }

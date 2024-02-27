@@ -1,23 +1,49 @@
 syntax = "proto3";
 
-package questionnaire;
+package scheduler;
 
-import "questionnaire.proto";
-import "answer.proto";
+import "schedule.proto";
+import "subscription.proto";
+import "user.subscription.proto";
+import "review.proto";
 
-service QuestionnaireService {
-    rpc GetQuestionnaires(GetAllQuestions) returns (QuestionsResponse) {}
-    rpc GetQuestionnaire(GetOneQuestion) returns (QuestionResponse) {}
-    rpc CreateQuestionnaire(CreateQuestion) returns (GenericResponse) {}
-    rpc UpdateQuestionnaire(UpdateQuestion) returns (GenericResponse) {}
-    rpc DeleteQuestionnaire(DeleteQuestion) returns (GenericResponse) {}
+service ScheduleService {
+    rpc GetSchedules(GetAllSchedules) returns (SchedulesResponse) {}
+    rpc GetSchedule(GetOneSchedule) returns (ScheduleResponse) {}
+    rpc CreateSchedule(CreateSchedule) returns (ScheduleMessage) {}
+    rpc CreateReSchedule(CreateReSchedule) returns (ScheduleMessage) {}
+    rpc UpdateSchedule(UpdateSchedule) returns (ScheduleMessage) {}
+    rpc UpdateReSchedule(UpdateReSchedule) returns (ScheduleMessage) {}
+    rpc DeleteSchedule(DeleteSchedule) returns (ScheduleMessage) {}
+    rpc DeleteReSchedule(DeleteReSchedule) returns (ScheduleMessage) {}
 }
 
-service AnswerService {
-    rpc GetAnswers(GetAllAnswers) returns (AnswersResponse) {}
-    rpc GetAnswer(GetOneAnswer) returns (AnswerResponse) {}
-    rpc CreateAnswer(CreateAnswer) returns (MessageResponse) {}
-    rpc UpdateAnswer(UpdateAnswer) returns (MessageResponse) {}
-    rpc DeleteAnswer(DeleteAnswer) returns (MessageResponse) {}
+service  SubscriptionService {
+    rpc GetSubscriptions(GetAllSubscriptions) returns (SubscriptionsResponse) {}
+    rpc GetSubscription(GetOneSubscription) returns (SubscriptionResponse) {}
+    rpc CreateSubscription(CreateSubscription) returns (SubscriptionMessage) {}
+    rpc UpdateSubscription(UpdateSubscription) returns (SubscriptionMessage) {}
+    rpc DeleteSubscription(DeleteSubscription) returns (SubscriptionMessage) {}
+}
+
+service UserSubscriptionService {
+    rpc GetUserSubscriptions(GetAllUserSubscriptions) returns (SubscriptionsResponse) {}
+    rpc GetUserSubscription(GetOneUserSubscription) returns (SubscriptionResponse) {}
+    rpc CreateUserSubscription(CreateUserSubscription) returns (SubscriptionMessage) {}
+    rpc UpdateUserSubscription(CreateUserSubscription) returns (SubscriptionMessage) {}
+    rpc DeleteUserSubscription(DeleteUserSubscription) returns (SubscriptionMessage) {}
+}
+
+service ReviewService {
+    rpc GetDoctorReviews(GetDoctorReviews) returns (ReviewsResponse) {}
+    rpc GetSessionReviews(GetSessionReviews) returns (ReviewResponse) {}
+    rpc CreateReview(CreateReview) returns (ReviewMessage) {}
+    rpc UpdateReview(UpdateReview) returns (ReviewMessage) {}
+    rpc DeleteReview(DeleteReview) returns (ReviewMessage) {}
+}
+
+// From external source for searching
+enum DoctorType {
+    // required for searching doctor while scheduling
 }
 

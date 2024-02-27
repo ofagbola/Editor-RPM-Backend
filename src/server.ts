@@ -2,8 +2,8 @@ import path from 'path';
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from './protos/gen/services';
-import { QuestionRoutes } from './routes/questionnaire.routes';
-import { AnswerRoutes } from './routes/answer.routes';
+import { QuestionRoutes } from './routes/scheduler.routes';
+import { AnswerRoutes } from './routes/subscription.routes';
 import customConfig from './config/default';
 import connectDB from './utils/prisma';
 const options: protoLoader.Options = {

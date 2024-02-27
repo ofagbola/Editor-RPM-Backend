@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package scheduler;
+
+import "google/protobuf/timestamp.proto";
+
+enum UserBillingType {
+  WEEKLY = 0;
+  MONTHLY = 1;
+  YEARLY = 2;
+}
+
+enum UserPaymentMethodType {
+  PAYPAL = 0;
+  STRIPE = 1;
+  VENMO = 2;
+  CARD = 3;
+}
+
+message PaymentInfo {
+  string name = 1;
+  uint64 cardNumber = 2;
+  string paymentId = 3;
+  string additionalKey = 4;
+  uint32 cvv = 5;
+  uint32 pin = 6;
+  UserPaymentMethodType type = 7;
+  string description = 8;
+}
+
+message UserSubscriptionRequest {
+  string id = 1;
+  string subscriptionId = 2;
+  string userId = 3;
+  double payed = 4;
+  double outstanding = 5;
+  double discount = 6;
+  UserBillingType billing = 7;
+  UserPaymentMethodType paymentMethod = 8;
+  PaymentInfo paymentInfo = 9;
+  string status = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+message UserSubscriptionMessage {
+  int32 code = 1;
+  string message = 2;
+}
+
+message UserSubscriptionsResponse {
+  int32 code = 1;
+  repeated UserSubscriptionRequest data = 2;
+}
+
+message UserSubscriptionResponse {
+  int32 code = 1;
+  UserSubscriptionRequest data = 2;
+}
+
+message GetAllUserSubscriptions { 
+  string access_token = 1; 
+  map<string, string> request_query = 2;
+}
+
+message GetOneUserSubscription { 
+  string access_token = 1; 
+  string id = 2;
+}
+
+message CreateUserSubscription { 
+  string access_token = 1; 
+  string subscriptionId = 2;
+  double payed = 3;
+  UserBillingType billing = 4;
+  UserPaymentMethodType paymentMethod = 5;
+  PaymentInfo paymentInfo = 6;
+}
+
+message UpdateUserSubscription { 
+  string access_token = 1; 
+  double payed = 2;
+  string status = 3;
+  string id = 4;
+}
+
+message DeleteUserSubscription { 
+  string access_token = 1; 
+  string id = 2;
+}
