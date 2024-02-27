@@ -16,7 +16,7 @@ model Question {
   id String  @id @default(uuid())
   question String  @db.VarChar(255)
   answers String[] @db.VarChar(255)
-  type String @db.VarChar(255)
+  type String @db.VarChar(255) 
   status String @db.VarChar(255)
 
   created_at DateTime @default(now())
