@@ -32,5 +32,10 @@ mac_proto:
 	brew install protobuf
 linux_proto:
 	sudo apt install protobuf-compiler
+push:
+	git push -u secondorigin main:feature/teleconferencing  	
+
+
+
 
 
