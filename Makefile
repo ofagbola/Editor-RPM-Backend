@@ -33,7 +33,7 @@ mac_proto:
 linux_proto:
 	sudo apt install protobuf-compiler
 push:
-	git push -u secondorigin main:feature/teleconferencing  	
+	git push secondorigin main:feature/teleconferencing  	
 
 
 
