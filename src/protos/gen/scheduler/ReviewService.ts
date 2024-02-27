@@ -7,7 +7,6 @@ import type { DeleteReview as _scheduler_DeleteReview, DeleteReview__Output as _
 import type { GetDoctorReviews as _scheduler_GetDoctorReviews, GetDoctorReviews__Output as _scheduler_GetDoctorReviews__Output } from '../scheduler/GetDoctorReviews';
 import type { GetSessionReviews as _scheduler_GetSessionReviews, GetSessionReviews__Output as _scheduler_GetSessionReviews__Output } from '../scheduler/GetSessionReviews';
 import type { ReviewMessage as _scheduler_ReviewMessage, ReviewMessage__Output as _scheduler_ReviewMessage__Output } from '../scheduler/ReviewMessage';
-import type { ReviewResponse as _scheduler_ReviewResponse, ReviewResponse__Output as _scheduler_ReviewResponse__Output } from '../scheduler/ReviewResponse';
 import type { ReviewsResponse as _scheduler_ReviewsResponse, ReviewsResponse__Output as _scheduler_ReviewsResponse__Output } from '../scheduler/ReviewsResponse';
 import type { UpdateReview as _scheduler_UpdateReview, UpdateReview__Output as _scheduler_UpdateReview__Output } from '../scheduler/UpdateReview';
 
@@ -39,14 +38,14 @@ export interface ReviewServiceClient extends grpc.Client {
   getDoctorReviews(argument: _scheduler_GetDoctorReviews, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
   getDoctorReviews(argument: _scheduler_GetDoctorReviews, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
   
-  GetSessionReviews(argument: _scheduler_GetSessionReviews, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewResponse__Output>): grpc.ClientUnaryCall;
-  GetSessionReviews(argument: _scheduler_GetSessionReviews, metadata: grpc.Metadata, callback: grpc.requestCallback<_scheduler_ReviewResponse__Output>): grpc.ClientUnaryCall;
-  GetSessionReviews(argument: _scheduler_GetSessionReviews, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewResponse__Output>): grpc.ClientUnaryCall;
-  GetSessionReviews(argument: _scheduler_GetSessionReviews, callback: grpc.requestCallback<_scheduler_ReviewResponse__Output>): grpc.ClientUnaryCall;
-  getSessionReviews(argument: _scheduler_GetSessionReviews, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewResponse__Output>): grpc.ClientUnaryCall;
-  getSessionReviews(argument: _scheduler_GetSessionReviews, metadata: grpc.Metadata, callback: grpc.requestCallback<_scheduler_ReviewResponse__Output>): grpc.ClientUnaryCall;
-  getSessionReviews(argument: _scheduler_GetSessionReviews, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewResponse__Output>): grpc.ClientUnaryCall;
-  getSessionReviews(argument: _scheduler_GetSessionReviews, callback: grpc.requestCallback<_scheduler_ReviewResponse__Output>): grpc.ClientUnaryCall;
+  GetSessionReviews(argument: _scheduler_GetSessionReviews, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
+  GetSessionReviews(argument: _scheduler_GetSessionReviews, metadata: grpc.Metadata, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
+  GetSessionReviews(argument: _scheduler_GetSessionReviews, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
+  GetSessionReviews(argument: _scheduler_GetSessionReviews, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
+  getSessionReviews(argument: _scheduler_GetSessionReviews, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
+  getSessionReviews(argument: _scheduler_GetSessionReviews, metadata: grpc.Metadata, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
+  getSessionReviews(argument: _scheduler_GetSessionReviews, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
+  getSessionReviews(argument: _scheduler_GetSessionReviews, callback: grpc.requestCallback<_scheduler_ReviewsResponse__Output>): grpc.ClientUnaryCall;
   
   UpdateReview(argument: _scheduler_UpdateReview, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_scheduler_ReviewMessage__Output>): grpc.ClientUnaryCall;
   UpdateReview(argument: _scheduler_UpdateReview, metadata: grpc.Metadata, callback: grpc.requestCallback<_scheduler_ReviewMessage__Output>): grpc.ClientUnaryCall;
@@ -66,7 +65,7 @@ export interface ReviewServiceHandlers extends grpc.UntypedServiceImplementation
   
   GetDoctorReviews: grpc.handleUnaryCall<_scheduler_GetDoctorReviews__Output, _scheduler_ReviewsResponse>;
   
-  GetSessionReviews: grpc.handleUnaryCall<_scheduler_GetSessionReviews__Output, _scheduler_ReviewResponse>;
+  GetSessionReviews: grpc.handleUnaryCall<_scheduler_GetSessionReviews__Output, _scheduler_ReviewsResponse>;
   
   UpdateReview: grpc.handleUnaryCall<_scheduler_UpdateReview__Output, _scheduler_ReviewMessage>;
   
@@ -76,6 +75,6 @@ export interface ReviewServiceDefinition extends grpc.ServiceDefinition {
   CreateReview: MethodDefinition<_scheduler_CreateReview, _scheduler_ReviewMessage, _scheduler_CreateReview__Output, _scheduler_ReviewMessage__Output>
   DeleteReview: MethodDefinition<_scheduler_DeleteReview, _scheduler_ReviewMessage, _scheduler_DeleteReview__Output, _scheduler_ReviewMessage__Output>
   GetDoctorReviews: MethodDefinition<_scheduler_GetDoctorReviews, _scheduler_ReviewsResponse, _scheduler_GetDoctorReviews__Output, _scheduler_ReviewsResponse__Output>
-  GetSessionReviews: MethodDefinition<_scheduler_GetSessionReviews, _scheduler_ReviewResponse, _scheduler_GetSessionReviews__Output, _scheduler_ReviewResponse__Output>
+  GetSessionReviews: MethodDefinition<_scheduler_GetSessionReviews, _scheduler_ReviewsResponse, _scheduler_GetSessionReviews__Output, _scheduler_ReviewsResponse__Output>
   UpdateReview: MethodDefinition<_scheduler_UpdateReview, _scheduler_ReviewMessage, _scheduler_UpdateReview__Output, _scheduler_ReviewMessage__Output>
 }

@@ -18,10 +18,7 @@ import { GetOneUserSubscription__Output } from '../protos/gen/scheduler/GetOneUs
 import { UserSubscriptionMessage__Output } from '../protos/gen/scheduler/UserSubscriptionMessage';
 import { UpdateUserSubscription__Output } from '../protos/gen/scheduler/UpdateUserSubscription';
 import { DeleteUserSubscription__Output } from '../protos/gen/scheduler/DeleteUserSubscription';
-import { signJwt, verifyJwt } from '../utils/jwt';
-import customConfig from '../config/default'; 
-import redisClient from '../utils/connectRedis';
-import { deserializeUser } from '../middlewares/deserializeUser'
+import { deserializeUser } from '../middlewares/deserializeUser';
 
 export const CreateUserSubscription = async (
   req: grpc.ServerUnaryCall<CreateUserSubscription__Output, UserSubscriptionMessage__Output>,

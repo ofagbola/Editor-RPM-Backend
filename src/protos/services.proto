@@ -6,6 +6,12 @@ import "schedule.proto";
 import "subscription.proto";
 import "user.subscription.proto";
 import "review.proto";
+package scheduler;
+
+import "schedule.proto";
+import "subscription.proto";
+import "user.subscription.proto";
+import "review.proto";
 
 service ScheduleService {
     rpc GetSchedules(GetAllSchedules) returns (SchedulesResponse) {}

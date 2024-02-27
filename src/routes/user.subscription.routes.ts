@@ -7,7 +7,7 @@ import {
     DeleteUserSubscription
 } from '../controllers/user.subscription.controller';
 
-export const userSubscriptionRoutes: UserSubscriptionServiceHandlers = {
+export const UserSubscriptionRoutes: UserSubscriptionServiceHandlers = {
     GetUserSubscriptions,
     GetUserSubscription,
     CreateUserSubscription,

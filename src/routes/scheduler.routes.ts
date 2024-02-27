@@ -10,7 +10,7 @@ import {
     DeleteReSchedule
 } from '../controllers/schedule.controller';
 
-export const QuestionRoutes: ScheduleServiceHandlers = {
+export const ScheduleRoutes: ScheduleServiceHandlers = {
     GetSchedule,
     GetSchedules,
     CreateSchedule,

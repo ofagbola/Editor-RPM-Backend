@@ -7,7 +7,7 @@ import {
     DeleteReview
 } from '../controllers/review.controller';
 
-export const QuestionRoutes: ReviewServiceHandlers = {
+export const ReviewRoutes: ReviewServiceHandlers = {
     GetDoctorReviews,
     GetSessionReviews,
     CreateReview,

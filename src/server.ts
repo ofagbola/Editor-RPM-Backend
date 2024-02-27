@@ -2,8 +2,10 @@ import path from 'path';
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from './protos/gen/services';
-import { QuestionRoutes } from './routes/scheduler.routes';
-import { AnswerRoutes } from './routes/subscription.routes';
+import { ReviewRoutes } from './routes/review.routes';
+import { ScheduleRoutes } from './routes/scheduler.routes';
+import { SubscriptionRoutes } from './routes/subscription.routes';
+import { UserSubscriptionRoutes } from './routes/user.subscription.routes';
 import customConfig from './config/default';
 import connectDB from './utils/prisma';
 const options: protoLoader.Options = {
@@ -25,12 +27,14 @@ const proto = grpc.loadPackageDefinition(
   packageDef
 ) as unknown as ProtoGrpcType;
 
-const questionnairePackage = proto.questionnaire;
+const questionnairePackage = proto.scheduler;
 
 const server = new grpc.Server();
 
-server.addService(questionnairePackage.QuestionnaireService.service, QuestionRoutes);
-server.addService(questionnairePackage.AnswerService.service, AnswerRoutes);
+server.addService(questionnairePackage.ReviewService.service, ReviewRoutes);
+server.addService(questionnairePackage.ScheduleService.service, ScheduleRoutes);
+server.addService(questionnairePackage.SubscriptionService.service, SubscriptionRoutes);
+server.addService(questionnairePackage.UserSubscriptionService.service, UserSubscriptionRoutes);
 
 server.bindAsync(
   `0.0.0.0:${PORT}`,
