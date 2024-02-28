@@ -1,15 +1,20 @@
 import * as grpc from '@grpc/grpc-js';
 import 'dotenv/config';
 import logger from './utils/logger';
+import sql from './utils/db';
 
 const PORT = process.env.RPC_PORT || 4000;
 const signals = ['SIGINT', 'SIGTERM'];
 
-
-
 export const app = () => {
   try {
     const server = new grpc.Server({});
+
+    sql`SELECT * FROM users`
+      .then(() => {})
+      .catch((error: any) => {
+        console.log(error);
+      });
 
     server.bindAsync(
       `0.0.0.0:${PORT}`,
