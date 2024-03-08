@@ -3,6 +3,13 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from '../protos/gen/services';
 import customConfig from '../config/default';
+import { 
+  GetAnswerConstants,
+  GetAnswerConstant,
+  CreateAnswerConstant,
+  UpdateAnswerConstant,
+  DeleteAnswerConstant 
+} from '../constants/answer.constant';
 
 const options: protoLoader.Options = {
   keepCase: true,
@@ -26,6 +33,7 @@ const client = new proto.questionnaire.AnswerService(
   `0.0.0.0:${PORT}`,
   grpc.credentials.createInsecure()
 );
+
 const deadline = new Date();
 deadline.setSeconds(deadline.getSeconds() + 5);
 client.waitForReady(deadline, (err: any) => {
@@ -38,13 +46,16 @@ client.waitForReady(deadline, (err: any) => {
 
 function onClientReady() {
   // CreateAnswer();
-  GetQestionnaires();
+  GetAnswers();
+  // GetAnswer();
+  // UpdateAnswer();
+  // DeleteAnswer();
 }
 
-function GetQestionnaires() {
-  client.GetAnswers(
-    { request_query: { status: "active" }, access_token: "efhiwfwuihiuwfhwwfbwifwwh" },
-    (err, res) => {
+function GetAnswers() {
+  const data = GetAnswerConstants();
+
+  client.getAnswers(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -54,13 +65,10 @@ function GetQestionnaires() {
   );
 }
 
-function GetQestionnaire() {
-  client.GetAnswer(
-    {
-      id: '2',
-      access_token: 'hgfsfedjgddgkhdjwdw',
-    },
-    (err, res) => {
+function GetAnswer() {
+  const data = GetAnswerConstant();
+
+  client.getAnswer(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -71,14 +79,9 @@ function GetQestionnaire() {
 }
 
 function CreateAnswer() {
-  client.CreateAnswer(
-    {
-      question: '2b260db0-033a-4169-bf6a-920e35163ad4',
-      status: 'active',
-      answer: 3,
-      access_token: 'hssjhfsiuhfwibiuiwffwfwf',
-    },
-    (err, res) => {
+  const data = CreateAnswerConstant();
+
+  client.createAnswer(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -89,14 +92,9 @@ function CreateAnswer() {
 }
 
 function UpdateAnswer() {
-  client.UpdateAnswer(
-    {
-      status: 'active',
-      answer: 3,
-      id: "2",
-      access_token: 'hssjhfsiuhfwibiuiwffwfwf',
-    },
-    (err, res) => {
+  const data = UpdateAnswerConstant();
+
+  client.updateAnswer(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -105,13 +103,11 @@ function UpdateAnswer() {
     }
   );
 }
-function DeleteQestionnaire() {
-  client.DeleteAnswer(
-    {
-      id: '2',
-      access_token: 'hgfsfedjgddgkhdjwdw',
-    },
-    (err, res) => {
+
+function DeleteAnswer() {
+  const data = DeleteAnswerConstant();
+
+  client.deleteAnswer(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;

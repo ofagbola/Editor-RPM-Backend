@@ -13,15 +13,15 @@ export interface ProtoGrpcType {
     }
   }
   questionnaire: {
-    CreateQuestion: MessageTypeDefinition
-    DeleteQuestion: MessageTypeDefinition
-    GenericResponse: MessageTypeDefinition
-    GetAllQuestions: MessageTypeDefinition
-    GetOneQuestion: MessageTypeDefinition
-    Question: MessageTypeDefinition
-    QuestionResponse: MessageTypeDefinition
-    QuestionsResponse: MessageTypeDefinition
-    UpdateQuestion: MessageTypeDefinition
+    CreateQuestionnaire: MessageTypeDefinition
+    DeleteQuestionnaire: MessageTypeDefinition
+    GetAllQuestionnaires: MessageTypeDefinition
+    GetOneQuestionnaire: MessageTypeDefinition
+    Questionnaire: MessageTypeDefinition
+    QuestionnaireMessage: MessageTypeDefinition
+    QuestionnaireResponse: MessageTypeDefinition
+    QuestionnairesResponse: MessageTypeDefinition
+    UpdateQuestionnaire: MessageTypeDefinition
   }
 }
 

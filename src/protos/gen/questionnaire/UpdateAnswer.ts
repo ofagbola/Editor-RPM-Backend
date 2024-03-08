@@ -3,14 +3,14 @@
 
 export interface UpdateAnswer {
   'access_token'?: (string);
-  'answer'?: (number);
+  'answer'?: (string)[];
   'status'?: (string);
   'id'?: (string);
 }
 
 export interface UpdateAnswer__Output {
   'access_token': (string);
-  'answer': (number);
+  'answer': (string)[];
   'status': (string);
   'id': (string);
 }

@@ -2,80 +2,80 @@
 
 import type * as grpc from '@grpc/grpc-js'
 import type { MethodDefinition } from '@grpc/proto-loader'
-import type { CreateQuestion as _questionnaire_CreateQuestion, CreateQuestion__Output as _questionnaire_CreateQuestion__Output } from '../questionnaire/CreateQuestion';
-import type { DeleteQuestion as _questionnaire_DeleteQuestion, DeleteQuestion__Output as _questionnaire_DeleteQuestion__Output } from '../questionnaire/DeleteQuestion';
-import type { GenericResponse as _questionnaire_GenericResponse, GenericResponse__Output as _questionnaire_GenericResponse__Output } from '../questionnaire/GenericResponse';
-import type { GetAllQuestions as _questionnaire_GetAllQuestions, GetAllQuestions__Output as _questionnaire_GetAllQuestions__Output } from '../questionnaire/GetAllQuestions';
-import type { GetOneQuestion as _questionnaire_GetOneQuestion, GetOneQuestion__Output as _questionnaire_GetOneQuestion__Output } from '../questionnaire/GetOneQuestion';
-import type { QuestionResponse as _questionnaire_QuestionResponse, QuestionResponse__Output as _questionnaire_QuestionResponse__Output } from '../questionnaire/QuestionResponse';
-import type { QuestionsResponse as _questionnaire_QuestionsResponse, QuestionsResponse__Output as _questionnaire_QuestionsResponse__Output } from '../questionnaire/QuestionsResponse';
-import type { UpdateQuestion as _questionnaire_UpdateQuestion, UpdateQuestion__Output as _questionnaire_UpdateQuestion__Output } from '../questionnaire/UpdateQuestion';
+import type { CreateQuestionnaire as _questionnaire_CreateQuestionnaire, CreateQuestionnaire__Output as _questionnaire_CreateQuestionnaire__Output } from '../questionnaire/CreateQuestionnaire';
+import type { DeleteQuestionnaire as _questionnaire_DeleteQuestionnaire, DeleteQuestionnaire__Output as _questionnaire_DeleteQuestionnaire__Output } from '../questionnaire/DeleteQuestionnaire';
+import type { GetAllQuestionnaires as _questionnaire_GetAllQuestionnaires, GetAllQuestionnaires__Output as _questionnaire_GetAllQuestionnaires__Output } from '../questionnaire/GetAllQuestionnaires';
+import type { GetOneQuestionnaire as _questionnaire_GetOneQuestionnaire, GetOneQuestionnaire__Output as _questionnaire_GetOneQuestionnaire__Output } from '../questionnaire/GetOneQuestionnaire';
+import type { QuestionnaireMessage as _questionnaire_QuestionnaireMessage, QuestionnaireMessage__Output as _questionnaire_QuestionnaireMessage__Output } from '../questionnaire/QuestionnaireMessage';
+import type { QuestionnaireResponse as _questionnaire_QuestionnaireResponse, QuestionnaireResponse__Output as _questionnaire_QuestionnaireResponse__Output } from '../questionnaire/QuestionnaireResponse';
+import type { QuestionnairesResponse as _questionnaire_QuestionnairesResponse, QuestionnairesResponse__Output as _questionnaire_QuestionnairesResponse__Output } from '../questionnaire/QuestionnairesResponse';
+import type { UpdateQuestionnaire as _questionnaire_UpdateQuestionnaire, UpdateQuestionnaire__Output as _questionnaire_UpdateQuestionnaire__Output } from '../questionnaire/UpdateQuestionnaire';
 
 export interface QuestionnaireServiceClient extends grpc.Client {
-  CreateQuestionnaire(argument: _questionnaire_CreateQuestion, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  CreateQuestionnaire(argument: _questionnaire_CreateQuestion, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  CreateQuestionnaire(argument: _questionnaire_CreateQuestion, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  CreateQuestionnaire(argument: _questionnaire_CreateQuestion, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  createQuestionnaire(argument: _questionnaire_CreateQuestion, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  createQuestionnaire(argument: _questionnaire_CreateQuestion, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  createQuestionnaire(argument: _questionnaire_CreateQuestion, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  createQuestionnaire(argument: _questionnaire_CreateQuestion, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
+  CreateQuestionnaire(argument: _questionnaire_CreateQuestionnaire, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  CreateQuestionnaire(argument: _questionnaire_CreateQuestionnaire, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  CreateQuestionnaire(argument: _questionnaire_CreateQuestionnaire, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  CreateQuestionnaire(argument: _questionnaire_CreateQuestionnaire, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  createQuestionnaire(argument: _questionnaire_CreateQuestionnaire, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  createQuestionnaire(argument: _questionnaire_CreateQuestionnaire, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  createQuestionnaire(argument: _questionnaire_CreateQuestionnaire, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  createQuestionnaire(argument: _questionnaire_CreateQuestionnaire, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
   
-  DeleteQuestionnaire(argument: _questionnaire_DeleteQuestion, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  DeleteQuestionnaire(argument: _questionnaire_DeleteQuestion, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  DeleteQuestionnaire(argument: _questionnaire_DeleteQuestion, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  DeleteQuestionnaire(argument: _questionnaire_DeleteQuestion, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  deleteQuestionnaire(argument: _questionnaire_DeleteQuestion, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  deleteQuestionnaire(argument: _questionnaire_DeleteQuestion, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  deleteQuestionnaire(argument: _questionnaire_DeleteQuestion, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  deleteQuestionnaire(argument: _questionnaire_DeleteQuestion, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
+  DeleteQuestionnaire(argument: _questionnaire_DeleteQuestionnaire, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  DeleteQuestionnaire(argument: _questionnaire_DeleteQuestionnaire, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  DeleteQuestionnaire(argument: _questionnaire_DeleteQuestionnaire, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  DeleteQuestionnaire(argument: _questionnaire_DeleteQuestionnaire, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  deleteQuestionnaire(argument: _questionnaire_DeleteQuestionnaire, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  deleteQuestionnaire(argument: _questionnaire_DeleteQuestionnaire, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  deleteQuestionnaire(argument: _questionnaire_DeleteQuestionnaire, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  deleteQuestionnaire(argument: _questionnaire_DeleteQuestionnaire, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
   
-  GetQuestionnaire(argument: _questionnaire_GetOneQuestion, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionResponse__Output>): grpc.ClientUnaryCall;
-  GetQuestionnaire(argument: _questionnaire_GetOneQuestion, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionResponse__Output>): grpc.ClientUnaryCall;
-  GetQuestionnaire(argument: _questionnaire_GetOneQuestion, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionResponse__Output>): grpc.ClientUnaryCall;
-  GetQuestionnaire(argument: _questionnaire_GetOneQuestion, callback: grpc.requestCallback<_questionnaire_QuestionResponse__Output>): grpc.ClientUnaryCall;
-  getQuestionnaire(argument: _questionnaire_GetOneQuestion, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionResponse__Output>): grpc.ClientUnaryCall;
-  getQuestionnaire(argument: _questionnaire_GetOneQuestion, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionResponse__Output>): grpc.ClientUnaryCall;
-  getQuestionnaire(argument: _questionnaire_GetOneQuestion, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionResponse__Output>): grpc.ClientUnaryCall;
-  getQuestionnaire(argument: _questionnaire_GetOneQuestion, callback: grpc.requestCallback<_questionnaire_QuestionResponse__Output>): grpc.ClientUnaryCall;
+  GetQuestionnaire(argument: _questionnaire_GetOneQuestionnaire, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireResponse__Output>): grpc.ClientUnaryCall;
+  GetQuestionnaire(argument: _questionnaire_GetOneQuestionnaire, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnaireResponse__Output>): grpc.ClientUnaryCall;
+  GetQuestionnaire(argument: _questionnaire_GetOneQuestionnaire, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireResponse__Output>): grpc.ClientUnaryCall;
+  GetQuestionnaire(argument: _questionnaire_GetOneQuestionnaire, callback: grpc.requestCallback<_questionnaire_QuestionnaireResponse__Output>): grpc.ClientUnaryCall;
+  getQuestionnaire(argument: _questionnaire_GetOneQuestionnaire, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireResponse__Output>): grpc.ClientUnaryCall;
+  getQuestionnaire(argument: _questionnaire_GetOneQuestionnaire, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnaireResponse__Output>): grpc.ClientUnaryCall;
+  getQuestionnaire(argument: _questionnaire_GetOneQuestionnaire, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireResponse__Output>): grpc.ClientUnaryCall;
+  getQuestionnaire(argument: _questionnaire_GetOneQuestionnaire, callback: grpc.requestCallback<_questionnaire_QuestionnaireResponse__Output>): grpc.ClientUnaryCall;
   
-  GetQuestionnaires(argument: _questionnaire_GetAllQuestions, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionsResponse__Output>): grpc.ClientUnaryCall;
-  GetQuestionnaires(argument: _questionnaire_GetAllQuestions, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionsResponse__Output>): grpc.ClientUnaryCall;
-  GetQuestionnaires(argument: _questionnaire_GetAllQuestions, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionsResponse__Output>): grpc.ClientUnaryCall;
-  GetQuestionnaires(argument: _questionnaire_GetAllQuestions, callback: grpc.requestCallback<_questionnaire_QuestionsResponse__Output>): grpc.ClientUnaryCall;
-  getQuestionnaires(argument: _questionnaire_GetAllQuestions, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionsResponse__Output>): grpc.ClientUnaryCall;
-  getQuestionnaires(argument: _questionnaire_GetAllQuestions, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionsResponse__Output>): grpc.ClientUnaryCall;
-  getQuestionnaires(argument: _questionnaire_GetAllQuestions, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionsResponse__Output>): grpc.ClientUnaryCall;
-  getQuestionnaires(argument: _questionnaire_GetAllQuestions, callback: grpc.requestCallback<_questionnaire_QuestionsResponse__Output>): grpc.ClientUnaryCall;
+  GetQuestionnaires(argument: _questionnaire_GetAllQuestionnaires, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnairesResponse__Output>): grpc.ClientUnaryCall;
+  GetQuestionnaires(argument: _questionnaire_GetAllQuestionnaires, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnairesResponse__Output>): grpc.ClientUnaryCall;
+  GetQuestionnaires(argument: _questionnaire_GetAllQuestionnaires, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnairesResponse__Output>): grpc.ClientUnaryCall;
+  GetQuestionnaires(argument: _questionnaire_GetAllQuestionnaires, callback: grpc.requestCallback<_questionnaire_QuestionnairesResponse__Output>): grpc.ClientUnaryCall;
+  getQuestionnaires(argument: _questionnaire_GetAllQuestionnaires, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnairesResponse__Output>): grpc.ClientUnaryCall;
+  getQuestionnaires(argument: _questionnaire_GetAllQuestionnaires, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnairesResponse__Output>): grpc.ClientUnaryCall;
+  getQuestionnaires(argument: _questionnaire_GetAllQuestionnaires, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnairesResponse__Output>): grpc.ClientUnaryCall;
+  getQuestionnaires(argument: _questionnaire_GetAllQuestionnaires, callback: grpc.requestCallback<_questionnaire_QuestionnairesResponse__Output>): grpc.ClientUnaryCall;
   
-  UpdateQuestionnaire(argument: _questionnaire_UpdateQuestion, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  UpdateQuestionnaire(argument: _questionnaire_UpdateQuestion, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  UpdateQuestionnaire(argument: _questionnaire_UpdateQuestion, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  UpdateQuestionnaire(argument: _questionnaire_UpdateQuestion, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  updateQuestionnaire(argument: _questionnaire_UpdateQuestion, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  updateQuestionnaire(argument: _questionnaire_UpdateQuestion, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  updateQuestionnaire(argument: _questionnaire_UpdateQuestion, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
-  updateQuestionnaire(argument: _questionnaire_UpdateQuestion, callback: grpc.requestCallback<_questionnaire_GenericResponse__Output>): grpc.ClientUnaryCall;
+  UpdateQuestionnaire(argument: _questionnaire_UpdateQuestionnaire, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  UpdateQuestionnaire(argument: _questionnaire_UpdateQuestionnaire, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  UpdateQuestionnaire(argument: _questionnaire_UpdateQuestionnaire, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  UpdateQuestionnaire(argument: _questionnaire_UpdateQuestionnaire, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  updateQuestionnaire(argument: _questionnaire_UpdateQuestionnaire, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  updateQuestionnaire(argument: _questionnaire_UpdateQuestionnaire, metadata: grpc.Metadata, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  updateQuestionnaire(argument: _questionnaire_UpdateQuestionnaire, options: grpc.CallOptions, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
+  updateQuestionnaire(argument: _questionnaire_UpdateQuestionnaire, callback: grpc.requestCallback<_questionnaire_QuestionnaireMessage__Output>): grpc.ClientUnaryCall;
   
 }
 
 export interface QuestionnaireServiceHandlers extends grpc.UntypedServiceImplementation {
-  CreateQuestionnaire: grpc.handleUnaryCall<_questionnaire_CreateQuestion__Output, _questionnaire_GenericResponse>;
+  CreateQuestionnaire: grpc.handleUnaryCall<_questionnaire_CreateQuestionnaire__Output, _questionnaire_QuestionnaireMessage>;
   
-  DeleteQuestionnaire: grpc.handleUnaryCall<_questionnaire_DeleteQuestion__Output, _questionnaire_GenericResponse>;
+  DeleteQuestionnaire: grpc.handleUnaryCall<_questionnaire_DeleteQuestionnaire__Output, _questionnaire_QuestionnaireMessage>;
   
-  GetQuestionnaire: grpc.handleUnaryCall<_questionnaire_GetOneQuestion__Output, _questionnaire_QuestionResponse>;
+  GetQuestionnaire: grpc.handleUnaryCall<_questionnaire_GetOneQuestionnaire__Output, _questionnaire_QuestionnaireResponse>;
   
-  GetQuestionnaires: grpc.handleUnaryCall<_questionnaire_GetAllQuestions__Output, _questionnaire_QuestionsResponse>;
+  GetQuestionnaires: grpc.handleUnaryCall<_questionnaire_GetAllQuestionnaires__Output, _questionnaire_QuestionnairesResponse>;
   
-  UpdateQuestionnaire: grpc.handleUnaryCall<_questionnaire_UpdateQuestion__Output, _questionnaire_GenericResponse>;
+  UpdateQuestionnaire: grpc.handleUnaryCall<_questionnaire_UpdateQuestionnaire__Output, _questionnaire_QuestionnaireMessage>;
   
 }
 
 export interface QuestionnaireServiceDefinition extends grpc.ServiceDefinition {
-  CreateQuestionnaire: MethodDefinition<_questionnaire_CreateQuestion, _questionnaire_GenericResponse, _questionnaire_CreateQuestion__Output, _questionnaire_GenericResponse__Output>
-  DeleteQuestionnaire: MethodDefinition<_questionnaire_DeleteQuestion, _questionnaire_GenericResponse, _questionnaire_DeleteQuestion__Output, _questionnaire_GenericResponse__Output>
-  GetQuestionnaire: MethodDefinition<_questionnaire_GetOneQuestion, _questionnaire_QuestionResponse, _questionnaire_GetOneQuestion__Output, _questionnaire_QuestionResponse__Output>
-  GetQuestionnaires: MethodDefinition<_questionnaire_GetAllQuestions, _questionnaire_QuestionsResponse, _questionnaire_GetAllQuestions__Output, _questionnaire_QuestionsResponse__Output>
-  UpdateQuestionnaire: MethodDefinition<_questionnaire_UpdateQuestion, _questionnaire_GenericResponse, _questionnaire_UpdateQuestion__Output, _questionnaire_GenericResponse__Output>
+  CreateQuestionnaire: MethodDefinition<_questionnaire_CreateQuestionnaire, _questionnaire_QuestionnaireMessage, _questionnaire_CreateQuestionnaire__Output, _questionnaire_QuestionnaireMessage__Output>
+  DeleteQuestionnaire: MethodDefinition<_questionnaire_DeleteQuestionnaire, _questionnaire_QuestionnaireMessage, _questionnaire_DeleteQuestionnaire__Output, _questionnaire_QuestionnaireMessage__Output>
+  GetQuestionnaire: MethodDefinition<_questionnaire_GetOneQuestionnaire, _questionnaire_QuestionnaireResponse, _questionnaire_GetOneQuestionnaire__Output, _questionnaire_QuestionnaireResponse__Output>
+  GetQuestionnaires: MethodDefinition<_questionnaire_GetAllQuestionnaires, _questionnaire_QuestionnairesResponse, _questionnaire_GetAllQuestionnaires__Output, _questionnaire_QuestionnairesResponse__Output>
+  UpdateQuestionnaire: MethodDefinition<_questionnaire_UpdateQuestionnaire, _questionnaire_QuestionnaireMessage, _questionnaire_UpdateQuestionnaire__Output, _questionnaire_QuestionnaireMessage__Output>
 }

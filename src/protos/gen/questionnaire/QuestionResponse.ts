@@ -1,4 +1,4 @@
-// Original file: src/protos/questionnaire.proto
+// Original file: src/protos/question.proto
 
 import type { Question as _questionnaire_Question, Question__Output as _questionnaire_Question__Output } from '../questionnaire/Question';
 

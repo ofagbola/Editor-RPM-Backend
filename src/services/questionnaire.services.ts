@@ -1,48 +1,48 @@
-import { Prisma, Question } from '@prisma/client';
+import { Prisma, Questionnaire } from '@prisma/client';
 import customConfig from '../config/default';
 import redisClient from '../utils/connectRedis';
 import { signJwt } from '../utils/jwt';
 import { prisma } from '../utils/prisma';
 
-export const createQuestion = async (input: Prisma.QuestionCreateInput) => {
-  return (await prisma.question.create({
+export const createQuestionnaire = async (input: Prisma.QuestionnaireCreateInput) => {
+  return (await prisma.questionnaire.create({
     data: input,
-  })) as Question;
+  })) as Questionnaire;
 };
 
-export const findQuestion = async (
-  where: Prisma.QuestionWhereInput,
-  select?: Prisma.QuestionSelect
+export const findQuestionnaire = async (
+  where: Prisma.QuestionnaireWhereInput,
+  select?: Prisma.QuestionnaireSelect
 ) => {
-  return (await prisma.question.findMany({
+  return (await prisma.questionnaire.findMany({
     where,
     select,
-  })) as Question[];
+  })) as Questionnaire[];
 };
 
-export const findUniqueQuestion = async (
-  where: Prisma.QuestionWhereUniqueInput,
-  select?: Prisma.QuestionSelect
+export const findUniqueQuestionnaire = async (
+  where: Prisma.QuestionnaireWhereUniqueInput,
+  select?: Prisma.QuestionnaireSelect
 ) => {
-  return (await prisma.question.findUnique({
+  return (await prisma.questionnaire.findUnique({
     where,
     select,
-  })) as Question;
+  })) as Questionnaire;
 };
 
-export const updateQuestion = async (
-  where: Prisma.QuestionWhereUniqueInput,
-  data: Prisma.QuestionUpdateInput,
-  select?: Prisma.QuestionSelect
+export const updateQuestionnaire = async (
+  where: Prisma.QuestionnaireWhereUniqueInput,
+  data: Prisma.QuestionnaireUpdateInput,
+  select?: Prisma.QuestionnaireSelect
 ) => {
-  return (await prisma.question.update({ where, data, select })) as Question;
+  return (await prisma.questionnaire.update({ where, data, select })) as Questionnaire;
 };
 
-export const deleteQuestion = async (
-  where: Prisma.QuestionWhereUniqueInput,
-  select?: Prisma.QuestionSelect
+export const deleteQuestionnaire = async (
+  where: Prisma.QuestionnaireWhereUniqueInput,
+  select?: Prisma.QuestionnaireSelect
 ) => {
-  return (await prisma.question.delete({ where, select })) as Question;
+  return (await prisma.questionnaire.delete({ where, select })) as Questionnaire;
 };
 
 // export const signTokens = async (user: Prisma.QuestionCreateInput) => {

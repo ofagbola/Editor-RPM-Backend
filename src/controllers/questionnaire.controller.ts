@@ -1,30 +1,45 @@
 //  import bcrypt from 'bcryptjs';
 import * as grpc from '@grpc/grpc-js';
 import {
-  createQuestion,
-  findUniqueQuestion,
-  findQuestion,
-  updateQuestion,
-  deleteQuestion
+  createQuestionnaire,
+  findUniqueQuestionnaire,
+  findQuestionnaire,
+  updateQuestionnaire,
+  deleteQuestionnaire
 } from '../services/questionnaire.services';
-import { CreateQuestion__Output } from '../protos/gen/questionnaire/CreateQuestion';
-import { QuestionResponse__Output } from '../protos/gen/questionnaire/QuestionResponse';
-import { QuestionsResponse__Output } from '../protos/gen/questionnaire/QuestionsResponse';
-import { GetAllQuestions__Output } from '../protos/gen/questionnaire/GetAllQuestions';
-import { GetOneQuestion__Output } from '../protos/gen/questionnaire/GetOneQuestion';
-import { GenericResponse__Output } from '../protos/gen/questionnaire/GenericResponse';
-import { UpdateQuestion__Output } from '../protos/gen/questionnaire/UpdateQuestion';
-import { DeleteQuestion__Output } from '../protos/gen/questionnaire/DeleteQuestion';
-import { signJwt, verifyJwt } from '../utils/jwt';
-import customConfig from '../config/default'; 
-import redisClient from '../utils/connectRedis';
+import { CreateQuestionnaire__Output } from '../protos/gen/questionnaire/CreateQuestionnaire';
+import { QuestionnaireResponse__Output } from '../protos/gen/questionnaire/QuestionnaireResponse';
+import { QuestionnairesResponse__Output } from '../protos/gen/questionnaire/QuestionnairesResponse';
+import { GetAllQuestionnaires__Output } from '../protos/gen/questionnaire/GetAllQuestionnaires';
+import { GetOneQuestionnaire__Output } from '../protos/gen/questionnaire/GetOneQuestionnaire';
+import { QuestionnaireMessage__Output } from '../protos/gen/questionnaire/QuestionnaireMessage';
+import { UpdateQuestionnaire__Output } from '../protos/gen/questionnaire/UpdateQuestionnaire';
+import { DeleteQuestionnaire__Output } from '../protos/gen/questionnaire/DeleteQuestionnaire';
 import { deserializeUser } from '../middlewares/deserializeUser'
+import { RequestValidator } from '../middlewares/requestValidator'
+import { 
+  CreateQuestionnaireRequest,
+  GetAllQuestionnaireRequest,
+  GetQuestionnaireRequest,
+  UpdateQuestionnaireRequest,
+  DeleteQuestionnaireRequest
+}from '../validators/questionnaire.validator'
 
 export const CreateQuestionnaire = async (
-  req: grpc.ServerUnaryCall<CreateQuestion__Output, GenericResponse__Output>,
-  res: grpc.sendUnaryData<GenericResponse__Output>
+  req: grpc.ServerUnaryCall<CreateQuestionnaire__Output, QuestionnaireMessage__Output>,
+  res: grpc.sendUnaryData<QuestionnaireMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(CreateQuestionnaireRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -35,19 +50,23 @@ export const CreateQuestionnaire = async (
       return;
     }
 
-    await createQuestion({
-      question: req.request.question,
-      answers: req.request.answers,
-      type: req.request.type,
+    await createQuestionnaire({
+      questions: req.request.questions,
+      category: req.request.category,
+      users: [{
+        id: user.id,
+        action: "created",
+        date: new Date()
+      }],
       status: req.request.status,
     });
 
-    res(null, {code: grpc.status.OK, message: "Question added successfully"});
+    res(null, {code: grpc.status.OK, message: "Questionnaire added successfully"});
   } catch (err: any) {
     if (err.code === 'P2002') {
       res({
         code: grpc.status.ALREADY_EXISTS,
-        message: 'Question already exists',
+        message: 'Questionnaire already exists',
       });
     }
 
@@ -56,10 +75,20 @@ export const CreateQuestionnaire = async (
 };
 
 export const GetQuestionnaires = async (
-  req: grpc.ServerUnaryCall<GetAllQuestions__Output, QuestionsResponse__Output>,
-  res: grpc.sendUnaryData<QuestionsResponse__Output>
+  req: grpc.ServerUnaryCall<GetAllQuestionnaires__Output, QuestionnairesResponse__Output>,
+  res: grpc.sendUnaryData<QuestionnairesResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetAllQuestionnaireRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -70,23 +99,23 @@ export const GetQuestionnaires = async (
       return;
     }
 
-    const questions = await findQuestion({ ...req.request.request_query });
+    const questionnaires = await findQuestionnaire({ ...req.request.request_query });
 
-    const formattedQuestions = questions.map(question => ({
-      ...question,
+    const formattedQuestionnaires: any = questionnaires.map(questionnaire => ({
+      ...questionnaire,
       created_at: { 
-        seconds: (question.created_at.getTime() / 1000).toString(), 
-        nanos: question.created_at.getMilliseconds() * 1000000
+        seconds: (questionnaire.created_at.getTime() / 1000).toString(), 
+        nanos: questionnaire.created_at.getMilliseconds() * 1000000
       },
       updated_at: { 
-        seconds: (question.updated_at.getTime() / 1000).toString(), 
-        nanos: question.updated_at.getMilliseconds() * 1000000
+        seconds: (questionnaire.updated_at.getTime() / 1000).toString(), 
+        nanos: questionnaire.updated_at.getMilliseconds() * 1000000
       }
     }));
     
     res(null, {
       code: grpc.status.OK,
-      data: formattedQuestions
+      data: formattedQuestionnaires
     });
   } catch (err: any) {
     res({
@@ -97,10 +126,20 @@ export const GetQuestionnaires = async (
 };
 
 export const GetQuestionnaire = async (
-  req: grpc.ServerUnaryCall<GetOneQuestion__Output, QuestionResponse__Output>,
-  res: grpc.sendUnaryData<QuestionResponse__Output>
+  req: grpc.ServerUnaryCall<GetOneQuestionnaire__Output, QuestionnaireResponse__Output>,
+  res: grpc.sendUnaryData<QuestionnaireResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetQuestionnaireRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -111,31 +150,33 @@ export const GetQuestionnaire = async (
       return;
     }
 
-    const question = await findUniqueQuestion({ id: req.request.id });
+    const questionnaire = await findUniqueQuestionnaire({ id: req.request.id });
 
-    if(!question) {
+    if(!questionnaire) {
       res({
         code: grpc.status.NOT_FOUND,
-        message: 'Question not found!',
+        message: 'Questionnaire not found!',
       });
       return;
     }
 
+    const users: any = questionnaire.users;
+
     res(null, {
       code: grpc.status.OK,
       data: {
-        id: question.id,
-        question: question.question,
-        answers: question.answers,
-        type: question.type!,
-        status: question.status!,
+        id: questionnaire.id,
+        questions: questionnaire.questions,
+        category: questionnaire.category,
+        status: questionnaire.status,
+        users: users,
         created_at: { 
-          seconds: (question.created_at.getTime() / 1000).toString(),
-          nanos: question.created_at.getMilliseconds() * 1000000 
+          seconds: (questionnaire.created_at.getTime() / 1000).toString(),
+          nanos: questionnaire.created_at.getMilliseconds() * 1000000 
         },
         updated_at: { 
-          seconds: (question.updated_at.getTime() / 1000).toString(),
-          nanos: question.updated_at.getMilliseconds() * 1000000  
+          seconds: (questionnaire.updated_at.getTime() / 1000).toString(),
+          nanos: questionnaire.updated_at.getMilliseconds() * 1000000  
         },
       },
     });
@@ -148,10 +189,20 @@ export const GetQuestionnaire = async (
 };
 
 export const UpdateQuestionnaire = async (
-  req: grpc.ServerUnaryCall<UpdateQuestion__Output, GenericResponse__Output>,
-  res: grpc.sendUnaryData<GenericResponse__Output>
+  req: grpc.ServerUnaryCall<UpdateQuestionnaire__Output, QuestionnaireMessage__Output>,
+  res: grpc.sendUnaryData<QuestionnaireMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(UpdateQuestionnaireRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -162,19 +213,40 @@ export const UpdateQuestionnaire = async (
       return;
     }
 
-    await updateQuestion({id : req.request.id}, {
-      question: req.request.question,
-      answers: req.request.answers,
-      type: req.request.type,
+    const questionnaire = await findUniqueQuestionnaire({ id: req.request.id });
+
+    if(!questionnaire) {
+      res({
+        code: grpc.status.NOT_FOUND,
+        message: 'Questionnaire not found!',
+      });
+      return;
+    }
+
+    const questions = req.request.questions && req.request.questions.length > 0
+      ? [...questionnaire.questions, ...req.request.questions] 
+      : questionnaire.questions
+    ;
+
+    const users: any = [...questionnaire.users, {
+      id: user.id,
+      action: "modified",
+      date: new Date()
+    }];
+
+    await updateQuestionnaire({id : req.request.id}, {
+      questions: questions,
+      users: users,
+      category: req.request.category,
       status: req.request.status,
     });
 
-    res(null, {code: grpc.status.OK, message: "Question updated successfully"});
+    res(null, {code: grpc.status.OK, message: "Questionnaire updated successfully"});
   } catch (err: any) {
     if (err.code === 'P2002') {
       res({
         code: grpc.status.ALREADY_EXISTS,
-        message: 'Question already exists',
+        message: 'Questionnaire already exists',
       });
     }
 
@@ -183,10 +255,20 @@ export const UpdateQuestionnaire = async (
 };
 
 export const DeleteQuestionnaire = async (
-  req: grpc.ServerUnaryCall<DeleteQuestion__Output, GenericResponse__Output>,
-  res: grpc.sendUnaryData<GenericResponse__Output>
+  req: grpc.ServerUnaryCall<DeleteQuestionnaire__Output, QuestionnaireMessage__Output>,
+  res: grpc.sendUnaryData<QuestionnaireMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(DeleteQuestionnaireRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -197,11 +279,11 @@ export const DeleteQuestionnaire = async (
       return;
     }
 
-    await deleteQuestion({ id: req.request.id });
+    await deleteQuestionnaire({ id: req.request.id });
 
     res(null, {
       code: grpc.status.OK,
-      message: "Question deleted successfully"
+      message: "Questionnaire deleted successfully"
     });
   } catch (err: any) {
     res({

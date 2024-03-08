@@ -4,7 +4,8 @@ import type { Timestamp as _google_protobuf_Timestamp, Timestamp__Output as _goo
 
 export interface Answer {
   'id'?: (string);
-  'answer'?: (number);
+  'questionnaire'?: (string);
+  'answer'?: (string)[];
   'question'?: (string);
   'user'?: (string);
   'status'?: (string);
@@ -14,7 +15,8 @@ export interface Answer {
 
 export interface Answer__Output {
   'id': (string);
-  'answer': (number);
+  'questionnaire': (string);
+  'answer': (string)[];
   'question': (string);
   'user': (string);
   'status': (string);

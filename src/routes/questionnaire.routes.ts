@@ -7,7 +7,7 @@ import {
     DeleteQuestionnaire
 } from '../controllers/questionnaire.controller';
 
-export const QuestionRoutes: QuestionnaireServiceHandlers = {
+export const QuestionnaireRoutes: QuestionnaireServiceHandlers = {
     GetQuestionnaires,
     GetQuestionnaire,
     CreateQuestionnaire,

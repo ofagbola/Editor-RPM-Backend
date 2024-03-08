@@ -1,4 +1,4 @@
-// Original file: src/protos/questionnaire.proto
+// Original file: src/protos/question.proto
 
 
 export interface GetAllQuestions {

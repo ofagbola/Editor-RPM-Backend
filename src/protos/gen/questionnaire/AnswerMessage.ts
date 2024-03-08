@@ -1,12 +1,12 @@
 // Original file: src/protos/answer.proto
 
 
-export interface MessageResponse {
+export interface AnswerMessage {
   'code'?: (number);
   'message'?: (string);
 }
 
-export interface MessageResponse__Output {
+export interface AnswerMessage__Output {
   'code': (number);
   'message': (string);
 }

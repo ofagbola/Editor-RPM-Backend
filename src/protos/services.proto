@@ -4,20 +4,38 @@ package questionnaire;
 
 import "questionnaire.proto";
 import "answer.proto";
+import "question.proto";
+import "category.proto";
 
 service QuestionnaireService {
-    rpc GetQuestionnaires(GetAllQuestions) returns (QuestionsResponse) {}
-    rpc GetQuestionnaire(GetOneQuestion) returns (QuestionResponse) {}
-    rpc CreateQuestionnaire(CreateQuestion) returns (GenericResponse) {}
-    rpc UpdateQuestionnaire(UpdateQuestion) returns (GenericResponse) {}
-    rpc DeleteQuestionnaire(DeleteQuestion) returns (GenericResponse) {}
+    rpc GetQuestionnaires(GetAllQuestionnaires) returns (QuestionnairesResponse) {}
+    rpc GetQuestionnaire(GetOneQuestionnaire) returns (QuestionnaireResponse) {}
+    rpc CreateQuestionnaire(CreateQuestionnaire) returns (QuestionnaireMessage) {}
+    rpc UpdateQuestionnaire(UpdateQuestionnaire) returns (QuestionnaireMessage) {}
+    rpc DeleteQuestionnaire(DeleteQuestionnaire) returns (QuestionnaireMessage) {}
+}
+
+service QuestionService {
+    rpc GetQuestions(GetAllQuestions) returns (QuestionsResponse) {}
+    rpc GetQuestion(GetOneQuestion) returns (QuestionResponse) {}
+    rpc CreateQuestion(CreateQuestion) returns (QuestionMessage) {}
+    rpc UpdateQuestion(UpdateQuestion) returns (QuestionMessage) {}
+    rpc DeleteQuestion(DeleteQuestion) returns (QuestionMessage) {}
 }
 
 service AnswerService {
     rpc GetAnswers(GetAllAnswers) returns (AnswersResponse) {}
     rpc GetAnswer(GetOneAnswer) returns (AnswerResponse) {}
-    rpc CreateAnswer(CreateAnswer) returns (MessageResponse) {}
-    rpc UpdateAnswer(UpdateAnswer) returns (MessageResponse) {}
-    rpc DeleteAnswer(DeleteAnswer) returns (MessageResponse) {}
+    rpc CreateAnswer(CreateAnswer) returns (AnswerMessage) {}
+    rpc UpdateAnswer(UpdateAnswer) returns (AnswerMessage) {}
+    rpc DeleteAnswer(DeleteAnswer) returns (AnswerMessage) {}
+}
+
+service CategoryService {
+    rpc GetCategories(GetAllCategories) returns (CategoriesResponse) {}
+    rpc GetCategory(GetOneCategory) returns (CategoryResponse) {}
+    rpc CreateCategory(CreateCategory) returns (CategoryMessage) {}
+    rpc UpdateCategory(UpdateCategory) returns (CategoryMessage) {}
+    rpc DeleteCategory(DeleteCategory) returns (CategoryMessage) {}
 }
 

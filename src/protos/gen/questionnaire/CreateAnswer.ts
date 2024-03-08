@@ -3,14 +3,16 @@
 
 export interface CreateAnswer {
   'access_token'?: (string);
+  'questionnaire'?: (string);
+  'answer'?: (string)[];
   'question'?: (string);
-  'answer'?: (number);
   'status'?: (string);
 }
 
 export interface CreateAnswer__Output {
   'access_token': (string);
+  'questionnaire': (string);
+  'answer': (string)[];
   'question': (string);
-  'answer': (number);
   'status': (string);
 }

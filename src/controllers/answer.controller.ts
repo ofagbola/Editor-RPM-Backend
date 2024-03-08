@@ -12,19 +12,34 @@ import { AnswerResponse__Output } from '../protos/gen/questionnaire/AnswerRespon
 import { AnswersResponse__Output } from '../protos/gen/questionnaire/AnswersResponse';
 import { GetAllAnswers__Output } from '../protos/gen/questionnaire/GetAllAnswers';
 import { GetOneAnswer__Output } from '../protos/gen/questionnaire/GetOneAnswer';
-import { GenericResponse__Output } from '../protos/gen/questionnaire/GenericResponse';
+import { AnswerMessage__Output } from '../protos/gen/questionnaire/AnswerMessage';
 import { UpdateAnswer__Output } from '../protos/gen/questionnaire/UpdateAnswer';
 import { DeleteAnswer__Output } from '../protos/gen/questionnaire/DeleteAnswer';
-import { signJwt, verifyJwt } from '../utils/jwt';
-import customConfig from '../config/default'; 
-import redisClient from '../utils/connectRedis';
-import { deserializeUser } from '../middlewares/deserializeUser'
+import { deserializeUser } from '../middlewares/deserializeUser';
+import {
+  CreateAnswerRequest,
+  GetAllAnswerRequest,
+  GetAnswerRequest,
+  UpdateAnswerRequest,
+  DeleteAnswerRequest
+} from '../validators/answer.validator';
+import { RequestValidator } from '../middlewares/requestValidator';
 
 export const CreateAnswer = async (
-  req: grpc.ServerUnaryCall<CreateAnswer__Output, GenericResponse__Output>,
-  res: grpc.sendUnaryData<GenericResponse__Output>
+  req: grpc.ServerUnaryCall<CreateAnswer__Output, AnswerMessage__Output>,
+  res: grpc.sendUnaryData<AnswerMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(CreateAnswerRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -36,6 +51,7 @@ export const CreateAnswer = async (
     }
 
     await createAnswer({
+      questionnaire: req.request.questionnaire,
       question: req.request.question,
       answer: req.request.answer,
       user: user.id,
@@ -60,6 +76,16 @@ export const GetAnswers = async (
   res: grpc.sendUnaryData<AnswersResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetAllAnswerRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -100,6 +126,16 @@ export const GetAnswer = async (
   res: grpc.sendUnaryData<AnswerResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetAnswerRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -116,6 +152,7 @@ export const GetAnswer = async (
       code: grpc.status.OK,
       data: {
         id: answer.id,
+        questionnaire: answer.questionnaire,
         question: answer.question,
         answer: answer.answer,
         user: answer.user!,
@@ -139,10 +176,20 @@ export const GetAnswer = async (
 };
 
 export const UpdateAnswer = async (
-  req: grpc.ServerUnaryCall<UpdateAnswer__Output, GenericResponse__Output>,
-  res: grpc.sendUnaryData<GenericResponse__Output>
+  req: grpc.ServerUnaryCall<UpdateAnswer__Output, AnswerMessage__Output>,
+  res: grpc.sendUnaryData<AnswerMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(UpdateAnswerRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -172,10 +219,20 @@ export const UpdateAnswer = async (
 };
 
 export const DeleteAnswer = async (
-  req: grpc.ServerUnaryCall<DeleteAnswer__Output, GenericResponse__Output>,
-  res: grpc.sendUnaryData<GenericResponse__Output>
+  req: grpc.ServerUnaryCall<DeleteAnswer__Output, AnswerMessage__Output>,
+  res: grpc.sendUnaryData<AnswerMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(DeleteAnswerRequest, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {

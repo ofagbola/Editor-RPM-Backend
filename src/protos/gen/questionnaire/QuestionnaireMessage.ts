@@ -1,12 +1,12 @@
 // Original file: src/protos/questionnaire.proto
 
 
-export interface GenericResponse {
+export interface QuestionnaireMessage {
   'code'?: (number);
   'message'?: (string);
 }
 
-export interface GenericResponse__Output {
+export interface QuestionnaireMessage__Output {
   'code': (number);
   'message': (string);
 }

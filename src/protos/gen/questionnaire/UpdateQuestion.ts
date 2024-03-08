@@ -1,4 +1,4 @@
-// Original file: src/protos/questionnaire.proto
+// Original file: src/protos/question.proto
 
 
 export interface UpdateQuestion {
@@ -7,6 +7,7 @@ export interface UpdateQuestion {
   'answers'?: (string)[];
   'type'?: (string);
   'status'?: (string);
+  'category'?: (string);
   'id'?: (string);
 }
 
@@ -16,5 +17,6 @@ export interface UpdateQuestion__Output {
   'answers': (string)[];
   'type': (string);
   'status': (string);
+  'category': (string);
   'id': (string);
 }
