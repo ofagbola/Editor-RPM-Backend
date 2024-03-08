@@ -11,7 +11,9 @@ export const app = () => {
     const server = new grpc.Server({});
 
     sql`SELECT * FROM users`
-      .then(() => {})
+      .then((users: any) => {
+        console.log(users);
+      })
       .catch((error: any) => {
         console.log(error);
       });
