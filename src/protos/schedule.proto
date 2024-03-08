@@ -15,6 +15,13 @@ enum ScheduleStatus {
   PENDING = 2;
 }
 
+enum Packages {
+  MESSAGING = 0;
+  VIDEO_CALL = 1;
+  VOICE_CALL = 2;
+  QUESTIONNAIRE = 3;
+}
+
 message User {
   string id = 1;
   UserType type = 2;
@@ -25,10 +32,9 @@ message Schedule {
   User recepient = 2;
   string duration = 3;
   int32 sessions = 4;
-  repeated string package = 5;
+  repeated Packages package = 5;
   ScheduleStatus status = 6;
   google.protobuf.Timestamp date = 7;
-  google.protobuf.Timestamp time = 8;
 }
 
 message ScheduleRequest {
@@ -110,6 +116,6 @@ message DeleteSchedule {
 
 message DeleteReSchedule { 
   string access_token = 1; 
-  string index = 2;
+  int32 index = 2;
   string id = 3; 
 }

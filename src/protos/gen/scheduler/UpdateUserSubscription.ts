@@ -3,14 +3,14 @@
 
 export interface UpdateUserSubscription {
   'access_token'?: (string);
-  'payed'?: (number | string);
+  'paid'?: (number | string);
   'status'?: (string);
   'id'?: (string);
 }
 
 export interface UpdateUserSubscription__Output {
   'access_token': (string);
-  'payed': (number);
+  'paid': (number);
   'status': (string);
   'id': (string);
 }

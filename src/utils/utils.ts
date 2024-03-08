@@ -1,64 +1,18 @@
-import Ajv, { DefinedError, AnySchema } from 'ajv';
-import * as grpc from '@grpc/grpc-js';
+export const getRandomInt = (min: number, max: number) => {  
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return (Math.floor(Math.random() * (max - min + 1)) + min);
+}
 
+export const getTimestampDate = ({ date }: { date?: string | null }) => {
+  const newDate = date ? new Date(date) : new Date();
 
-const ajv = new Ajv({
-  allErrors: true,
-});
+  const seconds = Math.floor(newDate.getTime() / 1000);
 
-/**
- * Validate schema middleware.
- * @param  {AnySchema} schema
- */
-export const validateSchema = (schema: AnySchema) => {
-  return function (call: any, callback: any, next: any) {
-    
-    const payload = {};
-    const validate = ajv.compile(schema);
+  const nanos = newDate.getMilliseconds() * 1000000;
 
-    if (!validate(payload)) {
-      const errors: string[] = [];
-      for (const err of validate.errors as DefinedError[]) {
-        if (err.message) {
-          errors.push(err.message);
-        }
-      }
-      const res = buildErrorResponse(errors, grpc.status.INVALID_ARGUMENT);
-      callback({
-        code: res.code,
-        message: res.details,
-      });
-    }
-
-    return next(call);
+  return { 
+    seconds: seconds.toString(), 
+    nanos: nanos.toString()
   };
 };
-
-export const buildSuccessResponse = (data: object | [] | null, status: grpc.status) => {
-  return new grpc.StatusBuilder()
-    .withCode(status)
-    .withDetails(
-      JSON.stringify({
-        status: 'SUCCESS',
-        result: data,
-      })
-    )
-    .build();
-};
-
-
-export const buildErrorResponse = (
-  errors: string[] | object,
-  status: grpc.status
-) => {
-  return new grpc.StatusBuilder()
-    .withCode(status)
-    .withDetails(
-      JSON.stringify({
-        status: 'ERROR',
-        errors,
-      })
-    )
-    .build();
-};
-

@@ -7,6 +7,7 @@ import {
   updateScheduleRequest,
   deleteScheduleRequest
 } from '../services/schedule.services';
+import { findUniqueUserSubscriptionRequest } from '../services/user.subscription.services';
 import { CreateSchedule__Output } from '../protos/gen/scheduler/CreateSchedule';
 import { CreateReSchedule__Output } from '../protos/gen/scheduler/CreateReSchedule';
 import { ScheduleResponse__Output } from '../protos/gen/scheduler/ScheduleResponse';
@@ -19,18 +20,57 @@ import { UpdateReSchedule__Output } from '../protos/gen/scheduler/UpdateReSchedu
 import { DeleteSchedule__Output } from '../protos/gen/scheduler/DeleteSchedule';
 import { DeleteReSchedule__Output } from '../protos/gen/scheduler/DeleteReSchedule';
 import { deserializeUser } from '../middlewares/deserializeUser';
+import { RequestValidator } from '../middlewares/requestValidator';
+import {
+  CreateScheduleValidator,
+  CreateReScheduleValidator,
+  GetAllScheduleValidator,
+  GetScheduleValidator,
+  UpdateScheduleValidator,
+  UpdateReScheduleValidator,
+  DeleteScheduleValidator,
+  DeleteReScheduleValidator
+} from '../validators/schedule.validator'
 
 export const CreateSchedule = async (
   req: grpc.ServerUnaryCall<CreateSchedule__Output, ScheduleMessage__Output>,
   res: grpc.sendUnaryData<ScheduleMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(CreateScheduleValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
       res({
         code: grpc.status.UNAUTHENTICATED,
         message: 'Invalid access token or session expired',
+      });
+      return;
+    }
+
+    const subscription = await findUniqueUserSubscriptionRequest({ id: req.request.userSubscriptionId })
+
+    if (!subscription) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: 'Invalid Subscription ID Provided',
+      });
+      return;
+    }
+
+    if (subscription.outstanding > 0) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: 'Subcription still has pending payment, complete payment and try again',
       });
       return;
     }
@@ -62,6 +102,16 @@ export const CreateReSchedule = async (
   res: grpc.sendUnaryData<ScheduleMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(CreateReScheduleValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -73,6 +123,14 @@ export const CreateReSchedule = async (
     }
 
     const reschedules = await findUniqueScheduleRequest({ id : req.request.id })
+
+    if(!reschedules) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: 'Schedule not found on provided id',
+      });
+      return;
+    }
 
     if(!req.request.reason || !req.request.schedule) {
       res({
@@ -106,6 +164,16 @@ export const GetSchedules = async (
   res: grpc.sendUnaryData<SchedulesResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetAllScheduleValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -146,6 +214,16 @@ export const GetSchedule = async (
   res: grpc.sendUnaryData<ScheduleResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetScheduleValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -157,6 +235,14 @@ export const GetSchedule = async (
     }
 
     const schedule: any = await findUniqueScheduleRequest({ id: req.request.id });
+
+    if (!schedule) {
+      res({
+        code: grpc.status.NOT_FOUND,
+        message: 'Schedule not found',
+      });
+      return;
+    }
 
     res(null, {
       code: grpc.status.OK,
@@ -190,6 +276,16 @@ export const UpdateSchedule = async (
   res: grpc.sendUnaryData<ScheduleMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(UpdateScheduleValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+    
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -219,6 +315,16 @@ export const UpdateReSchedule = async (
   res: grpc.sendUnaryData<ScheduleMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(UpdateReScheduleValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+    
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -261,6 +367,16 @@ export const DeleteSchedule = async (
   res: grpc.sendUnaryData<ScheduleMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(DeleteScheduleValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+    
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -290,6 +406,16 @@ export const DeleteReSchedule = async (
   res: grpc.sendUnaryData<ScheduleMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(DeleteReScheduleValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+    
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -304,11 +430,19 @@ export const DeleteReSchedule = async (
 
     const arrays: any = reschedules.reschedule
 
+    if (!arrays[req.request.index]) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: 'Invalid index provided',
+      });
+      return;
+    }
+
     const reschedule: any = [];
 
     for(let index = 0; index < arrays.length; index++) {
       if(arrays[index] && arrays[index].schedule) {
-        if(String(index) !== req.request.index) {
+        if(index !== req.request.index) {
           reschedule.push(arrays[index]);
         }
       }

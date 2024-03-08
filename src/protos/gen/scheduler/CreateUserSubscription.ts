@@ -7,7 +7,7 @@ import type { PaymentInfo as _scheduler_PaymentInfo, PaymentInfo__Output as _sch
 export interface CreateUserSubscription {
   'access_token'?: (string);
   'subscriptionId'?: (string);
-  'payed'?: (number | string);
+  'paid'?: (number | string);
   'billing'?: (_scheduler_UserBillingType);
   'paymentMethod'?: (_scheduler_UserPaymentMethodType);
   'paymentInfo'?: (_scheduler_PaymentInfo | null);
@@ -16,7 +16,7 @@ export interface CreateUserSubscription {
 export interface CreateUserSubscription__Output {
   'access_token': (string);
   'subscriptionId': (string);
-  'payed': (number);
+  'paid': (number);
   'billing': (_scheduler_UserBillingType__Output);
   'paymentMethod': (_scheduler_UserPaymentMethodType__Output);
   'paymentInfo': (_scheduler_PaymentInfo__Output | null);

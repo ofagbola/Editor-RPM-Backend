@@ -19,6 +19,7 @@ export interface ProtoGrpcType {
     DeleteSchedule: MessageTypeDefinition
     GetAllSchedules: MessageTypeDefinition
     GetOneSchedule: MessageTypeDefinition
+    Packages: EnumTypeDefinition
     Schedule: MessageTypeDefinition
     ScheduleMessage: MessageTypeDefinition
     ScheduleRequest: MessageTypeDefinition

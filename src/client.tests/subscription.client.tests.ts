@@ -3,6 +3,13 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from '../protos/gen/services';
 import customConfig from '../config/default';
+import { 
+  GetSubscriptionConstants,
+  GetSubscriptionConstant,
+  CreateSubscriptionConstant,
+  UpdateSubscriptionConstant,
+  DeleteSubscriptionConstant
+} from '../constants/subscription.constant';
 
 const options: protoLoader.Options = {
   keepCase: true,
@@ -22,7 +29,7 @@ const proto = grpc.loadPackageDefinition(
   packageDef
 ) as unknown as ProtoGrpcType;
 
-const client = new proto.questionnaire.QuestionnaireService(
+const client = new proto.scheduler.SubscriptionService(
   `0.0.0.0:${PORT}`,
   grpc.credentials.createInsecure()
 );
@@ -37,95 +44,82 @@ client.waitForReady(deadline, (err: any) => {
 });
 
 function onClientReady() {
-  // CreateQuestionnaire();
-  // GetQestionnaires();
-  // UpdateQuestionnaire();
-  // GetQestionnaire();
-  // DeleteQestionnaire();
+  // CreateSubscription();
+  GetSubscriptions();
+  // UpdateSubscription();
+  // GetSubscription();
+  // DeleteSubscription();
 }
 
-function GetQestionnaires() {
-  client.GetQuestionnaires(
-    { request_query: { status: "active" }, access_token: "efhiwfwuihiuwfhwwfbwifwwh" },
-    (err, res) => {
+function GetSubscriptions() {
+  const data = GetSubscriptionConstants();
+
+  client.getSubscriptions(
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
       }
+      
       console.log(res);
     }
   );
 }
 
-function GetQestionnaire() {
-  client.GetQuestionnaire(
-    {
-      id: '79c3047e-fe91-4d55-bbe7-d224d15f2baa',
-      access_token: 'hgfsfedjgddgkhdjwdw',
-    },
-    (err, res) => {
+function GetSubscription() {
+  const data = GetSubscriptionConstant();
+
+  client.getSubscription(
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
       }
+
       console.log(res);
     }
   );
 }
 
-function CreateQuestionnaire() {
-  client.CreateQuestionnaire(
-    {
-      question: 'Select couching scale between 1 and 10?',
-      status: 'active',
-      type: 'range',
-      answers: [
-        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
-      ],
-      access_token: 'hssjhfsiuhfwibiuiwffwfwf',
-    },
-    (err, res) => {
+function CreateSubscription() {
+  const data: any = CreateSubscriptionConstant();
+
+  client.createSubscription(
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
       }
+
       console.log(res);
     }
   );
 }
 
-function UpdateQuestionnaire() {
-  client.UpdateQuestionnaire(
-    {
-      id: "2b260db0-033a-4169-bf6a-920e35163ad4",
-      question: 'Select couching scale between 5 and 20?',
-      status: 'active',
-      type: 'range',
-      answers: [
-        "5", "10", "15", "20"
-      ],
-      access_token: 'hssjhfsiuhfwibiuiwffwfwf',
-    },
-    (err, res) => {
+function UpdateSubscription() {
+  const data: any = UpdateSubscriptionConstant();
+
+  client.updateSubscription(
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
       }
+
       console.log(res);
     }
   );
 }
-function DeleteQestionnaire() {
-  client.DeleteQuestionnaire(
-    {
-      id: '79c3047e-fe91-4d55-bbe7-d224d15f2baa',
-      access_token: 'hgfsfedjgddgkhdjwdw',
-    },
-    (err, res) => {
+function DeleteSubscription() {
+  const data = DeleteSubscriptionConstant();
+
+  client.deleteSubscription(
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
       }
+
       console.log(res);
     }
   );

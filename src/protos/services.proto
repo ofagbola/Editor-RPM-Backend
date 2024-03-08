@@ -6,12 +6,6 @@ import "schedule.proto";
 import "subscription.proto";
 import "user.subscription.proto";
 import "review.proto";
-package scheduler;
-
-import "schedule.proto";
-import "subscription.proto";
-import "user.subscription.proto";
-import "review.proto";
 
 service ScheduleService {
     rpc GetSchedules(GetAllSchedules) returns (SchedulesResponse) {}
@@ -33,16 +27,16 @@ service  SubscriptionService {
 }
 
 service UserSubscriptionService {
-    rpc GetUserSubscriptions(GetAllUserSubscriptions) returns (SubscriptionsResponse) {}
-    rpc GetUserSubscription(GetOneUserSubscription) returns (SubscriptionResponse) {}
-    rpc CreateUserSubscription(CreateUserSubscription) returns (SubscriptionMessage) {}
-    rpc UpdateUserSubscription(CreateUserSubscription) returns (SubscriptionMessage) {}
-    rpc DeleteUserSubscription(DeleteUserSubscription) returns (SubscriptionMessage) {}
+    rpc GetUserSubscriptions(GetAllUserSubscriptions) returns (UserSubscriptionsResponse) {}
+    rpc GetUserSubscription(GetOneUserSubscription) returns (UserSubscriptionResponse) {}
+    rpc CreateUserSubscription(CreateUserSubscription) returns (UserSubscriptionMessage) {}
+    rpc UpdateUserSubscription(UpdateUserSubscription) returns (UserSubscriptionMessage) {}
+    rpc DeleteUserSubscription(DeleteUserSubscription) returns (UserSubscriptionMessage) {}
 }
 
 service ReviewService {
     rpc GetDoctorReviews(GetDoctorReviews) returns (ReviewsResponse) {}
-    rpc GetSessionReviews(GetSessionReviews) returns (ReviewResponse) {}
+    rpc GetSessionReviews(GetSessionReviews) returns (ReviewsResponse) {}
     rpc CreateReview(CreateReview) returns (ReviewMessage) {}
     rpc UpdateReview(UpdateReview) returns (ReviewMessage) {}
     rpc DeleteReview(DeleteReview) returns (ReviewMessage) {}

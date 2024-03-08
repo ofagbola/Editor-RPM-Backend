@@ -19,12 +19,30 @@ import { UserSubscriptionMessage__Output } from '../protos/gen/scheduler/UserSub
 import { UpdateUserSubscription__Output } from '../protos/gen/scheduler/UpdateUserSubscription';
 import { DeleteUserSubscription__Output } from '../protos/gen/scheduler/DeleteUserSubscription';
 import { deserializeUser } from '../middlewares/deserializeUser';
+import { RequestValidator } from '../middlewares/requestValidator';
+import {
+  CreateUserSubscriptonValidator,
+  GetAllUserSubscriptonValidator,
+  GetUserSubscriptonValidator,
+  UpdateUserSubscriptonValidator,
+  DeleteUserSubscriptonValidator
+} from '../validators/user.subscription.validator'
 
 export const CreateUserSubscription = async (
   req: grpc.ServerUnaryCall<CreateUserSubscription__Output, UserSubscriptionMessage__Output>,
   res: grpc.sendUnaryData<UserSubscriptionMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(CreateUserSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -39,14 +57,16 @@ export const CreateUserSubscription = async (
 
     const discount = (subscription.discount / 100) * subscription.amount;
 
-    const outstanding: any = discount >= req.request.payed && discount - req.request.payed;
+    const amount = subscription.amount - discount;
 
-    const paymentInfo: any = req.request.paymentInfo
+    const outstanding: any = amount - req.request.paid;
+
+    const paymentInfo: any = {...req.request.paymentInfo, cardNumber: req.request.paymentInfo?.cardNumber}
 
     await createUserSubscriptionRequest({
       subscriptionId: req.request.subscriptionId,
       userId: user.id,
-      paid: req.request.payed,
+      paid: req.request.paid,
       outstanding: outstanding,
       discount: discount,
       billing: req.request.billing,
@@ -73,6 +93,16 @@ export const GetUserSubscriptions = async (
   res: grpc.sendUnaryData<UserSubscriptionsResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetAllUserSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -114,6 +144,16 @@ export const GetUserSubscription = async (
   res: grpc.sendUnaryData<UserSubscriptionResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetUserSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -142,7 +182,7 @@ export const GetUserSubscription = async (
         id: user_subscription.id,
         subscriptionId: user_subscription.subscriptionId,
         userId: user_subscription.userId,
-        payed: user_subscription.paid,
+        paid: user_subscription.paid,
         outstanding: user_subscription.outstanding,
         discount: user_subscription.discount,
         billing: billing,
@@ -172,6 +212,16 @@ export const UpdateUserSubscription = async (
   res: grpc.sendUnaryData<UserSubscriptionMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(UpdateUserSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -188,11 +238,12 @@ export const UpdateUserSubscription = async (
 
     const discount = (subscription.discount / 100) * subscription.amount;
 
-    const outstanding: any = discount >= (req.request.payed + user_subscription.paid)
-      && discount - (req.request.payed + user_subscription.paid);
+    const amount = subscription.amount - discount;
+
+    const outstanding: any = amount - req.request.paid;
 
     await updateUserSubscriptionRequest({ id : req.request.id }, {
-      paid: (req.request.payed + user_subscription.paid),
+      paid: (req.request.paid + user_subscription.paid),
       outstanding: outstanding,
       status: req.request.status,
     });
@@ -208,6 +259,16 @@ export const DeleteUserSubscription = async (
   res: grpc.sendUnaryData<UserSubscriptionMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(DeleteUserSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {

@@ -6,6 +6,7 @@ export interface ReviewRequest {
   'id'?: (string);
   'sessionId'?: (string);
   'doctorId'?: (string);
+  'userId'?: (string);
   'rating'?: (number | string);
   'review'?: (string);
   'created_at'?: (_google_protobuf_Timestamp | null);
@@ -16,6 +17,7 @@ export interface ReviewRequest__Output {
   'id': (string);
   'sessionId': (string);
   'doctorId': (string);
+  'userId': (string);
   'rating': (number);
   'review': (string);
   'created_at': (_google_protobuf_Timestamp__Output | null);

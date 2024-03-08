@@ -52,6 +52,11 @@ export interface SuscriptionRequest {
     billing: billing[];
     paymentMethod: paymentMethod[];
     benefits: benefits[];
+    extras: {
+        duration: string;
+        sessions: number;
+        package: packages[];
+    }
     created_at: Date;
     updated_at: Date;
 }
@@ -86,6 +91,7 @@ export interface ReviewRequest {
     id: string;
     sessionId: string;
     doctorId: string;
+    userId: string;
     rating: number;
     review: string;
     created_at: Date;

@@ -32,7 +32,7 @@ message UserSubscriptionRequest {
   string id = 1;
   string subscriptionId = 2;
   string userId = 3;
-  double payed = 4;
+  double paid = 4;
   double outstanding = 5;
   double discount = 6;
   UserBillingType billing = 7;
@@ -71,7 +71,7 @@ message GetOneUserSubscription {
 message CreateUserSubscription { 
   string access_token = 1; 
   string subscriptionId = 2;
-  double payed = 3;
+  double paid = 3;
   UserBillingType billing = 4;
   UserPaymentMethodType paymentMethod = 5;
   PaymentInfo paymentInfo = 6;
@@ -79,7 +79,7 @@ message CreateUserSubscription {
 
 message UpdateUserSubscription { 
   string access_token = 1; 
-  double payed = 2;
+  double paid = 2;
   string status = 3;
   string id = 4;
 }

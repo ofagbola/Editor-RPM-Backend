@@ -9,7 +9,7 @@ export interface UserSubscriptionRequest {
   'id'?: (string);
   'subscriptionId'?: (string);
   'userId'?: (string);
-  'payed'?: (number | string);
+  'paid'?: (number | string);
   'outstanding'?: (number | string);
   'discount'?: (number | string);
   'billing'?: (_scheduler_UserBillingType);
@@ -24,7 +24,7 @@ export interface UserSubscriptionRequest__Output {
   'id': (string);
   'subscriptionId': (string);
   'userId': (string);
-  'payed': (number);
+  'paid': (number);
   'outstanding': (number);
   'discount': (number);
   'billing': (_scheduler_UserBillingType__Output);

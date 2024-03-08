@@ -16,6 +16,8 @@ export interface ProtoGrpcType {
     Benefits: MessageTypeDefinition
     CreateSubscription: MessageTypeDefinition
     DeleteSubscription: MessageTypeDefinition
+    ExtraPackages: EnumTypeDefinition
+    Extras: MessageTypeDefinition
     GetAllSubscriptions: MessageTypeDefinition
     GetOneSubscription: MessageTypeDefinition
     Status: EnumTypeDefinition

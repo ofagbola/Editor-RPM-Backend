@@ -64,6 +64,7 @@ model ReviewRequest {
   doctorId  String     @db.VarChar(255)
   rating    Int        @db.SmallInt
   review    String     @db.VarChar(255)
+  userId    String     @db.VarChar(255)
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
 }

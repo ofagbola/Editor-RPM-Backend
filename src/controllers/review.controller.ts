@@ -13,13 +13,31 @@ import { GetSessionReviews__Output } from '../protos/gen/scheduler/GetSessionRev
 import { ReviewMessage__Output } from '../protos/gen/scheduler/ReviewMessage';
 import { UpdateReview__Output } from '../protos/gen/scheduler/UpdateReview';
 import { DeleteReview__Output } from '../protos/gen/scheduler/DeleteReview';
-import { deserializeUser } from '../middlewares/deserializeUser'
+import { deserializeUser } from '../middlewares/deserializeUser';
+import { RequestValidator } from '../middlewares/requestValidator';
+import {
+  CreateReviewValidator,
+  GetDoctorReviewValidator,
+  GetSessionReviewValidator,
+  UpdateReviewValidator,
+  DeleteReviewValidator
+} from '../validators/review.validator'
 
 export const CreateReview = async (
   req: grpc.ServerUnaryCall<CreateReview__Output, ReviewMessage__Output>,
   res: grpc.sendUnaryData<ReviewMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(CreateReviewValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -33,6 +51,7 @@ export const CreateReview = async (
     await createReviewRequest({
       sessionId: req.request.sessionId,
       doctorId: req.request.doctorId,
+      userId: user.id,
       rating: req.request.rating,
       review: req.request.review,
     });
@@ -55,6 +74,16 @@ export const GetDoctorReviews = async (
   res: grpc.sendUnaryData<ReviewsResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetDoctorReviewValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -66,7 +95,7 @@ export const GetDoctorReviews = async (
     }
 
     const reviews = await findReviewRequest({ doctorId: req.request.doctorId, ...req.request.request_query });
-    const formattedReviews = reviews.map(review => ({
+    const formattedReviews: any = reviews.map(review => ({
       ...review,
       created_at: { 
         seconds: (review.created_at.getTime() / 1000).toString(), 
@@ -95,6 +124,16 @@ export const GetSessionReviews = async (
   res: grpc.sendUnaryData<ReviewsResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetSessionReviewValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -106,7 +145,7 @@ export const GetSessionReviews = async (
     }
 
     const reviews = await findReviewRequest({ sessionId: req.request.sessionId, ...req.request.request_query });
-    const formattedReviews = reviews.map(review => ({
+    const formattedReviews: any = reviews.map(review => ({
       ...review,
       created_at: { 
         seconds: (review.created_at.getTime() / 1000).toString(), 
@@ -135,6 +174,16 @@ export const UpdateReview = async (
   res: grpc.sendUnaryData<ReviewMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(UpdateReviewValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -161,6 +210,16 @@ export const DeleteReview = async (
   res: grpc.sendUnaryData<ReviewMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(DeleteReviewValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {

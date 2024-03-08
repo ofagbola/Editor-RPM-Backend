@@ -1,4 +1,4 @@
-import { Question } from '@prisma/client';
+import { ScheduleRequest } from '@prisma/client';
 import redisClient from '../utils/connectRedis';
 import { verifyJwt } from '../utils/jwt';
 

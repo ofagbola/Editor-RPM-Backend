@@ -3,6 +3,13 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from '../protos/gen/services';
 import customConfig from '../config/default';
+import { 
+  GetDoctorReviewConstants,
+  GetSessionReviewConstants,
+  CreateReviewConstant,
+  UpdateReviewConstant,
+  DeleteReviewConstant 
+} from '../constants/review.constant';
 
 const options: protoLoader.Options = {
   keepCase: true,
@@ -40,14 +47,18 @@ client.waitForReady(deadline, (err: any) => {
 });
 
 function onClientReady() {
-  // CreateAnswer();
-  GetDoctorReviews();
+  // GetDoctorReviews();
+  GetSessionReviews();
+  // CreateReview();
+  // UpdateReview();
+  // DeleteReview();
 }
 
 function GetDoctorReviews() {
+  const data = GetDoctorReviewConstants();
+
   client.GetDoctorReviews(
-    { request_query: { status: "active" }, access_token: "efhiwfwuihiuwfhwwfbwifwwh" },
-    (err, res) => {
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
@@ -58,12 +69,10 @@ function GetDoctorReviews() {
 }
 
 function GetSessionReviews() {
+  const data = GetSessionReviewConstants();
+
   client.GetSessionReviews(
-    {
-      id: '2',
-      access_token: 'hgfsfedjgddgkhdjwdw',
-    },
-    (err, res) => {
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
@@ -73,15 +82,11 @@ function GetSessionReviews() {
   );
 }
 
-function CreateAnswer() {
-  client.CreateAnswer(
-    {
-      question: '2b260db0-033a-4169-bf6a-920e35163ad4',
-      status: 'active',
-      answer: 3,
-      access_token: 'hssjhfsiuhfwibiuiwffwfwf',
-    },
-    (err, res) => {
+function CreateReview() {
+  const data = CreateReviewConstant();
+
+  client.createReview(
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
@@ -91,30 +96,25 @@ function CreateAnswer() {
   );
 }
 
-function UpdateAnswer() {
-  client.UpdateAnswer(
-    {
-      status: 'active',
-      answer: 3,
-      id: "2",
-      access_token: 'hssjhfsiuhfwibiuiwffwfwf',
-    },
-    (err, res) => {
+function UpdateReview() {
+  const data = UpdateReviewConstant();
+
+  client.UpdateReview(
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
       }
+
       console.log(res);
     }
   );
 }
-function DeleteQestionnaire() {
-  client.DeleteAnswer(
-    {
-      id: '2',
-      access_token: 'hgfsfedjgddgkhdjwdw',
-    },
-    (err, res) => {
+function DeleteReview() {
+  const data = DeleteReviewConstant();
+
+  client.DeleteReview(
+    { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;

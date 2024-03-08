@@ -8,10 +8,11 @@ message ReviewRequest {
   string id = 1;
   string sessionId = 2;
   string doctorId = 3;
-  double rating = 4;
-  string review = 5;
-  google.protobuf.Timestamp created_at = 6;
-  google.protobuf.Timestamp updated_at = 7;
+  string userId = 4;
+  double rating = 5;
+  string review = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
 }
 
 message ReviewMessage {

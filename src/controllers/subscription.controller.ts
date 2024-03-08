@@ -15,13 +15,31 @@ import { GetOneSubscription__Output } from '../protos/gen/scheduler/GetOneSubscr
 import { SubscriptionMessage__Output } from '../protos/gen/scheduler/SubscriptionMessage';
 import { UpdateSubscription__Output } from '../protos/gen/scheduler/UpdateSubscription';
 import { DeleteSubscription__Output } from '../protos/gen/scheduler/DeleteSubscription';
-import { deserializeUser } from '../middlewares/deserializeUser'
+import { deserializeUser } from '../middlewares/deserializeUser';
+import { RequestValidator } from '../middlewares/requestValidator';
+import {
+  CreateSubscriptonValidator,
+  GetAllSubscriptonValidator,
+  GetSubscriptonValidator,
+  UpdateSubscriptonValidator,
+  DeleteSubscriptonValidator
+} from '../validators/subscription.validator'
 
 export const CreateSubscription = async (
   req: grpc.ServerUnaryCall<CreateSubscription__Output, SubscriptionMessage__Output>,
   res: grpc.sendUnaryData<SubscriptionMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(CreateSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -62,6 +80,16 @@ export const GetSubscriptions = async (
   res: grpc.sendUnaryData<SubscriptionsResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetAllSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -103,6 +131,16 @@ export const GetSubscription = async (
   res: grpc.sendUnaryData<SubscriptionResponse__Output>
 ) => {
   try {
+    const validate = await RequestValidator(GetSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {
@@ -158,6 +196,16 @@ export const UpdateSubscription = async (
   res: grpc.sendUnaryData<SubscriptionMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(UpdateSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
 
     if (!user) {
@@ -192,6 +240,16 @@ export const DeleteSubscription = async (
   res: grpc.sendUnaryData<SubscriptionMessage__Output>
 ) => {
   try {
+    const validate = await RequestValidator(DeleteSubscriptonValidator, req, res);
+
+    if(!validate || !validate.status) {
+      res({
+        code: grpc.status.INVALID_ARGUMENT,
+        message: validate? JSON.stringify(validate.message) : "Null or invalid parameter provided.",
+      });
+      return;
+    }
+
     const user = await deserializeUser(req.request.access_token);
     
     if (!user) {

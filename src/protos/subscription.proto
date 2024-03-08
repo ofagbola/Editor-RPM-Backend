@@ -22,6 +22,19 @@ message Benefits {
   string description = 2;
 }
 
+enum ExtraPackages {
+  MESSAGING = 0;
+  VIDEO_CALL = 1;
+  VOICE_CALL = 2;
+  QUESTIONNAIRE = 3;
+}
+
+message Extras {
+  string duration = 1;
+  int32 sessions = 2;
+  repeated ExtraPackages packages = 3;
+}
+
 enum Status {
   active = 0;
   inactive = 1;
@@ -37,8 +50,9 @@ message SubscriptionRequest {
   repeated SubscriptionBillingType billing = 7;
   repeated SubscriptionPaymentMethodType paymentMethod = 8;
   repeated Benefits benefits = 9;
-  google.protobuf.Timestamp created_at = 10;
-  google.protobuf.Timestamp updated_at = 11;
+  Extras extras = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
 }
 
 message SubscriptionMessage {
@@ -74,7 +88,8 @@ message CreateSubscription {
   repeated SubscriptionBillingType billing = 5;
   repeated SubscriptionPaymentMethodType paymentMethod = 6;
   repeated Benefits benefits = 7;
-  string access_token = 8; 
+  Extras extras = 8;
+  string access_token = 9; 
 }
 
 message UpdateSubscription { 
@@ -87,10 +102,11 @@ message UpdateSubscription {
   repeated SubscriptionBillingType billing = 7;
   repeated SubscriptionPaymentMethodType paymentMethod = 8;
   repeated Benefits benefits = 9;
-  string id = 10;
+  Extras extras = 10;
+  string id = 11;
 }
 
 message DeleteSubscription { 
   string access_token = 1; 
   string id = 2;
-}
+} 

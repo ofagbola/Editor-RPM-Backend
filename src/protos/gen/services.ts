@@ -29,6 +29,8 @@ export interface ProtoGrpcType {
     DeleteSubscription: MessageTypeDefinition
     DeleteUserSubscription: MessageTypeDefinition
     DoctorType: EnumTypeDefinition
+    ExtraPackages: EnumTypeDefinition
+    Extras: MessageTypeDefinition
     GetAllSchedules: MessageTypeDefinition
     GetAllSubscriptions: MessageTypeDefinition
     GetAllUserSubscriptions: MessageTypeDefinition
@@ -37,6 +39,7 @@ export interface ProtoGrpcType {
     GetOneSubscription: MessageTypeDefinition
     GetOneUserSubscription: MessageTypeDefinition
     GetSessionReviews: MessageTypeDefinition
+    Packages: EnumTypeDefinition
     PaymentInfo: MessageTypeDefinition
     ReviewMessage: MessageTypeDefinition
     ReviewRequest: MessageTypeDefinition
