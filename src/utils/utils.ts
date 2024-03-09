@@ -1,5 +1,7 @@
 import * as grpc from '@grpc/grpc-js';
 import Joi from 'joi';
+import bcrypt from 'bcrypt';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import * as otpGenerator from 'otp-generator';
 
 /**
@@ -8,6 +10,7 @@ import * as otpGenerator from 'otp-generator';
  */
 export const validateSchema = (schema: Joi.ObjectSchema<any>) => {
   return function (call: any, callback: any, next: any) {
+    console.log(call.request);
     try {
       const payload = call.request;
       const { error } = schema.validate(payload) as any;
@@ -76,4 +79,30 @@ export const generateOTP = async (): Promise<string> => {
     digits: true,
     specialChars: false,
   });
+};
+
+export const hashPassword = async (
+  password: string,
+  salt = 10
+): Promise<string> => {
+  return await bcrypt.hash(password, salt);
+};
+
+export const comparePassword = async (
+  plainPassword: string,
+  hashedPassword: string
+): Promise<boolean> => {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+};
+
+export const jwtToken = async (payload: {
+  [key: string]: any;
+}): Promise<string> => {
+  return await jwt.sign(payload, process.env!.JWTKEY ?? '');
+};
+
+export const jwtVerifyToken = async (
+  token: string
+): Promise<string | JwtPayload> => {
+  return await jwt.verify(token, process.env!.JWTKEY ?? '');
 };
