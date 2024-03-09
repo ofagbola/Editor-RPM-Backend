@@ -5,8 +5,6 @@ services:
     build: 
       context: ./
       dockerfile: Dockerfile
-    # image: postgres
-    # container_name: postgres-db
     env_file:
       - .env
     ports:
