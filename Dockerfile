@@ -10,5 +10,5 @@ COPY ./migrations /docker-entrypoint-initdb.d/
 
 # Set permissions for SQL scripts
 # RUN chmod 755 /docker-entrypoint-initdb.d/*.sql
-RUN chmod 644 migrations/*.sql
+RUN chmod 644 ./migrations/*.sql
 
