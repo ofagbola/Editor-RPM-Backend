@@ -47,3 +47,4 @@ type FileUploadResponse struct {
 	SuccessMsg string `json:"success_message"`
 	FileURL    string `json:"file_url"`
 }
+
