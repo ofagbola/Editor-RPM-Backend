@@ -2,7 +2,8 @@
 DB_URL=postgres://go_user:gofindP123@__@localhost:5432/go_db?sslmode=disable
 
 network:
-	docker network create erpm-network
+	docker network create erpm-network	
+
 
 postgres:
 	docker run --name postgres --network erpm-network -p 5432:5432 -e POSTGRES_USER=go_user -e POSTGRES_PASSWORD=gofindP123@__ -d postgres:14-alpine
