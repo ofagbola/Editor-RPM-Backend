@@ -5,6 +5,7 @@ import { notificationProtoDefinition } from '../protos';
 import { applyMiddleware } from '../middlewares/app.middleware';
 import { validateSchema } from '../utils/utils';
 import { SubscribeSchema, NotifySchema } from '../schemas/notification.schema';
+import { authorizer } from '../middlewares/app.middleware';
 
 /**
  * Notification RPC Services.
@@ -26,6 +27,7 @@ export const notificationRpcService = (
 
         notify: applyMiddleware([
           validateSchema(NotifySchema),
+
           notification_controller.notify,
         ]),
       }

@@ -9,6 +9,7 @@ import {
   ISubscribeRequest,
 } from '../interfaces/notification.interface';
 import { notificationProtoDefinition } from '../protos';
+import { redisSet, redisGet } from '../utils/redis';
 
 /**
  * Subscribe
@@ -68,7 +69,7 @@ export const notify = async (
   call: any
 ): Promise<void> => {
   try {
-    const { body, sender } = payload;
+    // const { body, sender } = payload;
 
     // await NotificationModel.updateUser(
     //   'subscribers',
@@ -79,34 +80,46 @@ export const notify = async (
     //   sender
     // );
 
-    call.on('data', async function ({ body }: any) {
+    call.on('data', async function ({ body, sender }: any) {
       try {
-        if (!groupClients[body.group]) {
-          groupClients[body.group] = new Map();
+        if (!(await redisGet(sender))) {
+          await redisSet(sender, JSON.stringify(call));
         }
 
-        groupClients[body.group].add(call);
+        // console.log(redisClient, 'client');
 
-        const subscribers = await NotificationModel.findNotificationByTopic(
-          'subscribers',
-          ['sub_uuid', 'call'],
-          body.group
-        );
+        // if (!groupClients[body.group]) {
+        //   groupClients[body.group] = new Map();
+        // }
 
-        subscribers.forEach((subscriber: any) => {
-          // const h = JSON.parse(subscriber.call.call);
-          // console.log(h, 'here');
-          // const client = JSON.parse(subscriber.call);
-          // // notificationProtoDefinition.NotificationServices.service.Client(
-          // //   subscriber.call.call
-          // // );
+        // groupClients[body.group].add(call);
 
-          // call.write(payload);
+        // const subscribers = await NotificationModel.findNotificationByTopic(
+        //   'subscribers',
+        //   ['sub_uuid', 'call'],
+        //   body.group
+        // );
 
-          groupClients[body.group].forEach((client: any) => {
-            client.write(payload);
-          });
+        // subscribers.forEach((subscriber: any) => {
+        //   // const h = JSON.parse(subscriber.call.call);
+        //   // console.log(h, 'here');
+        //   // const client = JSON.parse(subscriber.call);
+        //   // // notificationProtoDefinition.NotificationServices.service.Client(
+        //   // //   subscriber.call.call
+        //   // // );
+
+        //   // call.write(payload);
+
+        //   groupClients[body.group].forEach((client: any) => {
+        //     client.write(payload);
+        //   });
+        // });
+        let client = await redisGet(sender);
+        client = JSON.parse(client);
+        call.write({
+          message: 'hi',
         });
+        console.log(client);
       } catch (error) {
         console.log(error, 'erro');
       }
@@ -122,7 +135,7 @@ export const notify = async (
       //   sender
       // );
       //call.end();
-      groupClients[body.group].delete(call);
+      // groupClients[body.group].delete(call);
     });
   } catch (error) {
     throw error;
