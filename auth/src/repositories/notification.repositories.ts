@@ -71,14 +71,6 @@ export const notify = async (
   try {
     // const { body, sender } = payload;
 
-    // await NotificationModel.updateUser(
-    //   'subscribers',
-    //   ['call'],
-    //   {
-    //     call: JSON.stringify(call),
-    //   },
-    //   sender
-    // );
 
     call.on('data', async function ({ body, sender }: any) {
       try {
@@ -134,7 +126,7 @@ export const notify = async (
       //   },
       //   sender
       // );
-      //call.end();
+      call.end();
       // groupClients[body.group].delete(call);
     });
   } catch (error) {
