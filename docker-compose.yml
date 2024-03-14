@@ -1,16 +1,32 @@
 version: '3.8'
 
 services:
-  postgres:
-    build: 
+  auth:
+    build:
       context: ./auth
-      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"  # Example port mapping for the client
+    depends_on:
+      - auth_db
+  auth_db:
+    image: postgres
     env_file:
-      - ./auth/.env
+       - ./auth/.env
     ports:
       - "5432:5432"
     volumes:
       - pgdata2:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    command: ["bash", "-c", "mkdir -p /docker-entrypoint-initdb.d && chmod 644 ./migrations/*.sql"]
+  #   build: 
+  #     context: ./auth
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - ./auth/.env
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - pgdata2:/var/lib/postgresql/data
   redis:
     image: redis:latest
     container_name: auth-redis-container
