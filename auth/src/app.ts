@@ -12,7 +12,7 @@ export const app = () => {
 
     sql`SELECT * FROM users`
       .then((users: any) => {
-        // console.log(users);
+         console.log(users);
       })
       .catch((error: any) => {
         console.log(error);

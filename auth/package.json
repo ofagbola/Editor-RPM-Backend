@@ -38,7 +38,7 @@
     "gen": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=. ./src/protos/auth.proto ",
     "build": "tsc",
     "build:clean": "rm -rf dist",
-    "start": "npm install && ts-node --esm ./src/server.ts",
+    "start": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node --esm ./src/server.ts\"",
     "start:watch": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node --esm ./src/server.ts\""
   }
 }

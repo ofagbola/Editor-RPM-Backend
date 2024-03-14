@@ -15,20 +15,25 @@
 
 FROM node:18.17.0
 
+
+
 WORKDIR /usr/src/app
+
+RUN apt-get update && apt-get upgrade -y && \
+apt-get install -y nodejs \
+    npm  
 
 
 COPY package*.json ./
 
-RUN yarn install
+RUN npm install
 
 COPY . .
 
-RUN chmod 644 ./auth/migrations/*.sql
 
 EXPOSE 4000
 
 
-CMD ["yarn", "run" "start"]
+CMD ["npm", "start"]
 
 

@@ -6,7 +6,9 @@ export let client: any = null;
 export async function startRedis() {
   try {
     client = await redis
-      .createClient()
+      .createClient({
+        url: 'redis://auth_redis:6379',
+      })
       .on('error', (err: any) => logger.error(`Redis failed to start ${err}`))
       .connect();
   } catch (error: any) {
