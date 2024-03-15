@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SubscriptionRequest {
+  @@map(name: "subscriptions")
+
+  id            String     @id @default(uuid())
+  name          String     @db.VarChar(255)
+  status        String     @db.VarChar(255) @default("active")
+  amount        Int        @db.SmallInt
+  currency      String     @db.VarChar(255)
+  discount      Int        @db.SmallInt
+  billing       String[]   @db.VarChar(255)
+  paymentMethod String[]   @db.VarChar(255)
+  benefits      Json[]     @db.Json
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+}
+
+model UserSubscriptionRequest {
+  @@map(name: "userSubscriptions")
+
+  id             String     @id @default(uuid())
+  subscriptionId String     @db.VarChar(255)
+  userId         String     @db.VarChar(255)
+  paid           Int        @db.Integer
+  outstanding    Int        @db.Integer
+  discount       Int        @db.SmallInt
+  billing        String     @db.VarChar(255)
+  paymentMethod String      @db.VarChar(255)
+  paymentInfo    Json       @db.Json
+  status         String     @db.VarChar(255) @default("active")
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+}
+
+model ScheduleRequest {
+  @@map(name: "schedules")
+
+  id                String     @id @default(uuid())
+  title             String     @db.VarChar(255)
+  description       String     @db.VarChar(255)
+  schedule          Json       @db.Json
+  reschedule        Json[]     @db.Json
+  userSubscriptionId String    @db.VarChar(255)
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
+}
+
+model ReviewRequest {
+  @@map(name: "reviews")
+
+  id        String     @id @default(uuid())
+  sessionId String     @db.VarChar(255)
+  doctorId  String     @db.VarChar(255)
+  rating    Int        @db.SmallInt
+  review    String     @db.VarChar(255)
+  userId    String     @db.VarChar(255)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+}

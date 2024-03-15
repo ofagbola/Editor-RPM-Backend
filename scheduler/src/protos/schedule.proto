@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package scheduler;
+
+import "google/protobuf/timestamp.proto";
+
+enum UserType {
+  PATIENT = 0;
+  DOCTOR = 1;
+}
+
+enum ScheduleStatus {
+  ACCEPTED = 0;
+  REJECTED = 1;
+  PENDING = 2;
+}
+
+enum Packages {
+  MESSAGING = 0;
+  VIDEO_CALL = 1;
+  VOICE_CALL = 2;
+  QUESTIONNAIRE = 3;
+}
+
+message User {
+  string id = 1;
+  UserType type = 2;
+}
+
+message Schedule {
+  User initiator = 1;
+  User recepient = 2;
+  string duration = 3;
+  int32 sessions = 4;
+  repeated Packages package = 5;
+  ScheduleStatus status = 6;
+  google.protobuf.Timestamp date = 7;
+}
+
+message ScheduleRequest {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  Schedule schedule = 4;
+  repeated Reschedule reschedule = 5;
+  string userSubscriptionId = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+
+  message Reschedule {
+    string reason = 1;
+    Schedule schedule = 2;
+  }
+}
+
+message ScheduleMessage {
+  int32 code = 1;
+  string message = 2;
+}
+
+message SchedulesResponse {
+  int32 code = 1;
+  repeated ScheduleRequest data = 2;
+}
+
+message ScheduleResponse {
+  int32 code = 1;
+  ScheduleRequest data = 2;
+}
+
+message GetAllSchedules { 
+  string access_token = 1; 
+  map<string, string> request_query = 2;
+}
+
+message GetOneSchedule { 
+  string access_token = 1; 
+  string id = 2;
+}
+
+message CreateSchedule { 
+  string title = 1;
+  string description = 2;
+  Schedule schedule = 3;
+  string userSubscriptionId = 4;
+  string access_token = 5; 
+}
+
+message CreateReSchedule {
+  string id = 1; 
+  string reason = 2;
+  Schedule schedule = 3;
+  string access_token = 4; 
+}
+
+message UpdateSchedule { 
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  Schedule schedule = 4;
+  string access_token = 5; 
+}
+
+message UpdateReSchedule { 
+  int32 index = 1;
+  string reason = 2;
+  Schedule schedule = 3;
+  string id = 4; 
+  string access_token = 5; 
+}
+
+message DeleteSchedule { 
+  string access_token = 1; 
+  string id = 2;
+}
+
+message DeleteReSchedule { 
+  string access_token = 1; 
+  int32 index = 2;
+  string id = 3; 
+}

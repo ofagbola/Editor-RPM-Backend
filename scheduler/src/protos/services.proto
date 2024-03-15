@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package scheduler;
+
+import "schedule.proto";
+import "subscription.proto";
+import "user.subscription.proto";
+import "review.proto";
+
+service ScheduleService {
+    rpc GetSchedules(GetAllSchedules) returns (SchedulesResponse) {}
+    rpc GetSchedule(GetOneSchedule) returns (ScheduleResponse) {}
+    rpc CreateSchedule(CreateSchedule) returns (ScheduleMessage) {}
+    rpc CreateReSchedule(CreateReSchedule) returns (ScheduleMessage) {}
+    rpc UpdateSchedule(UpdateSchedule) returns (ScheduleMessage) {}
+    rpc UpdateReSchedule(UpdateReSchedule) returns (ScheduleMessage) {}
+    rpc DeleteSchedule(DeleteSchedule) returns (ScheduleMessage) {}
+    rpc DeleteReSchedule(DeleteReSchedule) returns (ScheduleMessage) {}
+}
+
+service  SubscriptionService {
+    rpc GetSubscriptions(GetAllSubscriptions) returns (SubscriptionsResponse) {}
+    rpc GetSubscription(GetOneSubscription) returns (SubscriptionResponse) {}
+    rpc CreateSubscription(CreateSubscription) returns (SubscriptionMessage) {}
+    rpc UpdateSubscription(UpdateSubscription) returns (SubscriptionMessage) {}
+    rpc DeleteSubscription(DeleteSubscription) returns (SubscriptionMessage) {}
+}
+
+service UserSubscriptionService {
+    rpc GetUserSubscriptions(GetAllUserSubscriptions) returns (UserSubscriptionsResponse) {}
+    rpc GetUserSubscription(GetOneUserSubscription) returns (UserSubscriptionResponse) {}
+    rpc CreateUserSubscription(CreateUserSubscription) returns (UserSubscriptionMessage) {}
+    rpc UpdateUserSubscription(UpdateUserSubscription) returns (UserSubscriptionMessage) {}
+    rpc DeleteUserSubscription(DeleteUserSubscription) returns (UserSubscriptionMessage) {}
+}
+
+service ReviewService {
+    rpc GetDoctorReviews(GetDoctorReviews) returns (ReviewsResponse) {}
+    rpc GetSessionReviews(GetSessionReviews) returns (ReviewsResponse) {}
+    rpc CreateReview(CreateReview) returns (ReviewMessage) {}
+    rpc UpdateReview(UpdateReview) returns (ReviewMessage) {}
+    rpc DeleteReview(DeleteReview) returns (ReviewMessage) {}
+}
+
+// From external source for searching
+enum DoctorType {
+    // required for searching doctor while scheduling
+}
+

@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package scheduler;
+
+import "google/protobuf/timestamp.proto";
+
+enum SubscriptionBillingType {
+  WEEKLY = 0;
+  MONTHLY = 1;
+  YEARLY = 2;
+}
+
+enum SubscriptionPaymentMethodType {
+  PAYPAL = 0;
+  STRIPE = 1;
+  VENMO = 2;
+  CARD = 3;
+}
+
+message Benefits {
+  bool available = 1;
+  string description = 2;
+}
+
+enum ExtraPackages {
+  MESSAGING = 0;
+  VIDEO_CALL = 1;
+  VOICE_CALL = 2;
+  QUESTIONNAIRE = 3;
+}
+
+message Extras {
+  string duration = 1;
+  int32 sessions = 2;
+  repeated ExtraPackages packages = 3;
+}
+
+enum Status {
+  active = 0;
+  inactive = 1;
+}
+
+message SubscriptionRequest {
+  string id = 1;
+  string name = 2;
+  Status status = 3;
+  double amount = 4;
+  string currency = 5;
+  double discount = 6;
+  repeated SubscriptionBillingType billing = 7;
+  repeated SubscriptionPaymentMethodType paymentMethod = 8;
+  repeated Benefits benefits = 9;
+  Extras extras = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+message SubscriptionMessage {
+  int32 code = 1;
+  string message = 2;
+}
+
+message SubscriptionsResponse {
+  int32 code = 1;
+  repeated SubscriptionRequest data = 2;
+}
+
+message SubscriptionResponse {
+  int32 code = 1;
+  SubscriptionRequest data = 2;
+}
+
+message GetAllSubscriptions { 
+  string access_token = 1; 
+  map<string, string> request_query = 2;
+}
+
+message GetOneSubscription { 
+  string access_token = 1; 
+  string id = 2;
+}
+
+message CreateSubscription { 
+  string name = 1;
+  double amount = 2;
+  string currency = 3;
+  double discount = 4;
+  repeated SubscriptionBillingType billing = 5;
+  repeated SubscriptionPaymentMethodType paymentMethod = 6;
+  repeated Benefits benefits = 7;
+  Extras extras = 8;
+  string access_token = 9; 
+}
+
+message UpdateSubscription { 
+  string access_token = 1; 
+  string name = 2;
+  Status status = 3;
+  double amount = 4;
+  string currency = 5;
+  double discount = 6;
+  repeated SubscriptionBillingType billing = 7;
+  repeated SubscriptionPaymentMethodType paymentMethod = 8;
+  repeated Benefits benefits = 9;
+  Extras extras = 10;
+  string id = 11;
+}
+
+message DeleteSubscription { 
+  string access_token = 1; 
+  string id = 2;
+} 

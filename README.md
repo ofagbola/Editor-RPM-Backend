@@ -1,65 +1,114 @@
-## Editor-RPM-Backend
 
-### Branching Strategy:
-1. **Master Branch:**
-   - The `master` branch is considered the stable and production-ready branch.
-   - Direct commits to `master` are restricted; changes should be merged through pull requests (PRs).
+## Scheduler-Backend
+
   
-2. **Dev Branch:**
-   - The `dev` branch is considered the single source of truth during development at any stage.
-   - Direct commits to `dev` are also restricted; changes should be merged through pull requests (PRs).
 
-3. **Feature Branches:**
-   - Each team will work on a feature branch specific to their assigned task or user story.
-   - Feature branches should be named descriptively (e.g., `feature/login-page`).
+### Setup:
 
-### Guidelines and Rules:
+1.  **Database Migration:**
 
-#### 1. Pull Requests (PRs):
-   - Each feature or bug fix should have its own PR.
-   - PR titles should be clear and concise, summarizing the changes.
-   - PR descriptions must include relevant information, such as the purpose of the change, testing steps, and potential impact.
+- To migrate database you use the command `yarn run db:migrate` as this initializes your database migrations.
 
-#### 2. Code Reviews:
-   - At least two team members must review each PR before merging.
-   - Reviewers should focus on code quality, readability, and adherence to coding standards.
-   - Use GitHub's review features (comments, suggestions) for feedback.
+- Next, you enter command `yarn run db:push` to update your migrations with your database.
 
-#### 3. Continuous Integration (CI):
-   - CI/CD pipelines must be set up to run automated tests on each PR.
-   - PRs cannot be merged until CI passes successfully.
+	>***Note:***  you will need  to  maually change values  like `DATABASE_PORT`, `POSTGRES_PASSWORD`, `POSTGRES_USER`,  `POSTGRES_DB`,  `POSTGRES_HOST`,  `POSTGRES_HOSTNAME`,  `DATABASE_URL`  in the  `.env`  file, to live.
 
-#### 4. Code Standards:
-   - Adhere to a consistent coding style and guidelines (e.g., ESLint for JavaScript).
-   - Document code as necessary to ensure clarity and maintainability.
+2.  **Generation of Proto Files:**
 
-#### 5. Commit Messages:
-   - Use descriptive and concise commit messages.
-   - Follow a consistent format, such as `<type>: <description>`, where type can be `feat`, `fix`, `chore`, etc.
+- To generate proto files, you use command `yarn run proto:gen`.
 
-#### 6. Collaboration:
-   - Teams should communicate regularly, especially if their work may impact others.
-   - Use team channels or meetings to discuss architectural decisions or major changes.
+  >***Note:*** you may need to maually change values like `del` to `rm` in the `package.json` file, depending on the hosted server operating system.
 
-#### 7. Branch Protection:
-   - Enable branch protection rules to enforce code review and status checks before merging to important branches.
+3.  **Build Service (Optional):**
 
-#### 8. Versioning:
-   - If applicable, follow a versioning system and update the version number in the codebase accordingly.
+- Although not required, but if you need to build a service, you just type in the command `yarn run build:clean`.
+	>***Note:*** you may need to maually change values like `del` to `rm` in the `package.json` file, depending on the hosted server operating system.
 
-#### 9. Rollback Plan:
-   - Teams should have a documented rollback plan in case issues are discovered after merging to the `master` branch.
+4.  **Start Server:**
 
-#### 10. Testing:
-   - Each team is responsible for testing their changes thoroughly before creating a PR.
-   - Automated tests should cover both new and existing functionality.
+- To start server you run command `yarn run start:server`.
 
-#### 11. Release Planning:
-   - Coordinate release cycles and plan releases with features and bug fixes from multiple teams.
+	>***Note:*** you may need to maually change start folder from `./src/server.ts` to `./dist/server.ts` in the `package.json` file, if you initially ran command `yarn run build:clean`.
 
-#### 12. Documentation:
-   - Keep documentation up-to-date, including README files and inline comments.
-   - Document any configuration changes or setup instructions.
+  
 
-### Conclusion:
-Adhering to these guidelines will help ensure a smooth collaboration process among the four teams, maintain code quality, and facilitate the integration of features into the main codebase. Regular communication and adherence to these rules will contribute to a successful and efficient development process.
+### Services Client Endpoints Testing:
+
+  
+
+#### 1. Test Subscription Client:
+
+- The subscription service is used in creating subscription packages users can opt into.
+
+- To test for subscription, you'll first need to go to the `./src/client.tests/subscription.client.tests.ts` file, and manually select the operation you'd like to perform.
+
+- Next, you'll need to go to the `./src/constants/subscription.constant.ts` file, and manually select or input the data you'd like to used in performing your selected operation.
+
+- Finally, you run command `yarn run test:subscription` to start test.
+
+	>***Note:***  you may need to maually change subscription test folder from `./src/client.tests/subscription.client.tests.ts` to `./dist/client.tests/subscription.client.tests.ts` in the `package.json` file, if you initially ran command `yarn run build:clean` after selecting input data. 
+	
+	>But it is advisable to run test on `./src/client.tests/subscription.client.tests.ts`, due to the constant changes that will be made to data inputs.
+
+
+#### 2. Test User Subscription Client:
+
+- The user subscription service is used in recording subscriptions made by users.
+
+- To test for user subscription, you'll first need to go to the `./src/client.tests/user.subscription.client.tests.ts` file, and manually select the operation you'd like to perform.
+
+- Next, you'll need to go to the `./src/constants/user.subscription.constant.ts` file, and manually select or input the data you'd like to used in performing your selected operation.
+
+- Finally, you run command `yarn run test:user:subscription` to start test.
+
+	>***Note:***  you may need to maually change user subscription test folder from `./src/client.tests/user.subscription.client.tests.ts` to `./dist/client.tests/user.subscription.client.tests.ts` in the `package.json` file, if you initially ran command `yarn run build:clean` after selecting input data. 
+	
+	>But it is advisable to run test on `./src/client.tests/user.subscription.client.tests.ts`, due to the constant changes that will be made to data inputs.
+ successful and efficient development process.
+
+#### 3. Test Schedule Client:
+
+- The schedule service is used in scheduling teleconferencing meetings, and questionnaires.
+
+- To test for schedule, you'll first need to go to the `./src/client.tests/schedule.client.tests.ts` file, and manually select the operation you'd like to perform.
+
+- Next, you'll need to go to the `./src/constants/schedule.constant.ts` file, and manually select or input the data you'd like to used in performing your selected operation.
+
+- Finally, you run command `yarn run test:schedule` to start test.
+
+	>***Note:***  you may need to maually change schedule test folder from `./src/client.tests/schedule.client.tests.ts` to `./dist/client.tests/schedule.client.tests.ts` in the `package.json` file, if you initially ran command `yarn run build:clean` after selecting input data. 
+	
+	>But it is advisable to run test on `./src/client.tests/schedule.client.tests.ts`, due to the constant changes that will be made to data inputs.
+ successful and efficient development process.
+
+#### 4. Test Review Client:
+
+- The review service is used in recording patient reviews on doctors and sessions.
+
+- To test for review, you'll first need to go to the `./src/client.tests/review.client.tests.ts` file, and manually select the operation you'd like to perform.
+
+- Next, you'll need to go to the `./src/constants/review.constant.ts` file, and manually select or input the data you'd like to used in performing your selected operation.
+
+- Finally, you run command `yarn run test:review` to start test.
+
+	>***Note:***  you may need to maually change review test folder from `./src/client.tests/review.client.tests.ts` to `./dist/client.tests/review.client.tests.ts` in the `package.json` file, if you initially ran command `yarn run build:clean` after selecting input data. 
+	
+	>But it is advisable to run test on `./src/client.tests/review.client.tests.ts`, due to the constant changes that will be made to data inputs.
+ successful and efficient development process.
+
+### Ports and Urls: 
+
+####  1. Redis Port:
+- Redis runs on the designated port `:6379`, this could be changed in `./schedule/docker-compose.yml`.
+
+- Redis does not have any designated urls, it automatically select custom url provided by local machine.
+- 
+####  2. Postgres Port:
+- Postgres runs on the designated port `:6500` or `:5432`, this could be changed in `./schedule/docker-compose.yml`.
+
+- Postgres does not have any designated urls, it automatically select custom url provided by local machine.
+
+####  3. Server Port:
+- Server runs on the designated port `:3003` , this could be changed in the `./scheduler.docker-compose.yaml` and `.env` file. you could also try to change it in `./src/config/default.ts` file, if any issues arise.
+
+- Server has a designated url of `0.0.0.0`, this could be changed in the `.env` file. you could also try to change it in `./src/config/default.ts` file, if any issues arise

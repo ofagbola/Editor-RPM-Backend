@@ -1,0 +1,26 @@
+# version: "3.8"
+# services:
+#   scheduler:
+#     build:
+#       dockerfile: Dockerfile
+#       context: ./scheduler
+#     ports:
+#       - "3003:3003"
+#     container_name: scheduler
+#     env_file:
+#       - .env
+#     restart: always
+#     volumes:
+#       - .:/app
+#       - /app/scheduler/node_modules
+
+version: "3.8"
+services:
+  scheduler:
+    image: ${IMAGE}
+    container_name: scheduler
+    restart: always
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env
