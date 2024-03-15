@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Question {
+  @@map(name: "questions")
+
+  id String  @id @default(uuid())
+  question String  @db.VarChar(255)
+  answers String[] @db.VarChar(255)
+  type String @db.VarChar(255) 
+  category String @db.VarChar(255) 
+  users Json[] @db.Json
+  status String @db.VarChar(255) @default("active")
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Questionnaire {
+  @@map(name: "questionnaires")
+
+  id String  @id @default(uuid())
+  questions String[]  @db.VarChar(255) 
+  category String @db.VarChar(255) 
+  users Json[] @db.Json
+  status String @db.VarChar(255) @default("active")
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Answer {
+  @@map(name: "answers")
+
+  id String  @id @default(uuid())
+  questionnaire String @db.VarChar(255)
+  question String @db.VarChar(255)
+  answer String[] @db.VarChar(255)
+  user String @db.VarChar(255)
+  status String @db.VarChar(255) @default("active")
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Categories {
+  @@map(name: "categories")
+
+  id String  @id @default(uuid())
+  name String @db.VarChar(255) 
+  users Json[] @db.Json
+  status String @db.VarChar(255) @default("active")
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}

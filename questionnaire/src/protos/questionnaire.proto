@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package questionnaire;
+
+import "google/protobuf/timestamp.proto";
+
+message Questionnaire {
+  string id = 1;
+  repeated string questions = 2;
+  repeated string users = 3;
+  string category = 4;
+  string status = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message QuestionnaireMessage {
+  int32 code = 1;
+  string message = 2;
+}
+
+message QuestionnairesResponse {
+  int32 code = 1;
+  repeated Questionnaire data = 2;
+}
+
+message QuestionnaireResponse {
+  int32 code = 1;
+  Questionnaire data = 2;
+}
+
+message GetAllQuestionnaires { 
+  string access_token = 1; 
+  map<string, string> request_query = 2;
+}
+
+message GetOneQuestionnaire { 
+  string access_token = 1; 
+  string id = 2;
+}
+
+message CreateQuestionnaire { 
+  string access_token = 1; 
+  repeated string questions = 2;
+  string category = 3;
+  string status = 4;
+}
+
+message UpdateQuestionnaire { 
+  string access_token = 1; 
+  repeated string questions = 2;
+  string category = 3;
+  string status = 4;
+  string id = 5;
+}
+
+message DeleteQuestionnaire { 
+  string access_token = 1; 
+  string id = 2;
+}

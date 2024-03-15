@@ -1,0 +1,52 @@
+{
+  "name": "rpm",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "type": "commonjs",
+  "license": "MIT",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.0",
+    "@grpc/proto-loader": "^0.7.10",
+    "@prisma/client": "^5.9.1",
+    "@types/cors": "^2.8.17",
+    "@types/debug": "^4.1.12",
+    "@types/node": "^20.9.1",
+    "@types/require-from-string": "^1.2.3",
+    "@types/semver": "^7.5.6",
+    "@types/uuid": "^9.0.7",
+    "ajv": "^8.12.0",
+    "axios": "^1.6.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "joi": "^17.12.2",
+    "jsonwebtoken": "^9.0.2",
+    "nocache": "^4.0.0",
+    "nodemon": "^3.0.1",
+    "postgres": "^3.4.3",
+    "redis": "^4.6.13",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "ts-proto": "^1.167.3",
+    "typescript": "^4.9.3",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "scripts": {
+    "db:migrate": "npx prisma migrate dev --name user-entity --create-only --schema ./prisma/schema.prisma && yarn prisma generate --schema ./prisma/schema.prisma",
+    "db:push": "npx prisma db push --schema ./prisma/schema.prisma",
+    "proto:gen": "del /q /s src\\protos\\gen && yarn proto-loader-gen-types --longs=String --enums=String --defaults --keepCase --oneofs --grpcLib=@grpc/grpc-js --outDir=src/protos/gen src/protos/category.proto src/protos/question.proto src/protos/answer.proto src/protos/questionnaire.proto src/protos/services.proto",
+    "build": "tsc",
+    "build:clean": "rm -rf dist",
+    "start": "yarn install && ts-node --esm ./src/server.ts",
+    "start:watch": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node --esm ./src/server.ts\"",
+    "start:server": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "test:question": "ts-node-dev --transpile-only ./src/client.tests/question.client.tests.ts",
+    "test:category": "ts-node-dev --transpile-only ./src/client.tests/category.client.tests.ts",
+    "test:questionnaire": "ts-node-dev --transpile-only ./src/client.tests/questionnaire.client.tests.ts",
+    "test:answer": "ts-node-dev --transpile-only ./src/client.tests/answer.client.tests.ts"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.5",
+    "prisma": "^5.9.1"
+  }
+}
