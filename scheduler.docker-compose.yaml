@@ -1,0 +1,26 @@
+# version: "3.8"
+# services:
+#   questionnaire:
+#     build:
+#       dockerfile: Dockerfile
+#       context: ./questionnaire
+#     ports:
+#       - "3004:3004"
+#     container_name: questionnaire
+#     env_file:
+#       - .env
+#     restart: always
+#     volumes:
+#       - .:/app
+#       - /app/questionnaire/node_modules
+
+version: "3.8"
+services:
+  questionnaire:
+    image: ${IMAGE}
+    container_name: questionnaire
+    restart: always
+    ports:
+      - "3004:3004"
+    env_file:
+      - .env

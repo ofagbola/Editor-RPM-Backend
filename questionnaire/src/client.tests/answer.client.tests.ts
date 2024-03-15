@@ -4,12 +4,12 @@ import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from '../protos/gen/services';
 import customConfig from '../config/default';
 import { 
-  GetQuestionConstants,
-  GetQuestionConstant,
-  CreateQuestionConstant,
-  UpdateQuestionConstant,
-  DeleteQuestionConstant 
-} from '../constants/question.constant';
+  GetAnswerConstants,
+  GetAnswerConstant,
+  CreateAnswerConstant,
+  UpdateAnswerConstant,
+  DeleteAnswerConstant 
+} from '../constants/answer.constant';
 
 const options: protoLoader.Options = {
   keepCase: true,
@@ -19,6 +19,7 @@ const options: protoLoader.Options = {
   oneofs: true,
 };
 const PORT = customConfig.port;
+const URL = customConfig.url;
 const PROTO_FILE = '../protos/services.proto';
 const packageDef = protoLoader.loadSync(
   path.resolve(__dirname, PROTO_FILE),
@@ -29,8 +30,8 @@ const proto = grpc.loadPackageDefinition(
   packageDef
 ) as unknown as ProtoGrpcType;
 
-const client = new proto.questionnaire.QuestionService(
-  `0.0.0.0:${PORT}`,
+const client = new proto.questionnaire.AnswerService(
+  `${URL}:${PORT}`,
   grpc.credentials.createInsecure()
 );
 
@@ -41,22 +42,21 @@ client.waitForReady(deadline, (err: any) => {
     console.error(err);
     return;
   }
-  
   onClientReady();
 });
 
 function onClientReady() {
-  // CreateQuestion();
-  GetQuestions();
-  // UpdateQuestion();
-  // GetQuestion();
-  // DeleteQuestion();
+  // CreateAnswer();
+  GetAnswers();
+  // GetAnswer();
+  // UpdateAnswer();
+  // DeleteAnswer();
 }
 
-function GetQuestions() {
-  const data = GetQuestionConstants();
-  
-  client.GetQuestions(data, (err: any, res: any) => {
+function GetAnswers() {
+  const data = GetAnswerConstants();
+
+  client.getAnswers(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -66,10 +66,10 @@ function GetQuestions() {
   );
 }
 
-function GetQuestion() {
-  const data = GetQuestionConstant();
+function GetAnswer() {
+  const data = GetAnswerConstant();
 
-  client.GetQuestion(data, (err: any, res: any) => {
+  client.getAnswer(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -79,10 +79,10 @@ function GetQuestion() {
   );
 }
 
-function CreateQuestion() {
-  const data = CreateQuestionConstant();
+function CreateAnswer() {
+  const data = CreateAnswerConstant();
 
-  client.CreateQuestion(data, (err: any, res: any) => {
+  client.createAnswer(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -92,10 +92,10 @@ function CreateQuestion() {
   );
 }
 
-function UpdateQuestion() {
-  const data = UpdateQuestionConstant();
+function UpdateAnswer() {
+  const data = UpdateAnswerConstant();
 
-  client.UpdateQuestion(data, (err: any, res: any) => {
+  client.updateAnswer(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -105,10 +105,10 @@ function UpdateQuestion() {
   );
 }
 
-function DeleteQuestion() {
-  const data = DeleteQuestionConstant();
+function DeleteAnswer() {
+  const data = DeleteAnswerConstant();
 
-  client.DeleteQuestion(data, (err: any, res: any) => {
+  client.deleteAnswer(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;

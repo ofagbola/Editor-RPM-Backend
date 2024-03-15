@@ -4,12 +4,12 @@ import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from '../protos/gen/services';
 import customConfig from '../config/default';
 import { 
-  GetCategoryConstants,
-  GetCategoryConstant,
-  CreateCategoryConstant,
-  UpdateCategoryConstant,
-  DeleteCategoryConstant 
-} from '../constants/category.constant';
+  GetQuestionConstants,
+  GetQuestionConstant,
+  CreateQuestionConstant,
+  UpdateQuestionConstant,
+  DeleteQuestionConstant 
+} from '../constants/question.constant';
 
 const options: protoLoader.Options = {
   keepCase: true,
@@ -18,8 +18,8 @@ const options: protoLoader.Options = {
   defaults: true,
   oneofs: true,
 };
-
 const PORT = customConfig.port;
+const URL = customConfig.url;
 const PROTO_FILE = '../protos/services.proto';
 const packageDef = protoLoader.loadSync(
   path.resolve(__dirname, PROTO_FILE),
@@ -30,8 +30,8 @@ const proto = grpc.loadPackageDefinition(
   packageDef
 ) as unknown as ProtoGrpcType;
 
-const client = new proto.questionnaire.CategoryService(
-  `0.0.0.0:${PORT}`,
+const client = new proto.questionnaire.QuestionService(
+  `${URL}:${PORT}`,
   grpc.credentials.createInsecure()
 );
 
@@ -42,35 +42,22 @@ client.waitForReady(deadline, (err: any) => {
     console.error(err);
     return;
   }
+  
   onClientReady();
 });
 
 function onClientReady() {
-  // CreateCategory();
-  GetCategories();
-  // GetCategory();
-  // UpdateCategory();
-  // DeleteCategory();
+  // CreateQuestion();
+  GetQuestions();
+  // UpdateQuestion();
+  // GetQuestion();
+  // DeleteQuestion();
 }
 
-function GetCategories() {
-  const data = GetCategoryConstants();
+function GetQuestions() {
+  const data = GetQuestionConstants();
   
-  client.getCategories(data, (err: any, res: any) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-
-      console.log(res);
-    }
-  );
-}
-
-function GetCategory() {
-  const data = GetCategoryConstant();
-
-  client.getCategory(data, (err: any, res: any) => {
+  client.GetQuestions(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -80,10 +67,10 @@ function GetCategory() {
   );
 }
 
-function CreateCategory() {
-  const data = CreateCategoryConstant();
+function GetQuestion() {
+  const data = GetQuestionConstant();
 
-  client.createCategory(data, (err: any, res: any) => {
+  client.GetQuestion(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -93,10 +80,10 @@ function CreateCategory() {
   );
 }
 
-function UpdateCategory() {
-  const data = UpdateCategoryConstant();
+function CreateQuestion() {
+  const data = CreateQuestionConstant();
 
-  client.updateCategory(data, (err: any, res: any) => {
+  client.CreateQuestion(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -106,12 +93,25 @@ function UpdateCategory() {
   );
 }
 
-function DeleteCategory() {
-  const data = DeleteCategoryConstant();
+function UpdateQuestion() {
+  const data = UpdateQuestionConstant();
 
-  client.deleteCategory(data, (err: any, res: any) => {
+  client.UpdateQuestion(data, (err: any, res: any) => {
       if (err) {
-        console.error(err);  
+        console.error(err);
+        return;
+      }
+      console.log(res);
+    }
+  );
+}
+
+function DeleteQuestion() {
+  const data = DeleteQuestionConstant();
+
+  client.DeleteQuestion(data, (err: any, res: any) => {
+      if (err) {
+        console.error(err);
         return;
       }
       console.log(res);

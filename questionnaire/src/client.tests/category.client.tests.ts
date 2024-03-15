@@ -4,12 +4,12 @@ import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from '../protos/gen/services';
 import customConfig from '../config/default';
 import { 
-  GetAnswerConstants,
-  GetAnswerConstant,
-  CreateAnswerConstant,
-  UpdateAnswerConstant,
-  DeleteAnswerConstant 
-} from '../constants/answer.constant';
+  GetCategoryConstants,
+  GetCategoryConstant,
+  CreateCategoryConstant,
+  UpdateCategoryConstant,
+  DeleteCategoryConstant 
+} from '../constants/category.constant';
 
 const options: protoLoader.Options = {
   keepCase: true,
@@ -18,7 +18,9 @@ const options: protoLoader.Options = {
   defaults: true,
   oneofs: true,
 };
+
 const PORT = customConfig.port;
+const URL = customConfig.url;
 const PROTO_FILE = '../protos/services.proto';
 const packageDef = protoLoader.loadSync(
   path.resolve(__dirname, PROTO_FILE),
@@ -29,8 +31,8 @@ const proto = grpc.loadPackageDefinition(
   packageDef
 ) as unknown as ProtoGrpcType;
 
-const client = new proto.questionnaire.AnswerService(
-  `0.0.0.0:${PORT}`,
+const client = new proto.questionnaire.CategoryService(
+  `${URL}:${PORT}`,
   grpc.credentials.createInsecure()
 );
 
@@ -45,17 +47,31 @@ client.waitForReady(deadline, (err: any) => {
 });
 
 function onClientReady() {
-  // CreateAnswer();
-  GetAnswers();
-  // GetAnswer();
-  // UpdateAnswer();
-  // DeleteAnswer();
+  // CreateCategory();
+  GetCategories();
+  // GetCategory();
+  // UpdateCategory();
+  // DeleteCategory();
 }
 
-function GetAnswers() {
-  const data = GetAnswerConstants();
+function GetCategories() {
+  const data = GetCategoryConstants();
+  
+  client.getCategories(data, (err: any, res: any) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
 
-  client.getAnswers(data, (err: any, res: any) => {
+      console.log(res);
+    }
+  );
+}
+
+function GetCategory() {
+  const data = GetCategoryConstant();
+
+  client.getCategory(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -65,10 +81,10 @@ function GetAnswers() {
   );
 }
 
-function GetAnswer() {
-  const data = GetAnswerConstant();
+function CreateCategory() {
+  const data = CreateCategoryConstant();
 
-  client.getAnswer(data, (err: any, res: any) => {
+  client.createCategory(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -78,10 +94,10 @@ function GetAnswer() {
   );
 }
 
-function CreateAnswer() {
-  const data = CreateAnswerConstant();
+function UpdateCategory() {
+  const data = UpdateCategoryConstant();
 
-  client.createAnswer(data, (err: any, res: any) => {
+  client.updateCategory(data, (err: any, res: any) => {
       if (err) {
         console.error(err);
         return;
@@ -91,25 +107,12 @@ function CreateAnswer() {
   );
 }
 
-function UpdateAnswer() {
-  const data = UpdateAnswerConstant();
+function DeleteCategory() {
+  const data = DeleteCategoryConstant();
 
-  client.updateAnswer(data, (err: any, res: any) => {
+  client.deleteCategory(data, (err: any, res: any) => {
       if (err) {
-        console.error(err);
-        return;
-      }
-      console.log(res);
-    }
-  );
-}
-
-function DeleteAnswer() {
-  const data = DeleteAnswerConstant();
-
-  client.deleteAnswer(data, (err: any, res: any) => {
-      if (err) {
-        console.error(err);
+        console.error(err);  
         return;
       }
       console.log(res);

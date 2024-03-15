@@ -17,6 +17,7 @@ const options: protoLoader.Options = {
 };
 
 const PORT = customConfig.port;
+const URL = customConfig.url;
 const PROTO_FILE = './protos/services.proto';
 const packageDef = protoLoader.loadSync(
   path.resolve(__dirname, PROTO_FILE),
@@ -37,7 +38,7 @@ server.addService(questionnairePackage.QuestionnaireService.service, Questionnai
 server.addService(questionnairePackage.CategoryService.service, CategoryRoutes);
 
 server.bindAsync(
-  `0.0.0.0:${PORT}`,
+  `${URL}:${PORT}`,
   grpc.ServerCredentials.createInsecure(),
   (err, port) => {
     if (err) {
