@@ -4,12 +4,12 @@ import * as protoLoader from '@grpc/proto-loader';
 import { ProtoGrpcType } from '../protos/gen/services';
 import customConfig from '../config/default';
 import { 
-  GetDoctorReviewConstants,
-  GetSessionReviewConstants,
-  CreateReviewConstant,
-  UpdateReviewConstant,
-  DeleteReviewConstant 
-} from '../constants/review.constant';
+  GetSubscriptionConstants,
+  GetSubscriptionConstant,
+  CreateSubscriptionConstant,
+  UpdateSubscriptionConstant,
+  DeleteSubscriptionConstant
+} from '../constants/subscription.constant';
 
 const options: protoLoader.Options = {
   keepCase: true,
@@ -18,8 +18,8 @@ const options: protoLoader.Options = {
   defaults: true,
   oneofs: true,
 };
-
 const PORT = customConfig.port;
+const URL = customConfig.url;
 const PROTO_FILE = '../protos/services.proto';
 const packageDef = protoLoader.loadSync(
   path.resolve(__dirname, PROTO_FILE),
@@ -30,11 +30,10 @@ const proto = grpc.loadPackageDefinition(
   packageDef
 ) as unknown as ProtoGrpcType;
 
-const client = new proto.scheduler.ReviewService(
-  `0.0.0.0:${PORT}`,
+const client = new proto.scheduler.SubscriptionService(
+  `${URL}:${PORT}`,
   grpc.credentials.createInsecure()
 );
-
 const deadline = new Date();
 deadline.setSeconds(deadline.getSeconds() + 5);
 client.waitForReady(deadline, (err: any) => {
@@ -42,64 +41,36 @@ client.waitForReady(deadline, (err: any) => {
     console.error(err);
     return;
   }
-
   onClientReady();
 });
 
 function onClientReady() {
-  // GetDoctorReviews();
-  GetSessionReviews();
-  // CreateReview();
-  // UpdateReview();
-  // DeleteReview();
+  // CreateSubscription();
+  GetSubscriptions();
+  // UpdateSubscription();
+  // GetSubscription();
+  // DeleteSubscription();
 }
 
-function GetDoctorReviews() {
-  const data = GetDoctorReviewConstants();
+function GetSubscriptions() {
+  const data = GetSubscriptionConstants();
 
-  client.GetDoctorReviews(
+  client.getSubscriptions(
     { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
       }
+      
       console.log(res);
     }
   );
 }
 
-function GetSessionReviews() {
-  const data = GetSessionReviewConstants();
+function GetSubscription() {
+  const data = GetSubscriptionConstant();
 
-  client.GetSessionReviews(
-    { ...data }, (err, res) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      console.log(res);
-    }
-  );
-}
-
-function CreateReview() {
-  const data = CreateReviewConstant();
-
-  client.createReview(
-    { ...data }, (err, res) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      console.log(res);
-    }
-  );
-}
-
-function UpdateReview() {
-  const data = UpdateReviewConstant();
-
-  client.UpdateReview(
+  client.getSubscription(
     { ...data }, (err, res) => {
       if (err) {
         console.error(err);
@@ -110,15 +81,46 @@ function UpdateReview() {
     }
   );
 }
-function DeleteReview() {
-  const data = DeleteReviewConstant();
 
-  client.DeleteReview(
+function CreateSubscription() {
+  const data: any = CreateSubscriptionConstant();
+
+  client.createSubscription(
     { ...data }, (err, res) => {
       if (err) {
         console.error(err);
         return;
       }
+
+      console.log(res);
+    }
+  );
+}
+
+function UpdateSubscription() {
+  const data: any = UpdateSubscriptionConstant();
+
+  client.updateSubscription(
+    { ...data }, (err, res) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+
+      console.log(res);
+    }
+  );
+}
+function DeleteSubscription() {
+  const data = DeleteSubscriptionConstant();
+
+  client.deleteSubscription(
+    { ...data }, (err, res) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+
       console.log(res);
     }
   );

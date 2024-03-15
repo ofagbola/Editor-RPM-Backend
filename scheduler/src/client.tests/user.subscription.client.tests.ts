@@ -20,6 +20,7 @@ const options: protoLoader.Options = {
 };
 
 const PORT = customConfig.port;
+const URL = customConfig.url;
 const PROTO_FILE = '../protos/services.proto';
 const packageDef = protoLoader.loadSync(
   path.resolve(__dirname, PROTO_FILE),
@@ -31,7 +32,7 @@ const proto = grpc.loadPackageDefinition(
 ) as unknown as ProtoGrpcType;
 
 const client = new proto.scheduler.UserSubscriptionService(
-  `0.0.0.0:${PORT}`,
+  `${URL}:${PORT}`,
   grpc.credentials.createInsecure()
 );
 

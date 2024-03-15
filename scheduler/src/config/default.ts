@@ -3,6 +3,7 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 const customConfig: {
   port: number;
+  url: string;
   accessTokenExpiresIn: number;
   refreshTokenExpiresIn: number;
   dbUri: string;
@@ -12,7 +13,8 @@ const customConfig: {
   refreshTokenPublicKey: string;
   redisCacheExpiresIn: number;
 } = {
-  port: 8001,
+  port: Number(process.env.PORT) || 3003 as number,
+  url: process.env.URL || "0.0.0.0" as string,
   accessTokenExpiresIn: 15,
   refreshTokenExpiresIn: 60,
   redisCacheExpiresIn: 60,
