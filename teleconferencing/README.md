@@ -1,5 +1,23 @@
-## Editor-RPM-Backend
+## Editor-RPM-Backend-Teleconferencing
+## Setup local development (Ensure all dependencies are installed as instructed below)
 
+1. Run Network
+> make network
+2. Run Postgres
+> make postgres
+3. Run CreateDB
+> make createdb
+4. Run Server 
+> make server
+
+### Install tools
+- [Docker desktop](https://www.docker.com/products/docker-desktop)
+- [Golang](https://golang.org/)
+- [Migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
+
+
+
+<!-- 
 ### Branching Strategy:
 1. **Master Branch:**
    - The `master` branch is considered the stable and production-ready branch.
@@ -62,4 +80,4 @@
    - Document any configuration changes or setup instructions.
 
 ### Conclusion:
-Adhering to these guidelines will help ensure a smooth collaboration process among the four teams, maintain code quality, and facilitate the integration of features into the main codebase. Regular communication and adherence to these rules will contribute to a successful and efficient development process.
+Adhering to these guidelines will help ensure a smooth collaboration process among the four teams, maintain code quality, and facilitate the integration of features into the main codebase. Regular communication and adherence to these rules will contribute to a successful and efficient development process. -->

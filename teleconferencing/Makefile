@@ -12,7 +12,7 @@ createdb:
 
 dropdb:
 	docker exec -it postgres-teleconferencing dropdb postgres_teleconferencing_db
-
+ 
 migrateup:
 	migrate -path migrations -database "$(DB_URL)" -verbose up
 
@@ -27,14 +27,16 @@ server:
 
 redis:
 	docker run --name redis-teleconferencing -p 6379:6379 -d redis:7-alpine
-mac_proto:
+mac_proto: 
 	brew install protobuf
 linux_proto:
 	sudo apt install protobuf-compiler
 push:
-	git push secondorigin branch:feature/teleconferencing  	
-
-.PHONY: network postgres createdb server createdb
-
-
+	git push secondorigin branch:feature/teleconferencing  
+dockerBuild:
+	docker build -t editor-rpm-be-teleconferencing:latest .
+dockerConnect: 
+	docker run --name editor-rpm-backend-teleconferencing --network erpm-network -p 8082:8082 -e GIN_MODE=release -e DB_SOURCE="$(DB_URL)" editor-rpm-be-teleconferencing:latest
+.PHONY: network postgres createdb server createdb dockerBuild dockerConnect
+ 
 
