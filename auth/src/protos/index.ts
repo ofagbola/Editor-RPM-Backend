@@ -4,10 +4,7 @@ import path from 'path';
 import * as grpc from '@grpc/grpc-js';
 
 const auth_definition = path.resolve(__dirname, '../protos/auth.proto');
-const notification_definition = path.resolve(
-  __dirname,
-  '../protos/notification.proto'
-);
+
 
 const loadProtoFile = (file: string) => {
   return protoLoader.loadSync(file, {
@@ -23,5 +20,3 @@ export const authProtoDefinition: GrpcObject | any = grpc.loadPackageDefinition(
   loadProtoFile(auth_definition)
 );
 
-export const notificationProtoDefinition: GrpcObject | any =
-  grpc.loadPackageDefinition(loadProtoFile(notification_definition));
