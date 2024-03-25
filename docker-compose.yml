@@ -39,10 +39,6 @@ services:
       - mongodb_data:/data/db
     env_file:
        - ./notification/.env
-    # environment:
-      # MONGO_INITDB_ROOT_USERNAME: admin
-      # MONGO_INITDB_ROOT_PASSWORD: admin
-      # MONGO_INITDB_DATABASE: notification
     networks:
       - auth_network
 volumes:

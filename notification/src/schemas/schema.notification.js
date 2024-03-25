@@ -12,6 +12,31 @@ const subscriptionSchema = new mongoose.Schema({
   },
 });
 
+const notificationSchema = new mongoose.Schema({
+  body: {
+    type: {
+      message: String,
+    },
+    required: true,
+  },
+  topics: {
+    type: [String],
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  id: {
+    type: String,
+    required: true,
+  },
+  read: {
+    type: Boolean,
+    required: true,
+  },
+});
+
 const userSchema = new mongoose.Schema({
   userId: {
     type: String,
@@ -25,5 +50,5 @@ const userSchema = new mongoose.Schema({
 });
 
 export const User = mongoose.model('users', userSchema);
-
+export const Notification = mongoose.model('Notifications', notificationSchema);
 export const Subscription = mongoose.model('Subscriptions', subscriptionSchema);
