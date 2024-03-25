@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+    <script>
+      const socket = io('http://localhost:3000', {
+        path: '/',
+      });
+
+      socket.on('connect', () => {
+        console.log('connected');
+        socket.emit('NEW_USER', '123', 'tester@gmail.com');
+        socket.emit('SUBSCRIBE_TO_TOPIC', '123', ['usertopic', 'medics']);
+
+        //socket.emit('REJOIN_SUBSCRIPTION', '123');
+
+        setInterval(() => {
+          socket.emit(
+            'NOTIFY',
+            {
+              title: 'hello',
+              body: {
+                message: 'hello',
+              },
+            },
+            ['usertopic']
+          );
+
+          socket.emit(
+            'NOTIFY',
+            {
+              title: 'medics',
+              body: {
+                message: 'medics',
+              },
+            },
+            ['medics']
+          );
+        }, 5000);
+
+        socket.on('SUBSCRIBE_TO_TOPIC', (data) => {
+          console.log(data);
+        });
+
+        socket.on('REJOIN_SUBSCRIPTION', (data) => {
+          console.log(data);
+        });
+
+        socket.on('RECEIVED_NOTIFICATION', (data) => {
+          console.log(data, 'heree');
+        });
+
+        socket.on('NOTIFY', (data) => {
+          console.log(data, 'heree');
+        });
+
+        socket.on('disconnect', () => {
+          console.log('Disconnected from server');
+        });
+      });
+    </script>
+  </body>
+</html>
