@@ -35,6 +35,10 @@ const notificationSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   },
+  date: {
+    type: String,
+    required: true,
+  },
 });
 
 const userSchema = new mongoose.Schema({

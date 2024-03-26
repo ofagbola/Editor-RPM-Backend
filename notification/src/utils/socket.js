@@ -6,6 +6,7 @@ import {
   Notification,
 } from '../schemas/schema.notification.js';
 import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 
 export let io = null;
 
@@ -65,6 +66,7 @@ export const InitSocket = (server) => {
               body: payload.body ?? '',
               id,
               read: false,
+              date: moment().format('D MMM, YYYY, h:mm').toString(),
             };
 
             notify(id, {
