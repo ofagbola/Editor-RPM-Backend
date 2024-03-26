@@ -1,6 +1,12 @@
 import { Server } from 'socket.io';
 import logger from './logger.js';
-import { Subscription, User } from '../schemas/schema.notification.js';
+import {
+  Subscription,
+  User,
+  Notification,
+} from '../schemas/schema.notification.js';
+import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 
 export let io = null;
 
@@ -53,7 +59,22 @@ export const InitSocket = (server) => {
       socket.on('NOTIFY', async (payload, topics = []) => {
         try {
           if (topics.length > 0) {
-            io.to(topics).emit('RECEIVED_NOTIFICATION', payload);
+            const id = uuidv4();
+
+            const data = {
+              title: payload.title ?? '',
+              body: payload.body ?? '',
+              id,
+              read: false,
+              date: moment().format('D MMM, YYYY, h:mm').toString(),
+            };
+
+            notify(id, {
+              ...data,
+              topics,
+            }).then(() => {
+              io.to(topics).emit('RECEIVED_NOTIFICATION', data);
+            });
           }
         } catch (error) {
           socket.emit('NOTIFY', {
@@ -78,9 +99,50 @@ export const InitSocket = (server) => {
           }
         }
       });
+
+      socket?.on('GET_NOTIFICATIONS', async (topics) => {
+        try {
+          const notifications = await getNotifications(topics);
+          socket.emit('NOTIFICATION_DATA', notifications);
+        } catch (error) {
+          socket.emit('GET_NOTIFICATIONS', {
+            message: 'failed to get notification',
+          });
+        }
+      });
+
+      socket?.on('MARK_NOTIFICATION', async (id) => {
+        try {
+          await markNotification(id);
+        } catch (error) {
+          socket.emit('MARK_NOTIFICATION', {
+            message: 'failed to mark notification',
+          });
+        }
+      });
     });
   } catch (error) {
     logger.error(`Socket connection failed ${error}`);
+  }
+};
+
+const getNotifications = async (topic) => {
+  try {
+    return await Notification.find({ topics: { $in: topic }, read: false });
+  } catch (error) {
+    throw error;
+  }
+};
+
+const markNotification = async (id) => {
+  try {
+    await Notification.findOneAndUpdate(
+      { id: id },
+      { $set: { read: true } },
+      { new: true }
+    );
+  } catch (error) {
+    throw error;
   }
 };
 
@@ -147,6 +209,22 @@ const createUser = async (userId, user_email) => {
     };
 
     await User.findOneAndUpdate(query, newData, options);
+  } catch (error) {
+    throw error;
+  }
+};
+
+const notify = async (id, data) => {
+  try {
+    const query = { id };
+
+    const options = {
+      upsert: true,
+      new: true,
+      setDefaultsOnInsert: true,
+    };
+
+    await Notification.findOneAndUpdate(query, data, options);
   } catch (error) {
     throw error;
   }
