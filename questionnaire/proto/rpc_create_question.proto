@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+import "question.proto";
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/questionnaire/pb";
+
+message CreateQuestionRequest {
+    string title = 1;
+    string input_field = 2;
+    string options = 3;
+    string created_by = 4;
+}
+
+message CreateQuestionResponse {
+    Question question = 1;
+}
