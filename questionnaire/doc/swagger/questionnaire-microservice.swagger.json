@@ -1,0 +1,231 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Editor RPM Questionnaire API Service",
+    "version": "1.0",
+    "contact": {
+      "name": "EvonMedics LLC",
+      "url": "https://github.com/EvonMedicsLLC",
+      "email": "it@evonmedics.org"
+    }
+  },
+  "tags": [
+    {
+      "name": "QuestionnaireService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/create_question": {
+      "post": {
+        "summary": "Create new question",
+        "description": "Use this API to create a new question",
+        "operationId": "QuestionnaireService_CreateQuestion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateQuestionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateQuestionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QuestionnaireService"
+        ]
+      }
+    },
+    "/v1/create_question_config": {
+      "post": {
+        "summary": "Create new question configuration",
+        "description": "Use this API to create a new question configuration",
+        "operationId": "QuestionnaireService_CreateQuestionConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateQuestionConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateQuestionConfigRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QuestionnaireService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "pbCreateQuestionConfigRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "createdBy": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateQuestionConfigResponse": {
+      "type": "object",
+      "properties": {
+        "questionConfig": {
+          "$ref": "#/definitions/pbQuestionConfig"
+        }
+      }
+    },
+    "pbCreateQuestionRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "inputField": {
+          "type": "string"
+        },
+        "options": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateQuestionResponse": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "$ref": "#/definitions/pbQuestion"
+        }
+      }
+    },
+    "pbQuestion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "title": {
+          "type": "string"
+        },
+        "inputField": {
+          "type": "string"
+        },
+        "options": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbQuestionConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}
