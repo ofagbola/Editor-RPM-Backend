@@ -83,6 +83,58 @@ func local_request_QuestionnaireService_CreateQuestionConfig_0(ctx context.Conte
 
 }
 
+func request_QuestionnaireService_CreateSendQuestionConfig_0(ctx context.Context, marshaler runtime.Marshaler, client QuestionnaireServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateSendQuestionConfigRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.CreateSendQuestionConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_QuestionnaireService_CreateSendQuestionConfig_0(ctx context.Context, marshaler runtime.Marshaler, server QuestionnaireServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateSendQuestionConfigRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.CreateSendQuestionConfig(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_QuestionnaireService_CreateResponseQuestionConfig_0(ctx context.Context, marshaler runtime.Marshaler, client QuestionnaireServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateResponseQuestionConfigRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.CreateResponseQuestionConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_QuestionnaireService_CreateResponseQuestionConfig_0(ctx context.Context, marshaler runtime.Marshaler, server QuestionnaireServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CreateResponseQuestionConfigRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.CreateResponseQuestionConfig(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterQuestionnaireServiceHandlerServer registers the http handlers for service QuestionnaireService to "mux".
 // UnaryRPC     :call QuestionnaireServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -136,6 +188,56 @@ func RegisterQuestionnaireServiceHandlerServer(ctx context.Context, mux *runtime
 		}
 
 		forward_QuestionnaireService_CreateQuestionConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_QuestionnaireService_CreateSendQuestionConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.QuestionnaireService/CreateSendQuestionConfig", runtime.WithHTTPPathPattern("/v1/create_send_question_config"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_QuestionnaireService_CreateSendQuestionConfig_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_QuestionnaireService_CreateSendQuestionConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_QuestionnaireService_CreateResponseQuestionConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.QuestionnaireService/CreateResponseQuestionConfig", runtime.WithHTTPPathPattern("/v1/create_response_question_config"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_QuestionnaireService_CreateResponseQuestionConfig_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_QuestionnaireService_CreateResponseQuestionConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -224,6 +326,50 @@ func RegisterQuestionnaireServiceHandlerClient(ctx context.Context, mux *runtime
 
 	})
 
+	mux.Handle("POST", pattern_QuestionnaireService_CreateSendQuestionConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/pb.QuestionnaireService/CreateSendQuestionConfig", runtime.WithHTTPPathPattern("/v1/create_send_question_config"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_QuestionnaireService_CreateSendQuestionConfig_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_QuestionnaireService_CreateSendQuestionConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_QuestionnaireService_CreateResponseQuestionConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/pb.QuestionnaireService/CreateResponseQuestionConfig", runtime.WithHTTPPathPattern("/v1/create_response_question_config"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_QuestionnaireService_CreateResponseQuestionConfig_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_QuestionnaireService_CreateResponseQuestionConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -231,10 +377,18 @@ var (
 	pattern_QuestionnaireService_CreateQuestion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "create_question"}, ""))
 
 	pattern_QuestionnaireService_CreateQuestionConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "create_question_config"}, ""))
+
+	pattern_QuestionnaireService_CreateSendQuestionConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "create_send_question_config"}, ""))
+
+	pattern_QuestionnaireService_CreateResponseQuestionConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "create_response_question_config"}, ""))
 )
 
 var (
 	forward_QuestionnaireService_CreateQuestion_0 = runtime.ForwardResponseMessage
 
 	forward_QuestionnaireService_CreateQuestionConfig_0 = runtime.ForwardResponseMessage
+
+	forward_QuestionnaireService_CreateSendQuestionConfig_0 = runtime.ForwardResponseMessage
+
+	forward_QuestionnaireService_CreateResponseQuestionConfig_0 = runtime.ForwardResponseMessage
 )

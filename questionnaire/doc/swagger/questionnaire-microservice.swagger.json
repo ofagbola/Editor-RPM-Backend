@@ -88,12 +88,83 @@
           "QuestionnaireService"
         ]
       }
+    },
+    "/v1/create_response_question_config": {
+      "post": {
+        "summary": "Create response to question configuration",
+        "description": "Use this API to create response to question configuration",
+        "operationId": "QuestionnaireService_CreateResponseQuestionConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateResponseQuestionConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateResponseQuestionConfigRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QuestionnaireService"
+        ]
+      }
+    },
+    "/v1/create_send_question_config": {
+      "post": {
+        "summary": "Create an instance of sending a question configuration",
+        "description": "Use this API to create an instance of sending question configuration",
+        "operationId": "QuestionnaireService_CreateSendQuestionConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateSendQuestionConfigResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateSendQuestionConfigRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QuestionnaireService"
+        ]
+      }
     }
   },
   "definitions": {
     "pbCreateQuestionConfigRequest": {
       "type": "object",
       "properties": {
+        "code": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },
@@ -103,8 +174,7 @@
         "questions": {
           "type": "array",
           "items": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           }
         },
         "createdBy": {
@@ -123,6 +193,9 @@
     "pbCreateQuestionRequest": {
       "type": "object",
       "properties": {
+        "code": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },
@@ -130,7 +203,10 @@
           "type": "string"
         },
         "options": {
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "createdBy": {
           "type": "string"
@@ -145,12 +221,60 @@
         }
       }
     },
+    "pbCreateResponseQuestionConfigRequest": {
+      "type": "object",
+      "properties": {
+        "questionConfigId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "patient": {
+          "type": "string"
+        },
+        "response": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "pbCreateResponseQuestionConfigResponse": {
+      "type": "object",
+      "properties": {
+        "responseQuestionConfig": {
+          "$ref": "#/definitions/pbResponseQuestionConfig"
+        }
+      }
+    },
+    "pbCreateSendQuestionConfigRequest": {
+      "type": "object",
+      "properties": {
+        "questionConfigId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "recipient": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateSendQuestionConfigResponse": {
+      "type": "object",
+      "properties": {
+        "sendQuestionConfig": {
+          "$ref": "#/definitions/pbSendQuestionConfig"
+        }
+      }
+    },
     "pbQuestion": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int32"
+        "code": {
+          "type": "string"
         },
         "title": {
           "type": "string"
@@ -159,7 +283,10 @@
           "type": "string"
         },
         "options": {
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "createdBy": {
           "type": "string"
@@ -177,6 +304,9 @@
           "type": "integer",
           "format": "int32"
         },
+        "code": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },
@@ -186,12 +316,63 @@
         "questions": {
           "type": "array",
           "items": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           }
         },
         "createdBy": {
           "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbResponseQuestionConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "questionConfigId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "response": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "patient": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbSendQuestionConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "questionConfigId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "recipient": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "submitted": {
+          "type": "boolean"
         },
         "createdAt": {
           "type": "string",

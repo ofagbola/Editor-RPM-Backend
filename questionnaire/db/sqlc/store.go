@@ -10,6 +10,8 @@ type Store interface {
 	Querier
 	CreateQuestionTx(ctx context.Context, arg CreateQuestionTxParams) (CreateQuestionTxResult, error)
 	CreateQuestionConfigTx(ctx context.Context, arg CreateQuestionConfigTxParams) (CreateQuestionConfigTxResult, error)
+	CreateSendQuestionConfigTx(ctx context.Context, arg CreateSendQuestionConfigTxParams) (CreateSendQuestionConfigTxResult, error)
+	CreateResponseQuestionConfigTx(ctx context.Context, arg CreateResponseQuestionConfigTxParams) (CreateResponseQuestionConfigTxResult, error)
 }
 
 // SQLStore provides all functions to execute SQL queries and transactions

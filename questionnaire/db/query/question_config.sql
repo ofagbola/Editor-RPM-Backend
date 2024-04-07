@@ -1,11 +1,12 @@
 -- name: CreateQuestionConfig :one
 INSERT INTO question_configs (
+  code,
   title,  
   description,
   questions,
   created_by
 ) VALUES (
-  $1, $2, $3, $4
+  $1, $2, $3, $4, $5
 ) RETURNING *;
 
 -- name: GetQuestionConfig :one

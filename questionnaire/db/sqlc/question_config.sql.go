@@ -13,24 +13,27 @@ import (
 
 const createQuestionConfig = `-- name: CreateQuestionConfig :one
 INSERT INTO question_configs (
+  code,
   title,  
   description,
   questions,
   created_by
 ) VALUES (
-  $1, $2, $3, $4
-) RETURNING id, title, description, questions, created_by, created_at
+  $1, $2, $3, $4, $5
+) RETURNING id, code, title, description, questions, created_by, created_at
 `
 
 type CreateQuestionConfigParams struct {
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Questions   []int32 `json:"questions"`
-	CreatedBy   string  `json:"created_by"`
+	Code        string   `json:"code"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Questions   []string `json:"questions"`
+	CreatedBy   string   `json:"created_by"`
 }
 
 func (q *Queries) CreateQuestionConfig(ctx context.Context, arg CreateQuestionConfigParams) (QuestionConfig, error) {
 	row := q.db.QueryRow(ctx, createQuestionConfig,
+		arg.Code,
 		arg.Title,
 		arg.Description,
 		arg.Questions,
@@ -39,6 +42,7 @@ func (q *Queries) CreateQuestionConfig(ctx context.Context, arg CreateQuestionCo
 	var i QuestionConfig
 	err := row.Scan(
 		&i.ID,
+		&i.Code,
 		&i.Title,
 		&i.Description,
 		&i.Questions,
@@ -59,7 +63,7 @@ func (q *Queries) DeleteQuestionConfig(ctx context.Context, id int64) error {
 }
 
 const getQuestionConfig = `-- name: GetQuestionConfig :one
-SELECT id, title, description, questions, created_by, created_at FROM question_configs
+SELECT id, code, title, description, questions, created_by, created_at FROM question_configs
 WHERE id = $1 LIMIT 1
 `
 
@@ -68,6 +72,7 @@ func (q *Queries) GetQuestionConfig(ctx context.Context, id int64) (QuestionConf
 	var i QuestionConfig
 	err := row.Scan(
 		&i.ID,
+		&i.Code,
 		&i.Title,
 		&i.Description,
 		&i.Questions,
@@ -78,7 +83,7 @@ func (q *Queries) GetQuestionConfig(ctx context.Context, id int64) (QuestionConf
 }
 
 const listQuestionConfigs = `-- name: ListQuestionConfigs :many
-SELECT id, title, description, questions, created_by, created_at FROM question_configs
+SELECT id, code, title, description, questions, created_by, created_at FROM question_configs
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -100,6 +105,7 @@ func (q *Queries) ListQuestionConfigs(ctx context.Context, arg ListQuestionConfi
 		var i QuestionConfig
 		if err := rows.Scan(
 			&i.ID,
+			&i.Code,
 			&i.Title,
 			&i.Description,
 			&i.Questions,
@@ -125,13 +131,13 @@ SET
 WHERE
  created_by = $4
   AND id = $5
-RETURNING id, title, description, questions, created_by, created_at
+RETURNING id, code, title, description, questions, created_by, created_at
 `
 
 type UpdateQuestionConfigParams struct {
 	Title       pgtype.Text `json:"title"`
 	Description pgtype.Text `json:"description"`
-	Questions   []int32     `json:"questions"`
+	Questions   []string    `json:"questions"`
 	CreatedBy   string      `json:"created_by"`
 	ID          int64       `json:"id"`
 }
@@ -147,6 +153,7 @@ func (q *Queries) UpdateQuestionConfig(ctx context.Context, arg UpdateQuestionCo
 	var i QuestionConfig
 	err := row.Scan(
 		&i.ID,
+		&i.Code,
 		&i.Title,
 		&i.Description,
 		&i.Questions,

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/questionnaire/pb";
+
+message CreateSendQuestionConfigRequest {
+    int64 question_config_id = 1;
+    string recipient = 2;
+    string sender = 3;
+}  
+
+message CreateSendQuestionConfigResponse {
+    SendQuestionConfig send_question_config = 1;
+}
+
+message SendQuestionConfig {
+    int32 id = 1;
+    int64 question_config_id = 2;
+    string recipient = 3;
+    string sender = 4;
+    bool submitted = 5;
+    google.protobuf.Timestamp created_at = 6;
+}

@@ -6,22 +6,42 @@ package db
 
 import (
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Question struct {
-	ID         int64     `json:"id"`
+	Code       string    `json:"code"`
 	Title      string    `json:"title"`
 	InputField string    `json:"input_field"`
-	Options    string    `json:"options"`
+	Options    []string  `json:"options"`
 	CreatedBy  string    `json:"created_by"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 
 type QuestionConfig struct {
 	ID          int64     `json:"id"`
+	Code        string    `json:"code"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
-	Questions   []int32   `json:"questions"`
+	Questions   []string  `json:"questions"`
 	CreatedBy   string    `json:"created_by"`
 	CreatedAt   time.Time `json:"created_at"`
+}
+
+type ResponseQuestionConfig struct {
+	ID               int64     `json:"id"`
+	QuestionConfigID int64     `json:"question_config_id"`
+	Response         []string  `json:"response"`
+	Patient          string    `json:"patient"`
+	CreatedAt        time.Time `json:"created_at"`
+}
+
+type SendQuestionConfig struct {
+	ID               int64       `json:"id"`
+	QuestionConfigID int64       `json:"question_config_id"`
+	Recipient        string      `json:"recipient"`
+	Sender           string      `json:"sender"`
+	Submitted        pgtype.Bool `json:"submitted"`
+	CreatedAt        time.Time   `json:"created_at"`
 }

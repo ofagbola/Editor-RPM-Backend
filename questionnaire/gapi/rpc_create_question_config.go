@@ -14,15 +14,13 @@ func (server *Server) CreateQuestionConfig(ctx context.Context, req *pb.CreateQu
 
 	arg := db.CreateQuestionConfigTxParams{
 		CreateQuestionConfigParams: db.CreateQuestionConfigParams{
+			Code:        req.GetCode(),
 			Title:       req.GetTitle(),
 			Description: req.GetDescription(),
 			Questions:   req.GetQuestions(),
 			CreatedBy:   req.GetCreatedBy(),
 		},
 		// TODO: notify user
-		// AfterCreate: func(questionConfig db.QuestionConfig) error {
-		// 	//notify user
-		// }
 	}
 	txResult, err := server.store.CreateQuestionConfigTx(ctx, arg)
 	if err != nil {
