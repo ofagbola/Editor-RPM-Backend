@@ -2,17 +2,28 @@ syntax = "proto3";
 
 package pb;
 
-import "question_config.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ofagbola/Editor-RPM-Backend/questionnaire/pb";
 
 message CreateQuestionConfigRequest {
-    string title = 1;
-    string description = 2;
-    repeated int32 questions = 3;
-    string created_by = 4;
+    string code = 1;
+    string title = 2;
+    string description = 3;
+    repeated string questions = 4;
+    string created_by = 5;
 }
 
 message CreateQuestionConfigResponse {
     QuestionConfig question_config = 1;
 }
+
+message QuestionConfig {
+    int32 id = 1;
+    string code = 2;
+    string title = 3;
+    string description = 4;
+    repeated string questions = 5;
+    string created_by = 6;
+    google.protobuf.Timestamp created_at = 7;
+}  

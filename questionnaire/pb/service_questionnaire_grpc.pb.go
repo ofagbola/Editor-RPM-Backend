@@ -19,8 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	QuestionnaireService_CreateQuestion_FullMethodName       = "/pb.QuestionnaireService/CreateQuestion"
-	QuestionnaireService_CreateQuestionConfig_FullMethodName = "/pb.QuestionnaireService/CreateQuestionConfig"
+	QuestionnaireService_CreateQuestion_FullMethodName               = "/pb.QuestionnaireService/CreateQuestion"
+	QuestionnaireService_CreateQuestionConfig_FullMethodName         = "/pb.QuestionnaireService/CreateQuestionConfig"
+	QuestionnaireService_CreateSendQuestionConfig_FullMethodName     = "/pb.QuestionnaireService/CreateSendQuestionConfig"
+	QuestionnaireService_CreateResponseQuestionConfig_FullMethodName = "/pb.QuestionnaireService/CreateResponseQuestionConfig"
 )
 
 // QuestionnaireServiceClient is the client API for QuestionnaireService service.
@@ -29,6 +31,8 @@ const (
 type QuestionnaireServiceClient interface {
 	CreateQuestion(ctx context.Context, in *CreateQuestionRequest, opts ...grpc.CallOption) (*CreateQuestionResponse, error)
 	CreateQuestionConfig(ctx context.Context, in *CreateQuestionConfigRequest, opts ...grpc.CallOption) (*CreateQuestionConfigResponse, error)
+	CreateSendQuestionConfig(ctx context.Context, in *CreateSendQuestionConfigRequest, opts ...grpc.CallOption) (*CreateSendQuestionConfigResponse, error)
+	CreateResponseQuestionConfig(ctx context.Context, in *CreateResponseQuestionConfigRequest, opts ...grpc.CallOption) (*CreateResponseQuestionConfigResponse, error)
 }
 
 type questionnaireServiceClient struct {
@@ -57,12 +61,32 @@ func (c *questionnaireServiceClient) CreateQuestionConfig(ctx context.Context, i
 	return out, nil
 }
 
+func (c *questionnaireServiceClient) CreateSendQuestionConfig(ctx context.Context, in *CreateSendQuestionConfigRequest, opts ...grpc.CallOption) (*CreateSendQuestionConfigResponse, error) {
+	out := new(CreateSendQuestionConfigResponse)
+	err := c.cc.Invoke(ctx, QuestionnaireService_CreateSendQuestionConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *questionnaireServiceClient) CreateResponseQuestionConfig(ctx context.Context, in *CreateResponseQuestionConfigRequest, opts ...grpc.CallOption) (*CreateResponseQuestionConfigResponse, error) {
+	out := new(CreateResponseQuestionConfigResponse)
+	err := c.cc.Invoke(ctx, QuestionnaireService_CreateResponseQuestionConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QuestionnaireServiceServer is the server API for QuestionnaireService service.
 // All implementations must embed UnimplementedQuestionnaireServiceServer
 // for forward compatibility
 type QuestionnaireServiceServer interface {
 	CreateQuestion(context.Context, *CreateQuestionRequest) (*CreateQuestionResponse, error)
 	CreateQuestionConfig(context.Context, *CreateQuestionConfigRequest) (*CreateQuestionConfigResponse, error)
+	CreateSendQuestionConfig(context.Context, *CreateSendQuestionConfigRequest) (*CreateSendQuestionConfigResponse, error)
+	CreateResponseQuestionConfig(context.Context, *CreateResponseQuestionConfigRequest) (*CreateResponseQuestionConfigResponse, error)
 	mustEmbedUnimplementedQuestionnaireServiceServer()
 }
 
@@ -75,6 +99,12 @@ func (UnimplementedQuestionnaireServiceServer) CreateQuestion(context.Context, *
 }
 func (UnimplementedQuestionnaireServiceServer) CreateQuestionConfig(context.Context, *CreateQuestionConfigRequest) (*CreateQuestionConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateQuestionConfig not implemented")
+}
+func (UnimplementedQuestionnaireServiceServer) CreateSendQuestionConfig(context.Context, *CreateSendQuestionConfigRequest) (*CreateSendQuestionConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSendQuestionConfig not implemented")
+}
+func (UnimplementedQuestionnaireServiceServer) CreateResponseQuestionConfig(context.Context, *CreateResponseQuestionConfigRequest) (*CreateResponseQuestionConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateResponseQuestionConfig not implemented")
 }
 func (UnimplementedQuestionnaireServiceServer) mustEmbedUnimplementedQuestionnaireServiceServer() {}
 
@@ -125,6 +155,42 @@ func _QuestionnaireService_CreateQuestionConfig_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _QuestionnaireService_CreateSendQuestionConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSendQuestionConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QuestionnaireServiceServer).CreateSendQuestionConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: QuestionnaireService_CreateSendQuestionConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QuestionnaireServiceServer).CreateSendQuestionConfig(ctx, req.(*CreateSendQuestionConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _QuestionnaireService_CreateResponseQuestionConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateResponseQuestionConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QuestionnaireServiceServer).CreateResponseQuestionConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: QuestionnaireService_CreateResponseQuestionConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QuestionnaireServiceServer).CreateResponseQuestionConfig(ctx, req.(*CreateResponseQuestionConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // QuestionnaireService_ServiceDesc is the grpc.ServiceDesc for QuestionnaireService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +205,14 @@ var QuestionnaireService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateQuestionConfig",
 			Handler:    _QuestionnaireService_CreateQuestionConfig_Handler,
+		},
+		{
+			MethodName: "CreateSendQuestionConfig",
+			Handler:    _QuestionnaireService_CreateSendQuestionConfig_Handler,
+		},
+		{
+			MethodName: "CreateResponseQuestionConfig",
+			Handler:    _QuestionnaireService_CreateResponseQuestionConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

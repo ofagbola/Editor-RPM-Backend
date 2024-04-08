@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/questionnaire/pb";
+
+message CreateResponseQuestionConfigRequest {
+    int64 question_config_id = 1;
+    string patient = 2;
+    repeated string response = 3;
+}  
+
+message CreateResponseQuestionConfigResponse {
+    ResponseQuestionConfig response_question_config = 1;
+}
+
+message ResponseQuestionConfig {
+    int32 id = 1;
+    int64 question_config_id = 2;
+    repeated string response = 3;
+    string patient = 4;
+    google.protobuf.Timestamp created_at = 5;
+}

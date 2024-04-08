@@ -13,24 +13,27 @@ import (
 
 const createQuestion = `-- name: CreateQuestion :one
 INSERT INTO questions (
+  code,
   title,  
   input_field,
   options,
   created_by
 ) VALUES (
-  $1, $2, $3, $4
-) RETURNING id, title, input_field, options, created_by, created_at
+  $1, $2, $3, $4, $5
+) RETURNING code, title, input_field, options, created_by, created_at
 `
 
 type CreateQuestionParams struct {
-	Title      string `json:"title"`
-	InputField string `json:"input_field"`
-	Options    string `json:"options"`
-	CreatedBy  string `json:"created_by"`
+	Code       string   `json:"code"`
+	Title      string   `json:"title"`
+	InputField string   `json:"input_field"`
+	Options    []string `json:"options"`
+	CreatedBy  string   `json:"created_by"`
 }
 
 func (q *Queries) CreateQuestion(ctx context.Context, arg CreateQuestionParams) (Question, error) {
 	row := q.db.QueryRow(ctx, createQuestion,
+		arg.Code,
 		arg.Title,
 		arg.InputField,
 		arg.Options,
@@ -38,7 +41,7 @@ func (q *Queries) CreateQuestion(ctx context.Context, arg CreateQuestionParams) 
 	)
 	var i Question
 	err := row.Scan(
-		&i.ID,
+		&i.Code,
 		&i.Title,
 		&i.InputField,
 		&i.Options,
@@ -50,24 +53,24 @@ func (q *Queries) CreateQuestion(ctx context.Context, arg CreateQuestionParams) 
 
 const deleteQuestion = `-- name: DeleteQuestion :exec
 DELETE FROM questions
-WHERE id = $1
+WHERE code = $1
 `
 
-func (q *Queries) DeleteQuestion(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, deleteQuestion, id)
+func (q *Queries) DeleteQuestion(ctx context.Context, code string) error {
+	_, err := q.db.Exec(ctx, deleteQuestion, code)
 	return err
 }
 
 const getQuestion = `-- name: GetQuestion :one
-SELECT id, title, input_field, options, created_by, created_at FROM questions
-WHERE id = $1 LIMIT 1
+SELECT code, title, input_field, options, created_by, created_at FROM questions
+WHERE code = $1 LIMIT 1
 `
 
-func (q *Queries) GetQuestion(ctx context.Context, id int64) (Question, error) {
-	row := q.db.QueryRow(ctx, getQuestion, id)
+func (q *Queries) GetQuestion(ctx context.Context, code string) (Question, error) {
+	row := q.db.QueryRow(ctx, getQuestion, code)
 	var i Question
 	err := row.Scan(
-		&i.ID,
+		&i.Code,
 		&i.Title,
 		&i.InputField,
 		&i.Options,
@@ -78,8 +81,8 @@ func (q *Queries) GetQuestion(ctx context.Context, id int64) (Question, error) {
 }
 
 const listQuestions = `-- name: ListQuestions :many
-SELECT id, title, input_field, options, created_by, created_at FROM questions
-ORDER BY id
+SELECT code, title, input_field, options, created_by, created_at FROM questions
+ORDER BY code
 LIMIT $1
 OFFSET $2
 `
@@ -99,7 +102,7 @@ func (q *Queries) ListQuestions(ctx context.Context, arg ListQuestionsParams) ([
 	for rows.Next() {
 		var i Question
 		if err := rows.Scan(
-			&i.ID,
+			&i.Code,
 			&i.Title,
 			&i.InputField,
 			&i.Options,
@@ -120,20 +123,20 @@ const updateQuestion = `-- name: UpdateQuestion :one
 UPDATE questions
 SET
   title = COALESCE($1, title),
-  input_field = COALESCE($2, input_field),
-  options = COALESCE($3, options)
+  input_field = COALESCE($2, input_field), 
+  options = COALESCE($3, options) 
 WHERE
  created_by = $4
- AND id = $5
-RETURNING id, title, input_field, options, created_by, created_at
+ AND code = $5
+RETURNING code, title, input_field, options, created_by, created_at
 `
 
 type UpdateQuestionParams struct {
 	Title      pgtype.Text `json:"title"`
 	InputField pgtype.Text `json:"input_field"`
-	Options    pgtype.Text `json:"options"`
+	Options    []string    `json:"options"`
 	CreatedBy  string      `json:"created_by"`
-	ID         int64       `json:"id"`
+	Code       string      `json:"code"`
 }
 
 func (q *Queries) UpdateQuestion(ctx context.Context, arg UpdateQuestionParams) (Question, error) {
@@ -142,11 +145,11 @@ func (q *Queries) UpdateQuestion(ctx context.Context, arg UpdateQuestionParams) 
 		arg.InputField,
 		arg.Options,
 		arg.CreatedBy,
-		arg.ID,
+		arg.Code,
 	)
 	var i Question
 	err := row.Scan(
-		&i.ID,
+		&i.Code,
 		&i.Title,
 		&i.InputField,
 		&i.Options,

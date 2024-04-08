@@ -13,6 +13,7 @@ func (server *Server) CreateQuestion(ctx context.Context, req *pb.CreateQuestion
 
 	arg := db.CreateQuestionTxParams{
 		CreateQuestionParams: db.CreateQuestionParams{
+			Code:       req.GetCode(),
 			Title:      req.GetTitle(),
 			InputField: req.GetInputField(),
 			Options:    req.GetOptions(),
