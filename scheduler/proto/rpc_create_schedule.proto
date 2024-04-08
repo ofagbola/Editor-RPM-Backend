@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/scheduler/pb";
+
+message CreateScheduleRequest {
+    string recepient = 1;
+    string initiator = 2;
+    string time_slot = 3;
+}
+
+message CreateScheduleResponse {
+    Schedule schedule = 1;
+}
+message Schedule {
+    int64 id = 1;
+    string recepient = 2;
+    string initiator = 3;
+    string time_slot = 4;
+    google.protobuf.Timestamp created_at = 5;
+}
