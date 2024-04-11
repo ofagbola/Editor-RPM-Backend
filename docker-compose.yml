@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  envoy:
+    image: envoyproxy/envoy-alpine:v1.14-latest
+    container_name: envoy
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    command: ["envoy", "-c", "/etc/envoy/envoy.yaml"]
+    networks:
+      - auth_network
   auth:
     build:
       context: ./auth
@@ -39,10 +50,6 @@ services:
       - mongodb_data:/data/db
     env_file:
        - ./notification/.env
-    # environment:
-      # MONGO_INITDB_ROOT_USERNAME: admin
-      # MONGO_INITDB_ROOT_PASSWORD: admin
-      # MONGO_INITDB_DATABASE: notification
     networks:
       - auth_network
 volumes:

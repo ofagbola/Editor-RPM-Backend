@@ -22,6 +22,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "google-protobuf": "^3.21.2",
+    "grpc-tools": "^1.12.4",
     "grpc-web": "^1.5.0",
     "joi": "^17.12.1",
     "jsonwebtoken": "^9.0.2",
@@ -38,7 +39,7 @@
     "winston": "^3.11.0"
   },
   "scripts": {
-    "gen3": "protoc -I=$DIR ./src/protos/auth.proto --js_out=import_style=commonjs:generated --grpc-web_out=import_style=commonjs,mode=grpcwebtext:generated",
+    "gen3": "protoc --plugin=./node_modules/.bin/protoc-gen-grpc-web -I=./src/protos ./src/protos/auth.proto --js_out=import_style=commonjs:generated --grpc-web_out=import_style=commonjs,mode=grpcwebtext:generated",
     "gen2": "protoc --js_out=import_style=commonjs:. --plugin=./node_modules/.bin/protoc-gen-grpc-web  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./ ./src/protos/auth.proto",
     "gen": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=. ./src/protos/auth.proto ",
     "build": "tsc",
