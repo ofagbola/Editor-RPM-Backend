@@ -1,6 +1,6 @@
 DB_URL=postgresql://root:hush@localhost:5432/questionnaire_service_db?sslmode=disable
 postgres:
-	docker run --name questionnaire-service-postgres-container -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=hush -d postgres:16-alpine
+	docker run --name questionnaire-service-postgres-container --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=hush -d postgres:16-alpine
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
 migratedown:
@@ -13,6 +13,12 @@ dropdb:
 	docker exec -it questionnaire-service-postgres-container dropdb questionnaire_service_db	
 sqlc:
 	sqlc generate	
+network: 
+	docker network create questionnaire-network
+createContainer:
+	docker build -t questionnaire .
+runContainer:
+	docker run --name questionnaire --network questionnaire-network -p 9090:9090 -e GIN_MODE=release -e DB_SOURCE="postgresql://root:hush@questionnaire-service-postgres-container:5432/questionnaire_service_db?sslmode=disable" questionnaire:latest
 proto:
 	rm -f pb/*.go
 	rm -f doc/swagger/*.swagger.json
@@ -27,3 +33,5 @@ server:
 	go run main.go
 
 .PHONY: postgres createdb dropdb migrateup migratedown new_migration sqlc proto server
+
+# 
