@@ -9,6 +9,12 @@ Run & Test Questionnaire Server
 - run: `make createdb`
 - run: `make server`
 
+Run Build & Test Containarized Questionnaire Server
+- run: `make network`  (to create network)
+- run: `make postgres` (create postgres container and add to created network)
+- run: `make createdb` (create postgres db)
+- run: `make createContainer`
+- run: `make runContainer`
 
 TODO
 - Validator 
