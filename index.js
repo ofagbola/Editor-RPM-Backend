@@ -2,13 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const axios = require("axios");
-const {
-  GarminHeartRateSummary,
-  GarminSpO2Summary,
-  AppleHealthData,
-  FitBitSpO2Data,
-  FitBitHeartRateData,
-} = require("./models/HealthData");
+const { Vitals, Tokens } = require("./models/HealthData");
 
 const {
   fetchRestingHeartRate,
@@ -71,29 +65,10 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
 });
 
 // For FitBit
-//
-//
-//
-//
-//
-
-// Route to start the OAuth flow
-app.get("/authorize", (req, res) => {
-  const params = queryString.stringify({
-    response_type: "code",
-    client_id: process.env.FITBIT_CLIENT_ID,
-    redirect_uri: process.env.CALLBACK_URL,
-    scope: "activity heartrate sleep", // Specify needed scopes
-    expires_in: "31536000", // 1 year
-  });
-
-  res.redirect(`https://www.fitbit.com/oauth2/authorize?${params}`);
-});
 
 // Callback route Fitbit will redirect to
 app.get("/callback", async (req, res) => {
   const { code } = req.query;
-
   try {
     const response = await axios.post(
       "https://api.fitbit.com/oauth2/token",
@@ -115,13 +90,24 @@ app.get("/callback", async (req, res) => {
       },
     );
 
-    // Save the tokens somewhere (e.g., database)
+    console.log(response.data);
+
     console.log("Access Token:", response.data.access_token);
     console.log("Refresh Token:", response.data.refresh_token);
 
+    await Tokens.create({
+      userId: "id",
+      accessToken: response.data.access_token,
+      refreshToken: response.data.refresh_token,
+      userIdFromProvider: response.data.user_id,
+      expiresIn: response.data.expires_in,
+      scope: response.data.refresh_token,
+      device: "Fitbit",
+    });
+
     res.send("Authorization successful! You can close this window.");
   } catch (error) {
-    console.error("Error exchanging code for tokens:", error.response.data);
+    console.error("Error exchanging code for tokens:", error.response);
     res
       .status(500)
       .send(
@@ -137,10 +123,11 @@ app.get("/fetch-spo2/:date", async (req, res) => {
     const accessToken = req.params.accessToken;
 
     const spo2Data = await fetchSpO2DataByDate(accessToken);
-    await FitBitSpO2Data.create({
-      dateTime: spo2Data.dateTime,
+    await Vitals.create({
+      dateTimeFromProvider: spo2Data.dateTime,
       value: spo2Data.value,
       userId: userId,
+      dateTime: "current_date",
     });
 
     res.send({ success: true, message: "Data saved successfully" });
@@ -175,7 +162,6 @@ app.get("/fetch-heart-rate", async (req, res) => {
 });
 
 // For Apple
-
 app.post("/apple-health-data", async (req, res) => {
   try {
     if (

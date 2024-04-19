@@ -4,7 +4,7 @@ require("dotenv").config();
 const fetchSpO2DataByDate = (accessToken) => {
   return new Promise((resolve, reject) => {
     const options = {
-      url: `https://api.fitbit.com/1.2/user/-/spo2/date/today.json`,
+      url: `https://api.fitbit.com/1/user/-/spo2/date/today/all.json`,
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -48,4 +48,9 @@ const fetchRestingHeartRate = async (accessToken) => {
     console.error("Error fetching heart rate data from Fitbit:", error);
     throw error;
   }
+};
+
+module.exports = {
+  fetchSpO2DataByDate,
+  fetchRestingHeartRate,
 };
