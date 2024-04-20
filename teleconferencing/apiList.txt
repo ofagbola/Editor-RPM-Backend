@@ -1,0 +1,21 @@
+Api List (from me)
+1. api to fetch all chat list by a user, with the last recent chat,
+2. api to fetch all oneonone chat, just the last day chat, and the ability to load more chats from before
+3. sending chat message
+4. recording call sessiona, video call session
+5. api to create presciption
+6. api to fetch presciption based on patient and doctor id
+7. api to also fetch a file, recording or anything scoped to patient id and doctor id
+
+Api List (from auth)
+1. api get the user details of login user
+2. api to get a doctor details
+3. api to fetch all teh doctors and patients 
+
+Api List (questionaire)
+1. ability to create questionaire and send it
+2. ability to fetch list of questionaire scoped to patient id and doctor id
+
+Api List (Vitals)
+1. ability to fetch list of vitals scoped to patient id and doctor id
+2. Screen to navigate to when user want to record new vitals

@@ -15,7 +15,6 @@ import (
 	"websocket-chat/constants"
 	"websocket-chat/dboperations"
 	"websocket-chat/models"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -27,6 +26,11 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+type WebSocketMessage struct {
+	SenderID int `json:"sender_id"`
+	Message     string `json:"message"`
+	Username    string `json:"username"`
+}
 type UserConnectionManager struct {
 	connections map[string]*websocket.Conn
 	mutex       sync.Mutex
@@ -60,7 +64,7 @@ func (ucm *UserConnectionManager) GetConnection(userID string) *websocket.Conn {
 	return ucm.connections[userID]
 }
 
-func (ucm *UserConnectionManager) SendMessage(userID string, message string, db *sql.DB, message_model models.Message, fileContent ...string) error {
+func (ucm *UserConnectionManager) SendMessage(userID string, message string, db *sql.DB, message_model models.Message,username string, fileContent ...string,) error {
 	conn := ucm.GetConnection(userID)
 	// save to database
 	err:=dboperations.SaveMessageToDb(db, message_model)
@@ -75,7 +79,26 @@ func (ucm *UserConnectionManager) SendMessage(userID string, message string, db 
 		fmt.Printf("no connection found for user ID: %s", userID)
 		return nil
 	} else {
-		err := conn.WriteMessage(websocket.TextMessage, []byte(message))
+
+		// Example message
+		messageData := WebSocketMessage{
+			SenderID: message_model.SenderID,
+			Message:     message_model.MessageSent,
+			Username:    username,
+		}
+
+		// err := conn.WriteMessage(websocket.TextMessage, []byte(message))
+		// Convert message to JSON
+		jsonMessage, err := json.Marshal(messageData)
+		if err != nil {
+			log.Println("Error marshaling JSON:", err)
+			return err;
+		}
+
+
+
+	// Send JSON message over WebSocket connection
+	err = conn.WriteMessage(websocket.TextMessage, jsonMessage)
 		if err != nil {
 			fmt.Printf("failed to send message to user ID %s: %s", userID, err.Error())
 		}
@@ -139,6 +162,7 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 				SenderID     string   `json:"sender_id"`
 				IsGroupChat  bool     `json:"isGroupChat"`
 				GroupUserIDs []string `json:"groupUserIDs"`
+				Username    string `json:"username"`
 			}
 			// Parse the JSON string into a Bit struct
 
@@ -155,6 +179,7 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 			SenderID := parsedBit.SenderID
 			isGroupChat := parsedBit.IsGroupChat
 			groupUserIDs := parsedBit.GroupUserIDs
+			username := parsedBit.Username
 
 			sender_id, err := strconv.ParseInt(SenderID, 10, 64)
 			if err != nil {
@@ -185,7 +210,7 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 						CreatedAt:         time.Now().UTC(),
 						MessageType:       "text",
 					}
-					ucm.SendMessage(groupUserID, messageValue, db, message)
+					ucm.SendMessage(groupUserID, messageValue, db, message,username)
 					log.Printf("Seng message to user ID %s: %s", groupUserID, string(message.MessageSent))
 				}
 			} else {
@@ -207,7 +232,7 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 					MessageType:       "text",
 				}
 				// Handle individual chat message
-				ucm.SendMessage(RecipientID, messageValue, db, message)
+				ucm.SendMessage(RecipientID, messageValue, db, message,username)
 				log.Printf("Received message from user ID %s: %s", SenderID, string(message.MessageSent))
 			}
 
@@ -296,6 +321,7 @@ func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Reque
 	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
 	fmt.Printf("File Size: %+v\n", handler.Size)
 	fmt.Printf("MIME Header: %+v\n", handler.Header)
+
 
 
     // Create a folder for file uploads if it doesn't exist
@@ -387,3 +413,4 @@ func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Reque
 //   }
 // when connecing user id must be sent like this
 // ws://localhost:8080/ws?userID=20
+

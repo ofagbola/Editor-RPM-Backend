@@ -4,56 +4,175 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	// "websocket-chat/constants"
 	"websocket-chat/constants"
 	"websocket-chat/dboperations"
 	"websocket-chat/services"
+	chat_grpc "websocket-chat/grpc"
+	"google.golang.org/grpc"
+    "net"
+
 )
 
 // var redisClient *redis.Client
 
+
+
 func main() {
+    // Connect to Database
+    db, dbErr := dboperations.ConnectToDatabase(constants.PostgresConnectionString)
+    if dbErr != nil {
+        log.Fatal("Failed to start Database", dbErr)
+    }
 
-	// connect to Database
-	db, db_err := dboperations.ConnectToDatabase(constants.PostgresConnectionString)
+    // Create a new gRPC server
+    grpcServer := grpc.NewServer()
 
-	if db_err != nil {
-		log.Fatal("Failed to start Database", db_err)
-	}
-	// // for setting up user connection
+    // Register the ChatService server
+    chat_grpc.RegisterChatServiceServer(grpcServer, &services.ChatServiceServer{})
 
-	ucm := services.NewUserConnectionManager()
+    // Start the gRPC server in a separate goroutine
+    go func() {
+        // Create a listener on TCP port 50051
+        lis, err := net.Listen("tcp", ":50051")
+        if err != nil {
+            log.Fatalf("Failed to listen: %v", err)
+        }
 
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		services.HandleWebSocketConnections(ucm, w, r, db)
-	})
+        // Start the server
+        log.Println("gRPC Server started listening on port 50051...")
+        if err := grpcServer.Serve(lis); err != nil {
+            log.Fatalf("Failed to serve: %v", err)
+        }
+    }()
+
+    // Set up user connection manager
+    ucm := services.NewUserConnectionManager()
+
+    // Set up HTTP routes
+    http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+        services.HandleWebSocketConnections(ucm, w, r, db)
+    })
+    http.HandleFunc("/upload/", func(w http.ResponseWriter, r *http.Request) {
+        services.UploadFile(ucm, w, r, db)
+    })
+    http.HandleFunc("/", handleHTTP)
+    http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
+
+    // Start the HTTP server
+    go func() {
+        log.Println("Starting HTTP server on :8082")
+        if err := http.ListenAndServe(":8082", nil); err != nil {
+            log.Fatal("HTTP server error:", err)
+        }
+    }()
+
+    // Start the WebSocket server
+    log.Println("Starting WebSocket server on port 8084...")
+    if err := http.ListenAndServe(":8084", nil); err != nil {
+        log.Fatal("WebSocket server error:", err)
+    }
+}
+
+
+
+// func main() {
+
 	
 
-	go func() {
-		log.Println("Starting HTTP server on :8082")
-		if err := http.ListenAndServe(":8082", nil); err != nil {
-			log.Fatal("WebSocket server error:", err)
-		}
-	}()
-	// http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) { services.HandleFileUpload(ucm, w, r, db) })
-	http.HandleFunc("/upload/", func(w http.ResponseWriter, r *http.Request) { services.UploadFile(ucm, w, r, db) })
+// 	// connect to Database
+// 	db, db_err := dboperations.ConnectToDatabase(constants.PostgresConnectionString)
 
-	http.HandleFunc("/", handleHTTP)
+// 	if db_err != nil {
+// 		log.Fatal("Failed to start Database", db_err)
+// 	}
+// 	 // for setting up user connection
 
-	// Serve files in the uploads directory
-	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
+// 	ucm := services.NewUserConnectionManager()
 
-	log.Println("Starting WebSocket server on port 8080...")
-	// start http server
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal("Failed to start WebSocket server:", err)
-	}
-}
+// 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+// 		services.HandleWebSocketConnections(ucm, w, r, db)
+// 	})
+	
+
+// 	go func() {
+// 		log.Println("Starting HTTP server on :8082")
+// 		if err := http.ListenAndServe(":8082", nil); err != nil {
+// 			log.Fatal("WebSocket server error:", err)
+// 		}
+// 	}()
+// 	// http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) { services.HandleFileUpload(ucm, w, r, db) })
+// 	http.HandleFunc("/upload/", func(w http.ResponseWriter, r *http.Request) { services.UploadFile(ucm, w, r, db) })
+
+// 	http.HandleFunc("/", handleHTTP)
+
+// 	// Serve files in the uploads directory
+// 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
+
+// 	log.Println("Starting WebSocket server on port 8080...")
+// 	// start http server
+// 	err := http.ListenAndServe(":8080", nil)
+// 	if err != nil {
+// 		log.Fatal("Failed to start WebSocket server:", err)
+// 	}
+// }
 
 func handleHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello, HTTP!")
+}
+
+
+
+func mainBlo() {
+    // Connect to Database
+    db, dbErr := dboperations.ConnectToDatabase(constants.PostgresConnectionString)
+    if dbErr != nil {
+        log.Fatal("Failed to start Database", dbErr)
+    }
+	ucm := services.NewUserConnectionManager()
+    // Create a listener for HTTP server
+    http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+        services.HandleWebSocketConnections(ucm, w, r, db)
+    })
+
+    go func() {
+        // Start HTTP server
+        log.Println("Starting HTTP server on :8082")
+        if err := http.ListenAndServe(":8082", nil); err != nil {
+            log.Fatal("WebSocket server error:", err)
+        }
+    }()
+
+    // Register HTTP routes
+    http.HandleFunc("/upload/", func(w http.ResponseWriter, r *http.Request) {
+        services.UploadFile(ucm, w, r, db)
+    })
+    http.HandleFunc("/", handleHTTP)
+    http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
+
+    // Start gRPC server
+    go func() {
+        // Create a listener on TCP port 50051
+        lis, err := net.Listen("tcp", ":50051")
+        if err != nil {
+            log.Fatalf("Failed to listen: %v", err)
+        }
+        
+        // Create a new gRPC server
+        grpcServer := grpc.NewServer()
+        
+        // Register the ChatService server
+        chat_grpc.RegisterChatServiceServer(grpcServer, &services.ChatServiceServer{})
+        
+        // Start the server
+        log.Println("Server started listening on port 50051...")
+        if err := grpcServer.Serve(lis); err != nil {
+            log.Fatalf("Failed to serve: %v", err)
+        }
+    }()
+
+    // Block indefinitely to keep the main goroutine running
+    select {}
 }
 
 

@@ -14,6 +14,23 @@ type MyUserConnectionManager struct {
 	mutex       sync.Mutex
 }
 
+type ChatMessage struct {
+    CallDuration         int    `json:"call_duration"`
+    CreatedAt            string `json:"created_at"`
+    DocOrAttachmentID    int    `json:"doc_or_attachment_id"`
+    DocumentURL          string `json:"document_url"`
+    IDOfSender           int    `json:"id_of_sender"`
+    MessageSent          string `json:"message_sent"`
+    MessageType          string `json:"message_type"`
+    MissedCall           bool   `json:"missed_call"`
+    MissedVideoCall      bool   `json:"missed_video_call"`
+    ReadAt               string `json:"read_at"`
+    RecipientID          int    `json:"recipient_id"`
+    VideoDuration        int    `json:"video_duration"`
+    VoiceRecordID        int    `json:"voice_record_id"`
+}
+
+
 type Message struct {
 	MessageSent      string    `json:"message_sent"`
 	DocOrAttachmentID int       `json:"doc_or_attachment_id"`
@@ -47,4 +64,3 @@ type FileUploadResponse struct {
 	SuccessMsg string `json:"success_message"`
 	FileURL    string `json:"file_url"`
 }
-
