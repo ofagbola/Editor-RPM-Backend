@@ -1,9 +1,9 @@
 package models
 
 import (
-
-	"time"
 	"sync"
+	"time"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -63,4 +63,26 @@ type FileUploadResponse struct {
 	FileID     int    `json:"file_id"`
 	SuccessMsg string `json:"success_message"`
 	FileURL    string `json:"file_url"`
+}
+
+// User represents the users table in the database
+// User represents a user in the database
+type User struct {
+    ID            uint      `gorm:"primaryKey"`
+    Email         string    `gorm:"not null"`
+    FirstName     string    `gorm:"not null"`
+    LastName      string    `gorm:"not null"`
+    Location      string    `gorm:"not null"`
+    Credentials   string `gorm:"type:text[]"`
+    Ethnicity     string    `gorm:"not null"`
+    Gender        string    `gorm:"not null"`
+    Language      string    `gorm:"not null"`
+    Specialties   string  `gorm:"type:text[]"`
+    Image         string    `gorm:"not null"`
+    ClinicName    string    `gorm:"not null"`
+    ClinicID      string    `gorm:"not null"`
+    AcceptPatient bool      `gorm:"not null"`
+    PhoneNumber   string    `gorm:"not null"`
+    CreatedAt     time.Time `gorm:"autoCreateTime"`
+    UpdatedAt     time.Time `gorm:"autoUpdateTime"`
 }

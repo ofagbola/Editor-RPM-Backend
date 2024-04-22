@@ -53,6 +53,18 @@ func (s *ChatServiceServer) FetchChatList(ctx context.Context, req *chat_grpc.Ch
 
 	// Iterate over lastMessages and convert each message to chat_grpc.Chat
 	for _, message := range lastMessages {
+		// fetch user details 
+		var user_id int
+		user_id=message.RecipientID
+		if strconv.Itoa(message.RecipientID) == req.UserId {
+			user_id = message.IDOfSender
+		}
+		
+
+		user, err := dboperations.FetchUser(user_id)
+		if err != nil {
+			return nil, err
+		}
 		chatMessages := &chat_grpc.Chat{
 			DocumentUrl:   message.DocumentURL,
 			MessageType:   message.MessageType,
@@ -60,8 +72,9 @@ func (s *ChatServiceServer) FetchChatList(ctx context.Context, req *chat_grpc.Ch
 			ReadAt:        message.ReadAt,
 			Timestamp:     message.CreatedAt,
 			RecipientId:   strconv.Itoa(message.RecipientID),
-			RecipientName: strconv.Itoa(message.RecipientID),
+			RecipientName: user.FirstName + " " + user.LastName,
 			Missed:        strings.Contains(strings.ToLower(message.MessageType), "missed"),
+			RecipientBase64: user.Image,
 		}
 
 		// Append chatMessages to chatSlice

@@ -3,18 +3,34 @@ package dboperations
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
+
 	// "strconv"
 	"time"
+	"websocket-chat/constants"
 	"websocket-chat/models"
 
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var (
-	DBConnection *sql.DB
+	DBConnection   *sql.DB
+	GormConnection *gorm.DB
 )
+
+func ConnectGormDB() (*gorm.DB, error) {
+	// Open a connection to the database
+	db, err := gorm.Open(postgres.Open(constants.PostgresConnectionString), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	GormConnection = db
+	fmt.Println("Gorm database connected")
+	return db, nil
+}
 
 func ConnectToDatabase(connStr string) (*sql.DB, error) {
 	fmt.Println("Connecting to PostgreSQL!")
@@ -35,6 +51,7 @@ func ConnectToDatabase(connStr string) (*sql.DB, error) {
 
 	fmt.Println("Connected to PostgreSQL!")
 	DBConnection = db
+	ConnectGormDB()
 	return db, nil
 }
 
@@ -45,7 +62,7 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 	// Convert message struct to JSON
 	messageJSON, errr := json.Marshal(message)
 	if errr != nil {
-		log.Fatal(errr)
+		fmt.Println(errr)
 	}
 
 	// Check if a record exists for the given user_id_1 and user_id_2
@@ -64,18 +81,18 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 		// Marshal the updated messages back to JSON
 		updatedMessageArray, errr := json.Marshal(existingMessages)
 		if errr != nil {
-			log.Fatal(errr)
+			fmt.Println(errr)
 		}
 
 		// Create a new record if no record found
 		_, err := db.Exec("INSERT INTO chat (user_id_1, user_id_2, message_array, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
 			message.SenderID, message.RecipientID, updatedMessageArray /* initial empty JSON array */, currentDate, currentDate)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 		fmt.Println("New record created.")
 	case err != nil:
-		log.Fatal(err)
+		fmt.Println(err)
 	default:
 		fmt.Println(currentDate)
 		fmt.Println(createdAt.Truncate(24 * time.Hour))
@@ -91,7 +108,7 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 			// Unmarshal the existing message_array into a slice of Message structs
 			var existingMessages []models.Message
 			if unmarshal_err := json.Unmarshal(messageArray, &existingMessages); err != nil {
-				log.Fatal(unmarshal_err)
+				fmt.Println(unmarshal_err)
 			}
 
 			// Append the new message to the existing messages
@@ -100,14 +117,14 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 			// Marshal the updated messages back to JSON
 			updatedMessageArray, errr := json.Marshal(existingMessages)
 			if errr != nil {
-				log.Fatal(errr)
+				fmt.Println(errr)
 			}
 
 			// Update the existing record by appending the current message
 			_, err := db.Exec("UPDATE chat SET message_array = message_array || $1, updated_at = $2 WHERE user_id_1 = $3 AND user_id_2 = $4",
 				updatedMessageArray, time.Now(), message.SenderID, message.RecipientID)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 			fmt.Println("Message appended to existing record.")
 		} else {
@@ -115,7 +132,7 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 			_, err := db.Exec("INSERT INTO chat (user_id_1, user_id_2, message_array, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
 				message.SenderID, message.RecipientID, messageJSON /* initial empty JSON array */, currentDate, currentDate)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 			fmt.Println("New record created.")
 		}
@@ -156,26 +173,38 @@ func FetchChatsList(user_id string) ([]*models.ChatMessage, error) {
 
 	// Query the table to select the most recent row where user_id_1 or user_id_2 is equal to the specified user ID
 	query := `
-    SELECT message_array 
-    FROM chat 
-    WHERE user_id_1 = $1 
-      AND (user_id_2, created_at) IN (
-          SELECT user_id_2, MAX(created_at)
-          FROM chat 
-          WHERE user_id_1 = $1 
-          GROUP BY user_id_2
-      )
-`
-    var msgArrray []*models.ChatMessage
+	SELECT message_array 
+	FROM chat 
+	WHERE (
+		(user_id_1 = $1 AND user_id_2 != $1)
+		OR
+		(user_id_2 = $1 AND user_id_1 != $1)
+	)
+	AND (
+		(user_id_1 = $1 AND (user_id_2, created_at) IN (
+			SELECT user_id_2, MAX(created_at)
+			FROM chat 
+			WHERE user_id_1 = $1 
+			GROUP BY user_id_2
+		))
+		OR
+		(user_id_2 = $1 AND (user_id_1, created_at) IN (
+			SELECT user_id_1, MAX(created_at)
+			FROM chat 
+			WHERE user_id_2 = $1 
+			GROUP BY user_id_1
+		))
+	)
+	`
+	var msgArrray []*models.ChatMessage
 	rows, err := DBConnection.Query(query, user_id)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	defer rows.Close()
 
 	// Declare variables to hold JSON data
 	var messages []byte
-	
 
 	// Iterate over the rows
 	for rows.Next() {
@@ -183,7 +212,7 @@ func FetchChatsList(user_id string) ([]*models.ChatMessage, error) {
 		var chatMsg models.ChatMessage
 		// Scan the message_array data into the messages variable
 		if err := rows.Scan(&messages); err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 
 		// Unmarshal the JSON data into messageArray
@@ -225,12 +254,36 @@ func FetchChatsList(user_id string) ([]*models.ChatMessage, error) {
 			}
 		}
 		// Print the length of the messageArray
-		fmt.Println("Length of messageArray:\n",chatMsg)
-		msgArrray =append(msgArrray, &chatMsg)
+		fmt.Println("Length of messageArray:\n", chatMsg)
+		msgArrray = append(msgArrray, &chatMsg)
 	}
-     return msgArrray,nil	
+	return msgArrray, nil
 }
 
+// FetchUser fetches a user from the database by user_id
+func FetchUser(user_id int) (models.User, error) {
+	// Check if the database connection is nil
+	if GormConnection == nil {
+		return models.User{}, errors.New("database connection is nil")
+	}
+	// Specify the model that GORM should use for the query
+	db := GormConnection.Model(&models.User{})
+
+	// Prepare the query
+	var user models.User
+
+	// Fetch the user with user_id from the users table
+	result := db.Where("id = ?",user_id).First(&user)
+
+
+	// Check for errors
+	if result.Error != nil {
+		fmt.Println("fetch user error:", result.Error)
+		return user, result.Error
+	}
+
+	return user, nil
+}
 
 func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) (fileId int, fileUploadError error) {
 	query := `

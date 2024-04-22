@@ -10,6 +10,7 @@ message Chat {
   string id = 1;
   string recipientId = 2;
   string recipientName=9;
+  string recipientBase64=10;
   string text = 3;
   string timestamp = 4;
   string read_at = 5;
