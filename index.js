@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const { Vitals, Tokens } = require("./models/HealthData");
 
+const queryString = require("querystring");
+
 const {
   fetchRestingHeartRate,
   fetchSpO2DataByDate,
@@ -69,6 +71,11 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
 // Callback route Fitbit will redirect to
 app.get("/callback", async (req, res) => {
   const { code } = req.query;
+  const { state } = req.query;
+
+  console.log("code", code);
+  console.log("state", state);
+
   try {
     const response = await axios.post(
       "https://api.fitbit.com/oauth2/token",
@@ -77,6 +84,9 @@ app.get("/callback", async (req, res) => {
         grant_type: "authorization_code",
         redirect_uri: process.env.CALLBACK_URL,
         code: code,
+        state: state,
+        code_verifier:
+          "2u1g5f2q2y31464x0b70361p0j644a3459170k1s071t6g1z5y5n53551w13525c0g0t605k370u456x0l1908415w3m6i6o206p0q3q150f6h3f4a3o1u0d733r3i12",
       }),
       {
         headers: {
@@ -95,7 +105,10 @@ app.get("/callback", async (req, res) => {
     console.log("Access Token:", response.data.access_token);
     console.log("Refresh Token:", response.data.refresh_token);
 
-    await Tokens.create({
+    console.log("we are here now");
+
+    // why is this not saving???????
+    const token_data = await Tokens.create({
       userId: "id",
       accessToken: response.data.access_token,
       refreshToken: response.data.refresh_token,
@@ -105,13 +118,17 @@ app.get("/callback", async (req, res) => {
       device: "Fitbit",
     });
 
+    console.log("token data: ", token_data);
+
     res.send("Authorization successful! You can close this window.");
   } catch (error) {
+    console.log("$%$%$%$%$%$%$%$%$%^$%$^%$$%^%^$%^$%^$%^");
+    // console.log(error);
     console.error("Error exchanging code for tokens:", error.response);
     res
       .status(500)
       .send(
-        "Authorization failed. Please check the server logs for more details.",
+        "Authorization failed. Please check the server logs for more details. blah blah blah",
       );
   }
 });
