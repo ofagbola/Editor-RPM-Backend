@@ -69,7 +69,7 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
 // For FitBit
 
 // Callback route Fitbit will redirect to
-app.get("/callback", async (req, res) => {
+app.post("/callback", async (req, res) => {
   const { code } = req.query;
   const { state } = req.query;
   const { userId } = req.query;
@@ -87,7 +87,7 @@ app.get("/callback", async (req, res) => {
         code: code,
         state: state,
         code_verifier:
-          "2u1g5f2q2y31464x0b70361p0j644a3459170k1s071t6g1z5y5n53551w13525c0g0t605k370u456x0l1908415w3m6i6o206p0q3q150f6h3f4a3o1u0d733r3i12",
+          "0e183g1m581a1h01032h4m2s311o304t446c1q093r2q1m397170635j2r1p5l494u6v0l5w5k5d14556e2t0t296d0m1d5h1b5e0t63081i4i3c334n2a4b1u035464",
       }),
       {
         headers: {
@@ -125,12 +125,47 @@ app.get("/callback", async (req, res) => {
   } catch (error) {
     console.log("$%$%$%$%$%$%$%$%$%^$%$^%$$%^%^$%^$%^$%^");
     // console.log(error);
-    console.error("Error exchanging code for tokens:", error.response);
+    console.error(
+      "Error exchanging code for tokens:",
+      error.response.data.errors,
+    );
     res
       .status(500)
       .send(
         "Authorization failed. Please check the server logs for more details. blah blah blah",
       );
+  }
+});
+
+app.post("/revoke-fitbit-token", async (req, res) => {
+  const { accessToken } = req.query;
+  const { userId } = req.query;
+
+  try {
+    const response = await axios.post(
+      "https://api.fitbit.com/oauth2/revoke",
+      queryString.stringify({
+        token: accessToken,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization:
+            "Basic " +
+            Buffer.from(
+              `${process.env.FITBIT_CLIENT_ID}:${process.env.FITBIT_CLIENT_SECRET}`,
+            ).toString("base64"),
+        },
+      },
+    );
+    const token_data = await Tokens.findOneAndDelete({
+      userId: userId,
+    });
+
+    res.send("Token Revoked successfully");
+  } catch (error) {
+    console.error("Error exchanging code for tokens:", error.response);
+    res.status(500).send("something went terribly wrong");
   }
 });
 
