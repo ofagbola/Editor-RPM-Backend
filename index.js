@@ -72,6 +72,7 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
 app.get("/callback", async (req, res) => {
   const { code } = req.query;
   const { state } = req.query;
+  const { userId } = req.query;
 
   console.log("code", code);
   console.log("state", state);
@@ -109,7 +110,7 @@ app.get("/callback", async (req, res) => {
 
     // why is this not saving???????
     const token_data = await Tokens.create({
-      userId: "id",
+      userId: userId,
       accessToken: response.data.access_token,
       refreshToken: response.data.refresh_token,
       userIdFromProvider: response.data.user_id,
@@ -135,16 +136,16 @@ app.get("/callback", async (req, res) => {
 
 app.get("/fetch-spo2/:date", async (req, res) => {
   try {
-    const date = req.params.date;
     const userId = req.params.userId;
-    const accessToken = req.params.accessToken;
 
-    const spo2Data = await fetchSpO2DataByDate(accessToken);
+    const userTokens = await Tokens.findOne({ userId: userId });
+
+    const spo2Data = await fetchSpO2DataByDate(userTokens.accessToken);
     await Vitals.create({
       dateTimeFromProvider: spo2Data.dateTime,
       value: spo2Data.value,
       userId: userId,
-      dateTime: "current_date",
+      dateTime: new Date(),
     });
 
     res.send({ success: true, message: "Data saved successfully" });
@@ -157,9 +158,12 @@ app.get("/fetch-spo2/:date", async (req, res) => {
 
 app.get("/fetch-heart-rate", async (req, res) => {
   try {
-    const accessToken = req.params.accessToken;
-    const { dateTime, restingHeartRate } =
-      await fetchRestingHeartRate(accessToken);
+    const userId = req.params.userId;
+    const userTokens = await Tokens.findOne({ userId: userId });
+
+    const { dateTime, restingHeartRate } = await fetchRestingHeartRate(
+      userTokens.accessToken,
+    );
     const newHeartRate = await FitBitHeartRateData.create({
       dateTime,
       restingHeartRate,
