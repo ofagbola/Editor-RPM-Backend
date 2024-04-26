@@ -1,0 +1,133 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Editor RPM Scheduler API Service",
+    "version": "1.0",
+    "contact": {
+      "name": "EvonMedics LLC",
+      "url": "https://github.com/EvonMedicsLLC",
+      "email": "it@evonmedics.org"
+    }
+  },
+  "tags": [
+    {
+      "name": "SchedulerService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/create_Schedule": {
+      "post": {
+        "summary": "Create new Schedule",
+        "description": "Use this API to create a new Schedule",
+        "operationId": "SchedulerService_CreateSchedule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateScheduleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateScheduleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SchedulerService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "pbCreateScheduleRequest": {
+      "type": "object",
+      "properties": {
+        "recepient": {
+          "type": "string"
+        },
+        "initiator": {
+          "type": "string"
+        },
+        "timeSlot": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateScheduleResponse": {
+      "type": "object",
+      "properties": {
+        "schedule": {
+          "$ref": "#/definitions/pbSchedule"
+        }
+      }
+    },
+    "pbSchedule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "recepient": {
+          "type": "string"
+        },
+        "initiator": {
+          "type": "string"
+        },
+        "timeSlot": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+
+import "rpc_create_question.proto"; 
+import "rpc_create_question_config.proto";
+import "rpc_create_send_question_config.proto";
+import "rpc_create_response_question_config.proto";
+
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/questionnaire/pb";
+
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Editor RPM Questionnaire API Service";
+        version: "1.0";
+        contact: {
+            name: "EvonMedics LLC";
+            url: "https://github.com/EvonMedicsLLC";
+            email: "it@evonmedics.org";
+        };
+    };
+};
+ 
+service QuestionnaireService { 
+    rpc CreateQuestion (CreateQuestionRequest) returns (CreateQuestionResponse) {
+        option (google.api.http) = {
+            post: "/v1/create_question"
+            body: "*"
+        };
+            option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create a new question";
+            summary: "Create new question";
+        };
+     }
+    rpc CreateQuestionConfig (CreateQuestionConfigRequest) returns (CreateQuestionConfigResponse) { 
+        option (google.api.http) = {
+            post: "/v1/create_question_config"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create a new question configuration";
+            summary: "Create new question configuration";
+        };
+    }
+    rpc CreateSendQuestionConfig (CreateSendQuestionConfigRequest) returns (CreateSendQuestionConfigResponse) { 
+        option (google.api.http) = {
+            post: "/v1/create_send_question_config"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create an instance of sending question configuration";
+            summary: "Create an instance of sending a question configuration";
+        };
+    }
+
+    rpc CreateResponseQuestionConfig (CreateResponseQuestionConfigRequest) returns (CreateResponseQuestionConfigResponse) { 
+        option (google.api.http) = {
+            post: "/v1/create_response_question_config"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create response to question configuration";
+            summary: "Create response to question configuration";
+        };
+    }
+}
