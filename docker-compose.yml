@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   envoy:
@@ -20,8 +20,18 @@ services:
       - notification
     ports:
       - "4000:4000"
+      - "5770:5770"
     networks:
       - auth_network
+    develop:
+      watch:
+        - action: rebuild
+          path: "./auth/src/"
+          ignore:
+            - ./auth/node_modules/
+        - action: rebuild
+          path: "./auth/package.json"
+
   notification:
     build:
       context: ./notification
@@ -34,7 +44,7 @@ services:
   auth_db:
     image: postgres
     env_file:
-       - ./auth/.env
+      - ./auth/.env
     ports:
       - "5432:5432"
     volumes:
@@ -49,7 +59,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     env_file:
-       - ./notification/.env
+      - ./notification/.env
     networks:
       - auth_network
 volumes:

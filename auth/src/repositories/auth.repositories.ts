@@ -1,6 +1,6 @@
-import { AuthModel } from '../models/auth.model';
-import * as utils from '../utils/utils';
-import { RequestError } from '../utils/errors';
+import { AuthModel } from "../models/auth.model";
+import * as utils from "../utils/utils";
+import { RequestError } from "../utils/errors";
 import {
   IClinicianSignupRequest,
   ICreatePasswordRequest,
@@ -11,10 +11,11 @@ import {
   IUpdateAccountInsuranceRequest,
   IVerifyAccountRequest,
   IVerifyOneTimePasswordRequest,
-} from '../interfaces/auth.interface';
-import { IResponse } from '../interfaces';
-import * as grpc from '@grpc/grpc-js';
-import { v4 as uuidv4 } from 'uuid';
+} from "../interfaces/auth.interface";
+import { IResponse } from "../interfaces";
+import * as grpc from "@grpc/grpc-js";
+import { v4 as uuidv4 } from "uuid";
+import { sendNotification } from "../../src/services/mail.services";
 
 /**
  * Forgot password
@@ -26,15 +27,15 @@ export const forgotPassword = async (
 ): Promise<IResponse> => {
   try {
     const user = await AuthModel.findUserEmail(
-      'users',
-      ['user_id', 'user_email'],
+      "users",
+      ["user_id", "user_email"],
       payload.email
     );
 
     if (user.length === 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
@@ -43,8 +44,8 @@ export const forgotPassword = async (
     const verificationCode = await utils.generateOTP();
 
     await AuthModel.updateUser(
-      'verifications',
-      ['otp'],
+      "verifications",
+      ["otp"],
       {
         otp: verificationCode,
       },
@@ -54,7 +55,7 @@ export const forgotPassword = async (
 
     return {
       code: grpc.status.OK,
-      message: 'Verification code sent',
+      message: "Verification code sent",
       data: [],
     };
   } catch (error) {
@@ -72,15 +73,15 @@ export const resetPassword = async (
 ): Promise<IResponse> => {
   try {
     const user = await AuthModel.findUserEmail(
-      'users',
-      ['user_id', 'user_email'],
+      "users",
+      ["user_id", "user_email"],
       payload.email
     );
 
     if (user.length === 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
@@ -89,8 +90,8 @@ export const resetPassword = async (
     const hashedPassword = await utils.hashPassword(payload.new_password, 10);
 
     await AuthModel.updateUser(
-      'users',
-      ['password'],
+      "users",
+      ["password"],
       {
         password: hashedPassword,
       },
@@ -99,7 +100,7 @@ export const resetPassword = async (
 
     return {
       code: grpc.status.OK,
-      message: 'Password updated',
+      message: "Password updated",
       data: [],
     };
   } catch (error) {
@@ -117,15 +118,15 @@ export const patientSignUp = async (
 ): Promise<IResponse> => {
   try {
     const user = await AuthModel.findUserEmail(
-      'users',
-      ['user_id', 'user_email'],
+      "users",
+      ["user_id", "user_email"],
       payload.email
     );
 
     if (user.length > 0) {
       throw new RequestError({
         code: grpc.status.ALREADY_EXISTS,
-        message: 'Account already exist',
+        message: "Account already exist",
       });
     }
 
@@ -139,13 +140,19 @@ export const patientSignUp = async (
       last_name: payload.last_name,
       dob: payload.dob,
       phone_number: payload.phone_number,
-      user_type: 'patient',
+      user_type: "patient",
       otp: verificationCode,
+    });
+
+    await sendNotification({
+      subject: `Email Verification`,
+      message: `Your verification code is ${verificationCode}`,
+      category: "OTP Verification",
     });
 
     return {
       code: grpc.status.OK,
-      message: 'Successfully signed up',
+      message: "Successfully signed up",
       data: [],
     };
   } catch (error) {
@@ -163,28 +170,28 @@ export const verifyAccount = async (
 ): Promise<IResponse> => {
   try {
     const user = await AuthModel.findUserEmail(
-      'users',
-      ['user_id'],
+      "users",
+      ["user_id"],
       payload.email
     );
 
     if (user.length === 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
     const verification = await AuthModel.findUserById(
-      'verifications',
-      ['user_id', 'is_verified', 'otp'],
+      "verifications",
+      ["user_id", "is_verified", "otp"],
       user[0]?.user_id
     );
 
     if (verification.length === 0) {
       throw new RequestError({
         code: grpc.status.INVALID_ARGUMENT,
-        message: 'Invalid code',
+        message: "Invalid code",
       });
     }
 
@@ -193,30 +200,30 @@ export const verifyAccount = async (
     if (is_verified) {
       throw new RequestError({
         code: grpc.status.OK,
-        message: 'Account verified',
+        message: "Account verified",
       });
     }
 
     if (otp !== payload.code) {
       throw new RequestError({
         code: grpc.status.OK,
-        message: 'Invalid code',
+        message: "Invalid code",
       });
     }
 
     await AuthModel.updateUser(
-      'verifications',
-      ['is_verified', 'otp'],
+      "verifications",
+      ["is_verified", "otp"],
       {
         is_verified: true,
-        otp: '',
+        otp: "",
       },
       user_id
     );
 
     return {
       code: grpc.status.OK,
-      message: 'Verified Successfully',
+      message: "Verified Successfully",
       data: [],
     };
   } catch (error) {
@@ -242,27 +249,27 @@ export const updateInsurance = async (
       email,
     } = payload;
 
-    const user = await AuthModel.findUserEmail('users', ['user_id'], email);
+    const user = await AuthModel.findUserEmail("users", ["user_id"], email);
 
     if (user.length === 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
     const { user_id } = user[0];
 
     const insuranceExist = await AuthModel.findUserById(
-      'patient_insurance',
-      ['user_id'],
+      "patient_insurance",
+      ["user_id"],
       user_id
     );
 
     if (insuranceExist.length > 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'Insurance provider already linked',
+        message: "Insurance provider already linked",
       });
     }
 
@@ -278,7 +285,7 @@ export const updateInsurance = async (
 
     return {
       code: grpc.status.OK,
-      message: 'Insurance provider linked',
+      message: "Insurance provider linked",
       data: [],
     };
   } catch (error) {
@@ -292,17 +299,20 @@ export const updateInsurance = async (
  */
 
 export const login = async (payload: ILoginRequest): Promise<IResponse> => {
+  console.log({ payloadEmail: payload.email });
   try {
     const user = await AuthModel.findUserEmail(
-      'users',
-      ['user_id', 'user_email', 'password'],
+      "users",
+      ["user_id", "user_email", "password"],
       payload.email
     );
+
+    console.log({ user });
 
     if (user.length === 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
@@ -311,20 +321,22 @@ export const login = async (payload: ILoginRequest): Promise<IResponse> => {
     if (hashedPassword === null || hashedPassword === undefined) {
       throw new RequestError({
         code: grpc.status.INVALID_ARGUMENT,
-        message: 'Set up a valid password for the account',
+        message: "Set up a valid password for the account",
       });
     }
 
     const verification = await AuthModel.findUserById(
-      'verifications',
-      ['is_verified'],
+      "verifications",
+      ["is_verified"],
       user_id
     );
+
+    console.log({ verification });
 
     if (verification.length === 0 || verification[0]?.is_verified === false) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'Account not verified',
+        message: "Account not verified",
       });
     }
 
@@ -336,7 +348,7 @@ export const login = async (payload: ILoginRequest): Promise<IResponse> => {
     if (!isValidPassword) {
       throw new RequestError({
         code: grpc.status.INVALID_ARGUMENT,
-        message: 'Invalid credentials',
+        message: "Invalid credentials",
       });
     }
 
@@ -348,8 +360,8 @@ export const login = async (payload: ILoginRequest): Promise<IResponse> => {
     });
 
     await AuthModel.updateUser(
-      'verifications',
-      ['access_token', 'otp'],
+      "verifications",
+      ["access_token", "otp"],
       {
         access_token: token,
         otp: verificationCode,
@@ -360,8 +372,10 @@ export const login = async (payload: ILoginRequest): Promise<IResponse> => {
 
     return {
       code: grpc.status.OK,
-      message: 'Login successfully',
-      data: [],
+      message: "Login successfully",
+      data: {
+        token,
+      },
     };
   } catch (error) {
     throw error;
@@ -378,30 +392,30 @@ export const verifyOneTimePassword = async (
 ): Promise<IResponse> => {
   try {
     const user = await AuthModel.findUserEmail(
-      'users',
-      ['user_id', 'user_email'],
+      "users",
+      ["user_id", "user_email"],
       payload.email
     );
 
     if (user.length === 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
     const { user_id, user_email } = user[0];
 
     const verification = await AuthModel.findUserById(
-      'verifications',
-      ['otp'],
+      "verifications",
+      ["otp"],
       user_id
     );
 
     if (verification.length === 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'Invalid code',
+        message: "Invalid code",
       });
     }
 
@@ -410,7 +424,7 @@ export const verifyOneTimePassword = async (
     if (payload.code !== otp) {
       throw new RequestError({
         code: grpc.status.INVALID_ARGUMENT,
-        message: 'Invalid code',
+        message: "Invalid code",
       });
     }
 
@@ -420,22 +434,21 @@ export const verifyOneTimePassword = async (
     });
 
     await AuthModel.updateUser(
-      'verifications',
-      ['access_token'],
+      "verifications",
+      ["access_token", "is_verified"],
       {
         access_token: token,
+        is_verified: true,
       },
       user_id
     );
 
     return {
       code: grpc.status.OK,
-      message: 'One time password verified',
-      data: [
-        {
-          token,
-        },
-      ],
+      message: "One time password verified",
+      data: {
+        token,
+      },
     };
   } catch (error) {
     throw error;
@@ -453,12 +466,12 @@ export const createPassword = async (
   try {
     const { email, password } = payload;
 
-    const user = await AuthModel.findUserEmail('users', ['user_id'], email);
+    const user = await AuthModel.findUserEmail("users", ["user_id"], email);
 
     if (user.length === 0) {
       throw new RequestError({
         code: grpc.status.NOT_FOUND,
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
@@ -466,8 +479,8 @@ export const createPassword = async (
     const hashedPassword = await utils.hashPassword(password, 10);
 
     await AuthModel.updateUser(
-      'users',
-      ['password'],
+      "users",
+      ["password"],
       {
         password: hashedPassword,
       },
@@ -476,7 +489,7 @@ export const createPassword = async (
 
     return {
       code: grpc.status.OK,
-      message: 'Password created',
+      message: "Password created",
       data: [],
     };
   } catch (error) {
@@ -494,15 +507,15 @@ export const clinicianSignUp = async (
 ): Promise<IResponse> => {
   try {
     const user = await AuthModel.findUserEmail(
-      'users',
-      ['user_id', 'user_email'],
+      "users",
+      ["user_id", "user_email"],
       payload.email
     );
 
     if (user.length > 0) {
       throw new RequestError({
         code: grpc.status.ALREADY_EXISTS,
-        message: 'Account already exist',
+        message: "Account already exist",
       });
     }
 
@@ -520,7 +533,7 @@ export const clinicianSignUp = async (
       language: payload.language,
       ethnicity: payload.ethnicity,
       phone_number: payload.phone_number,
-      user_type: 'clinician',
+      user_type: "clinician",
       credentials: payload.credentials,
       clinic_id: payload.clinic_id,
       clinic_name: payload.clinic_name,
@@ -531,7 +544,7 @@ export const clinicianSignUp = async (
 
     return {
       code: grpc.status.OK,
-      message: 'Successfully signed up',
+      message: "Successfully signed up",
       data: [],
     };
   } catch (error) {
