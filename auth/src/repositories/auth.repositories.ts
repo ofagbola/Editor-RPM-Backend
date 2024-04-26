@@ -260,11 +260,15 @@ export const updateInsurance = async (
 
     const { user_id } = user[0];
 
+    console.log({ user });
+
     const insuranceExist = await AuthModel.findUserById(
       "patient_insurance",
       ["user_id"],
       user_id
     );
+
+    console.log({ insuranceExist });
 
     if (insuranceExist.length > 0) {
       throw new RequestError({
