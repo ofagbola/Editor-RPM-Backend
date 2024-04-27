@@ -44,7 +44,14 @@ const TokensSchema = new Schema(
 
 const Tokens = mongoose.model("Tokens", TokensSchema);
 
-module.exports = { Vitals, Tokens };
+const CodeStuffSchema = new Schema({
+  codeChallenge: String,
+  codeVerifier: String,
+});
+
+const CodeStuff = mongoose.model("CodeStuff", CodeStuffSchema);
+
+module.exports = { Vitals, Tokens, CodeStuff };
 
 // const GarminHeartRateSummarySchema = new Schema(
 //   {

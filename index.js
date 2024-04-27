@@ -2,9 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const axios = require("axios");
-const { Vitals, Tokens } = require("./models/HealthData");
 
+let openGlobal;
+(async () => {
+  const { default: open } = await import("open");
+  openGlobal = open;
+})();
 const queryString = require("querystring");
+
+const { Vitals, Tokens, CodeStuff } = require("./models/HealthData");
 
 const {
   fetchRestingHeartRate,
@@ -67,15 +73,16 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
 });
 
 // For FitBit
+app.get("/callback", async (req, res) => {
+  // const { code } = req.query;
+  // const { userId } = req.query;
 
-// Callback route Fitbit will redirect to
-app.post("/callback", async (req, res) => {
-  const { code } = req.query;
-  const { state } = req.query;
-  const { userId } = req.query;
+  const code = req.query.code;
+  const code_verifier = req.query.code_verifier;
 
-  console.log("code", code);
-  console.log("state", state);
+  console.log("Code", code);
+
+  console.log("Code:", code_verifier);
 
   try {
     const response = await axios.post(
@@ -85,9 +92,7 @@ app.post("/callback", async (req, res) => {
         grant_type: "authorization_code",
         redirect_uri: process.env.CALLBACK_URL,
         code: code,
-        state: state,
-        code_verifier:
-          "0e183g1m581a1h01032h4m2s311o304t446c1q093r2q1m397170635j2r1p5l494u6v0l5w5k5d14556e2t0t296d0m1d5h1b5e0t63081i4i3c334n2a4b1u035464",
+        code_verifier: code_verifier,
       }),
       {
         headers: {
@@ -101,45 +106,101 @@ app.post("/callback", async (req, res) => {
       },
     );
 
-    console.log(response.data);
-
+    console.log("Response Data:", response.data);
     console.log("Access Token:", response.data.access_token);
     console.log("Refresh Token:", response.data.refresh_token);
 
-    console.log("we are here now");
-
-    // why is this not saving???????
     const token_data = await Tokens.create({
-      userId: userId,
+      userId: "userId",
       accessToken: response.data.access_token,
       refreshToken: response.data.refresh_token,
       userIdFromProvider: response.data.user_id,
       expiresIn: response.data.expires_in,
-      scope: response.data.refresh_token,
+      scope: response.data.scope, // Corrected from refresh_token to scope
       device: "Fitbit",
     });
 
-    console.log("token data: ", token_data);
+    console.log("Token Data:", token_data);
 
     res.send("Authorization successful! You can close this window.");
   } catch (error) {
-    console.log("$%$%$%$%$%$%$%$%$%^$%$^%$$%^%^$%^$%^$%^");
-    // console.log(error);
     console.error(
       "Error exchanging code for tokens:",
-      error.response.data.errors,
+      error.response?.data?.errors,
+      error.message,
     );
     res
       .status(500)
       .send(
-        "Authorization failed. Please check the server logs for more details. blah blah blah",
+        "Authorization failed. Please check the server logs for more details.",
       );
   }
 });
 
+const crypto = require("crypto");
+
+function generateCodeVerifier() {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+function base64URLEncode(str) {
+  return str
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+}
+
+function sha256(buffer) {
+  return crypto.createHash("sha256").update(buffer).digest();
+}
+
+function generateCodeChallenge(codeVerifier) {
+  return base64URLEncode(sha256(Buffer.from(codeVerifier)));
+}
+
+// Redirect to Fitbit authorization URL
+app.get("/authorize", async (req, res) => {
+  const clientId = process.env.FITBIT_CLIENT_ID;
+  const redirectUri = encodeURIComponent(
+    "http://localhost:" + PORT + "/callback",
+  );
+  const scope = encodeURIComponent(
+    "activity cardio_fitness electrocardiogram heartrate location nutrition oxygen_saturation profile respiratory_rate settings sleep social temperature weight",
+  );
+  const responseType = "code";
+  const prompt = "login consent";
+
+  const codeVerifier = generateCodeVerifier();
+
+  console.log("Code verifier", codeVerifier);
+  const codeChallenge = generateCodeChallenge(codeVerifier);
+  console.log("Code challenge", codeChallenge);
+
+  const codeStuff = await CodeStuff.create({
+    codeChallenge: codeChallenge,
+    codeVerifier: codeVerifier,
+  });
+
+  const authorizationUrl = `https://www.fitbit.com/oauth2/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=${scope}&prompt=${prompt}`;
+
+  // return auth link
+  // code chall
+  // code verrifier
+  // openGlobal(authorizationUrl);
+
+  const returned_data = {
+    authorization_link: authorizationUrl,
+    code_verifier: codeVerifier,
+    code_challenge: codeChallenge,
+  };
+  res.send("Opening Fitbit authorization page...").json(returned_data);
+});
+
 app.post("/revoke-fitbit-token", async (req, res) => {
-  const { accessToken } = req.query;
-  const { userId } = req.query;
+  const { accessToken, userId } = req.body;
+  console.log("$#%#$%@#$%$");
+  console.log(accessToken);
 
   try {
     const response = await axios.post(
@@ -158,13 +219,17 @@ app.post("/revoke-fitbit-token", async (req, res) => {
         },
       },
     );
-    const token_data = await Tokens.findOneAndDelete({
-      userId: userId,
-    });
+    // const token_data = await Tokens.findOneAndDelete({
+    //   userId: userId,
+    // });
 
     res.send("Token Revoked successfully");
   } catch (error) {
-    console.error("Error exchanging code for tokens:", error.response);
+    console.error(
+      "Error exchanging code for tokens:",
+      error.response?.data?.errors,
+      error.response,
+    );
     res.status(500).send("something went terribly wrong");
   }
 });
