@@ -81,6 +81,7 @@ const { Vitals, Tokens, CodeStuff } = require("./models/HealthData");
 const {
   fetchRestingHeartRate,
   fetchSpO2DataByDate,
+  fetchUserProfile,
 } = require("./utils/fitbitapi");
 
 // Initialize Express
@@ -192,6 +193,7 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
 
 app.get("/callback", async (req, res) => {
   const code = req.query.code;
+  const userId = req.query.userId;
   const code_verifier = req.query.code_verifier;
 
   console.log("Code", code);
@@ -225,7 +227,7 @@ app.get("/callback", async (req, res) => {
     console.log("Refresh Token:", response.data.refresh_token);
 
     const token_data = await Tokens.create({
-      userId: "userId",
+      userId: userId,
       accessToken: response.data.access_token,
       refreshToken: response.data.refresh_token,
       userIdFromProvider: response.data.user_id,
@@ -319,48 +321,141 @@ app.post("/revoke-fitbit-token", async (req, res) => {
   }
 });
 
-app.get("/fetch-spo2/:date", async (req, res) => {
-  try {
-    const userId = req.params.userId;
+app.get("/fetch-spo2", async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) {
+    return res
+      .status(400)
+      .send({ success: false, message: "User ID is required" });
+  }
 
+  try {
+    console.log("User id: ", userId);
     const userTokens = await Tokens.findOne({ userId: userId });
+    if (!userTokens) {
+      return res
+        .status(404)
+        .send({ success: false, message: "User tokens not found" });
+    }
+    console.log("user tokens: ", userTokens);
 
     const spo2Data = await fetchSpO2DataByDate(userTokens.accessToken);
-    await Vitals.create({
+    console.log("spo2 data: ", spo2Data);
+    if (!spo2Data || !spo2Data.dateTime || spo2Data.value === undefined) {
+      console.error("Invalid or empty SpO2 data received", spo2Data);
+      return res
+        .status(500)
+        .send({ success: false, message: "Invalid or no SpO2 data received" });
+    }
+
+    const newVitals = await Vitals.create({
       dateTimeFromProvider: spo2Data.dateTime,
       value: spo2Data.value,
       userId: userId,
       dateTime: new Date(),
+      device: "FitBit",
+      metricType: "SpO2",
     });
 
-    res.send({ success: true, message: "Data saved successfully" });
+    res.send({
+      success: true,
+      message: "Data saved successfully",
+      data: newVitals,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .send({ success: false, message: "Failed to fetch or save data" });
+    console.error("Error fetching or saving data: ", error);
+    res.status(500).send({
+      success: false,
+      message: "Failed to fetch or save data",
+      error: error.message,
+    });
   }
 });
 
 app.get("/fetch-heart-rate", async (req, res) => {
-  try {
-    const userId = req.query.userId;
-    const userTokens = await Tokens.findOne({ userId: userId });
-    const { dateTime, restingHeartRate } = await fetchRestingHeartRate(
-      userTokens.accessToken,
-    );
-    const newHeartRate = await FitBitHeartRateData.create({
-      dateTime,
-      restingHeartRate,
+  const userId = req.query.userId;
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: "User ID is required",
     });
+  }
+
+  try {
+    const userTokens = await Tokens.findOne({ userId: userId });
+    if (!userTokens) {
+      return res.status(404).json({
+        success: false,
+        message: "No access token found for the user",
+      });
+    }
+
+    const heartRateData = await fetchRestingHeartRate(userTokens.accessToken);
+
+    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
+    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
+    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
+
+    console.log(heartRateData);
+
+    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
+    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
+    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
+
+    const newVital = await Vitals.create({
+      userId: userId,
+      dateTime: new Date(), // Ensure dateTime is a Date object
+      device: "FitBit",
+      metricType: "HeartRate",
+      dateTimeFromProvider: new Date(heartRateData.dateTime), // Assuming dateTime is in a format that can be converted to Date
+      value: heartRateData.restingHeartRate,
+    });
+
     res.json({
       success: true,
       message: "Heart rate data saved successfully",
-      data: newHeartRate,
+      data: newVital,
     });
   } catch (error) {
+    console.error("Error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch or save heart rate data",
+      error: error.message,
+    });
+  }
+});
+
+app.get("/fetch-user-profile", async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: "User ID is required",
+    });
+  }
+
+  try {
+    const userTokens = await Tokens.findOne({ userId: userId });
+    if (!userTokens) {
+      return res.status(404).json({
+        success: false,
+        message: "No access token found for the user",
+      });
+    }
+
+    const userData = await fetchUserProfile(userTokens.accessToken);
+
+    res.json({
+      success: true,
+      message: "user data retrieved successfully",
+      data: userData,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch user data",
       error: error.message,
     });
   }
