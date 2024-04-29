@@ -10,6 +10,72 @@ let openGlobal;
 })();
 const queryString = require("querystring");
 
+const crypto = require("crypto");
+
+function generateCodeVerifier() {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+function base64URLEncode(str) {
+  return str
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+}
+
+function sha256(buffer) {
+  return crypto.createHash("sha256").update(buffer).digest();
+}
+
+function generateCodeChallenge(codeVerifier) {
+  return base64URLEncode(sha256(Buffer.from(codeVerifier)));
+}
+
+function generateNonce(length = 32) {
+  return crypto.randomBytes(length).toString("hex");
+}
+
+function generateSignature(
+  method,
+  url,
+  params,
+  consumerSecret,
+  tokenSecret = "",
+) {
+  // 1. Percent encode every key and value that will be signed
+  const encodedParams = Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [
+      encodeURIComponent(key),
+      encodeURIComponent(value),
+    ]),
+  );
+
+  // 2. Sort the list of parameters alphabetically [RFC 5849 Section 3.4.1.3.2]
+  const sortedParams = Object.keys(encodedParams)
+    .sort()
+    .reduce((obj, key) => {
+      obj[key] = encodedParams[key];
+      return obj;
+    }, {});
+
+  // 3. Concatenate the request elements into a single string
+  const baseString = [
+    method.toUpperCase(),
+    encodeURIComponent(url),
+    encodeURIComponent(queryString.stringify(sortedParams)),
+  ].join("&");
+
+  // 4. Use the consumer secret and token secret to generate the signature
+  const signingKey = `${encodeURIComponent(consumerSecret)}&${encodeURIComponent(tokenSecret)}`;
+  const signature = crypto
+    .createHmac("sha1", signingKey)
+    .update(baseString)
+    .digest("base64");
+
+  return signature;
+}
+
 const { Vitals, Tokens, CodeStuff } = require("./models/HealthData");
 
 const {
@@ -31,6 +97,58 @@ mongoose
   .catch((err) => console.log(err));
 
 app.use(express.json());
+
+app.post("/authorize-garmin", async (req, res) => {
+  const url = "https://connectapi.garmin.com/oauth-service/oauth/request_token";
+  const customerKey = process.env.GARMIN_CUSTOMER_KEY;
+  const customerSecret = process.env.GARMIN_CUSTOMER_SECRET;
+  const tokenSecret = "";
+  const nonce = generateNonce();
+
+  const params = {
+    oauth_consumer_key: customerKey,
+    oauth_nonce: nonce,
+    oauth_timestamp: Math.floor(Date.now() / 1000),
+    oauth_signature_method: "HMAC-SHA1",
+    oauth_version: "1.0",
+  };
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const signature = generateSignature(
+    "POST",
+    url,
+    params,
+    customerSecret,
+    tokenSecret,
+  );
+  try {
+    // Perform the OAuth request
+    const response = await axios.post(
+      url,
+      {
+        // Add any request body data here if required
+      },
+      {
+        headers: {
+          Authorization:
+            `OAuth oauth_nonce=${nonce}, ` +
+            `oauth_signature=${signature}, ` +
+            `oauth_consumer_key=${customerKey}, ` +
+            `oauth_timestamp=${timestamp}, ` +
+            'oauth_signature_method="HMAC-SHA1", ' +
+            'oauth_version="1.0"',
+        },
+      },
+    );
+
+    // Return the response from the Garmin Connect API
+    res.status(response.status).json(response.data);
+  } catch (error) {
+    // If an error occurs, return an error response
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 app.get("/fetch-and-save-garmin-data", async (req, res) => {
   const garminApiUrl =
@@ -72,17 +190,13 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
   }
 });
 
-// For FitBit
 app.get("/callback", async (req, res) => {
-  // const { code } = req.query;
-  // const { userId } = req.query;
-
   const code = req.query.code;
   const code_verifier = req.query.code_verifier;
 
   console.log("Code", code);
 
-  console.log("Code:", code_verifier);
+  console.log("Code verifier:", code_verifier);
 
   try {
     const response = await axios.post(
@@ -117,7 +231,7 @@ app.get("/callback", async (req, res) => {
       userIdFromProvider: response.data.user_id,
       expiresIn: response.data.expires_in,
       scope: response.data.scope, // Corrected from refresh_token to scope
-      device: "Fitbit",
+      device: "FitBit",
     });
 
     console.log("Token Data:", token_data);
@@ -137,30 +251,7 @@ app.get("/callback", async (req, res) => {
   }
 });
 
-const crypto = require("crypto");
-
-function generateCodeVerifier() {
-  return crypto.randomBytes(32).toString("hex");
-}
-
-function base64URLEncode(str) {
-  return str
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
-}
-
-function sha256(buffer) {
-  return crypto.createHash("sha256").update(buffer).digest();
-}
-
-function generateCodeChallenge(codeVerifier) {
-  return base64URLEncode(sha256(Buffer.from(codeVerifier)));
-}
-
-// Redirect to Fitbit authorization URL
-app.get("/authorize", async (req, res) => {
+app.get("/authorize-fitbit", async (req, res) => {
   const clientId = process.env.FITBIT_CLIENT_ID;
   const redirectUri = encodeURIComponent(
     "http://localhost:" + PORT + "/callback",
@@ -172,8 +263,8 @@ app.get("/authorize", async (req, res) => {
   const prompt = "login consent";
 
   const codeVerifier = generateCodeVerifier();
-
   console.log("Code verifier", codeVerifier);
+
   const codeChallenge = generateCodeChallenge(codeVerifier);
   console.log("Code challenge", codeChallenge);
 
@@ -184,17 +275,11 @@ app.get("/authorize", async (req, res) => {
 
   const authorizationUrl = `https://www.fitbit.com/oauth2/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=${scope}&prompt=${prompt}`;
 
-  // return auth link
-  // code chall
-  // code verrifier
-  // openGlobal(authorizationUrl);
-
-  const returned_data = {
+  res.json({
     authorization_link: authorizationUrl,
     code_verifier: codeVerifier,
     code_challenge: codeChallenge,
-  };
-  res.send("Opening Fitbit authorization page...").json(returned_data);
+  });
 });
 
 app.post("/revoke-fitbit-token", async (req, res) => {
@@ -258,9 +343,8 @@ app.get("/fetch-spo2/:date", async (req, res) => {
 
 app.get("/fetch-heart-rate", async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.query.userId;
     const userTokens = await Tokens.findOne({ userId: userId });
-
     const { dateTime, restingHeartRate } = await fetchRestingHeartRate(
       userTokens.accessToken,
     );
