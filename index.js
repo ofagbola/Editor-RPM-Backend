@@ -126,9 +126,7 @@ app.post("/authorize-garmin", async (req, res) => {
     // Perform the OAuth request
     const response = await axios.post(
       url,
-      {
-        // Add any request body data here if required
-      },
+      {},
       {
         headers: {
           Authorization:
@@ -142,12 +140,88 @@ app.post("/authorize-garmin", async (req, res) => {
       },
     );
 
+    const parsedData = queryString.parse(response.data);
+
+    const oauth_token = parsedData.oauth_token;
+    const oauth_token_secret = parsedData.oauth_token_secret;
+
+    const garminTokenData = await CodeStuff.create({
+      oauth_nonce: nonce,
+      oauth_signature: signature,
+      oauth_token: oauth_token,
+      oauth_timestamp: timestamp,
+      oauth_token_secret: oauth_token_secret,
+      oauth_verifier: "temp_",
+      device: "Garmin",
+    });
+
+    const authorization_link = `https://connect.garmin.com/oauthConfirm?oauth_token=${oauth_token}&oauth_callback=https://apis.garmin.com/tools/oauthAuthorizeUser?action=step3`;
     // Return the response from the Garmin Connect API
-    res.status(response.status).json(response.data);
+    res.status(response.status).json({
+      oauth_tokens: response.data,
+      authorization_link: authorization_link,
+    });
   } catch (error) {
     // If an error occurs, return an error response
-    console.error("Error:", error);
+    console.error("Error:", error.message);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/garmin-callback", async (req, res) => {
+  const consumer_key = process.env.GARMIN_CUSTOMER_KEY;
+  const customerSecret = process.env.GARMIN_CUSTOMER_SECRET;
+  const oauth_verifier = req.query.oauth_verifier;
+  const oauth_token = req.query.oauth_token;
+  const tokenSecret = "";
+
+  const url = "https://connectapi.garmin.com/oauth-service/oauth/access_token";
+  const nonce = generateNonce();
+
+  const params = {
+    oauth_consumer_key: consumer_key,
+    oauth_nonce: nonce,
+    oauth_timestamp: Math.floor(Date.now() / 1000),
+    oauth_signature_method: "HMAC-SHA1",
+    oauth_version: "1.0",
+  };
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const signature = generateSignature(
+    "POST",
+    url,
+    params,
+    customerSecret,
+    tokenSecret,
+  );
+
+  const authorizationHeader =
+    `OAuth oauth_nonce=${nonce}, ` +
+    `oauth_signature=${signature}, ` +
+    `oauth_consumer_key=${consumer_key}, ` +
+    `oauth_token=${oauth_token}, ` +
+    `oauth_timestamp=${timestamp}, ` +
+    `oauth_verifier=${oauth_verifier}, ` +
+    'oauth_signature_method="HMAC-SHA1", ' +
+    'oauth_version="1.0"';
+
+  try {
+    const response = await axios.post(
+      url,
+      {},
+      {
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      },
+    );
+
+    console.log("response: ", response);
+
+    console.log("Access Token Data:", response.data);
+    return response.data; // Return the data for further processing or usage
+  } catch (error) {
+    console.error("Error fetching access token:", error.message);
   }
 });
 
@@ -191,7 +265,7 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
   }
 });
 
-app.get("/callback", async (req, res) => {
+app.get("/fitbit-callback", async (req, res) => {
   const code = req.query.code;
   const userId = req.query.userId;
   const code_verifier = req.query.code_verifier;
@@ -392,16 +466,6 @@ app.get("/fetch-heart-rate", async (req, res) => {
 
     const heartRateData = await fetchRestingHeartRate(userTokens.accessToken);
 
-    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
-    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
-    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
-
-    console.log(heartRateData);
-
-    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
-    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
-    console.log("+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_");
-
     const newVital = await Vitals.create({
       userId: userId,
       dateTime: new Date(), // Ensure dateTime is a Date object
@@ -486,7 +550,7 @@ app.post("/apple-health-data", async (req, res) => {
   }
 });
 
-app.post("/fetch-user-data", async (req, res) => {
+app.get("/fetch-user-data", async (req, res) => {
   const { userId, platform } = req.body;
 
   if (!userId || !platform) {
@@ -498,38 +562,27 @@ app.post("/fetch-user-data", async (req, res) => {
   try {
     switch (platform) {
       case "Garmin":
-        const heartRateData = await GarminHeartRateSummary.find({
+        const garminVitals = await Vitals.find({
           userId,
         }).sort({ createdAt: -1 });
-        const spo2Data = await GarminSpO2Summary.find({ userId }).sort({
-          createdAt: -1,
-        });
         data = {
-          heartRate: heartRateData ? heartRateData.avgValue : null,
-          spo2: spo2Data ? spo2Data.avgValue : null,
+          vitals: garminVitals,
         };
         break;
       case "FitBit":
-        const fitBitHeartRateData = await FitBitHeartRateData.find({
+        const fitbitVitals = await Vitals.find({
           userId,
         }).sort({ createdAt: -1 });
-        const fitBitSpO2Data = await FitBitSpO2Data.find({ userId }).sort({
-          createdAt: -1,
-        });
         data = {
-          heartRate: fitBitHeartRateData
-            ? fitBitHeartRateData.restingHeartRate
-            : null,
-          spo2: fitBitSpO2Data ? fitBitSpO2Data.value.avg : null,
+          vitals: fitbitVitals,
         };
         break;
       case "Apple":
-        const appleData = await AppleHealthData.find({ userId }).sort({
+        const appleVitals = await Vitals.find({ userId }).sort({
           createdAt: -1,
         });
         data = {
-          heartRate: appleData ? appleData.heartRate : null,
-          spo2: appleData ? appleData.spo2 : null,
+          vitals: appleVitals,
         };
         break;
 
