@@ -1,0 +1,57 @@
+version: "3"
+services:
+  app:
+    build: 
+      # context: .
+      # Correct the path to your Dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8084:8084"
+      - "127.0.0.1:8092:8092"
+      - "127.0.0.1:50051:50051"
+    volumes:
+      - /Users/user/Development/websites/games/go/chat_apps/websocket-chat-master/teleconferencing:/app
+    networks:
+      - backend
+    depends_on:
+      - db
+  # envoy:
+  #   image: envoyproxy/envoy-dev:e4955aed5694f9935d674419dbb364e744f697b4
+  #   restart: always
+  #   volumes:
+  #     - /Users/user/Development/mobile_apps/react-native/newProject/envoy.yaml:/etc/envoy/envoy.yaml
+  #   ports:
+  #     - "9901:9901"
+  #     - "8080:8080"
+  redis:
+    image: bitnami/redis
+    restart: always
+    volumes:
+      - ./data:/bitnami/redis/data
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
+
+     
+  db:
+    container_name: postgresql
+    restart: always
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: matego_useren
+      POSTGRES_PASSWORD: gofindP123
+      POSTGRES_DB: go_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:5432:5432"
+  
+volumes:
+  db_data:
+
+networks:
+  backend:
+    driver: bridge  

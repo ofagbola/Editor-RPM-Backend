@@ -86,3 +86,12 @@ type User struct {
     CreatedAt     time.Time `gorm:"autoCreateTime"`
     UpdatedAt     time.Time `gorm:"autoUpdateTime"`
 }
+
+type Chat struct {
+    ID          uint       `gorm:"primary_key"`
+    UserID1     int        `gorm:"column:user_id_1"`
+    UserID2     int        `gorm:"column:user_id_2"`
+    MessageArray []byte    `gorm:"column:message_array"`
+    CreatedAt   time.Time  `gorm:"column:created_at"`
+    UpdatedAt   time.Time  `gorm:"column:updated_at"`
+}

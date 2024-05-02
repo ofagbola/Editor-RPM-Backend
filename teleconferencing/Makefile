@@ -35,6 +35,9 @@ linux_proto:
 	sudo apt install protobuf-compiler
 push:
 	git push secondorigin branch:feature/teleconferencing  	
+
+secondBranch:
+	git push secondorigin branch:feature/teleconferencing  	
 grpc_server_code:
 	protoc --go_out=. --go_opt=paths=source_relative \
     --go-grpc_out=. --go-grpc_opt=paths=source_relative \

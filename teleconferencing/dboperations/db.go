@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+
+	// "strconv"
 
 	// "strconv"
 	"time"
@@ -68,7 +71,7 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 	// Check if a record exists for the given user_id_1 and user_id_2
 	var createdAt time.Time
 	var messageArray []byte
-	err := db.QueryRow("SELECT created_at, message_array FROM chat WHERE (user_id_1 = $1 AND user_id_2 = $2) OR (user_id_1 = $2 AND user_id_2 = $1)", message.SenderID, message.RecipientID).Scan(&createdAt, &messageArray)
+	err := db.QueryRow("SELECT created_at, message_array FROM chat WHERE (user_id_1 = $1 AND user_id_2 = $2) OR (user_id_1 = $2 AND user_id_2 = $1)  ORDER BY created_at DESC", message.SenderID, message.RecipientID).Scan(&createdAt, &messageArray)
 	switch {
 	case err == sql.ErrNoRows:
 		// Unmarshal the existing message_array into a slice of Message structs
@@ -86,7 +89,7 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 
 		// Create a new record if no record found
 		_, err := db.Exec("INSERT INTO chat (user_id_1, user_id_2, message_array, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-			message.SenderID, message.RecipientID, updatedMessageArray /* initial empty JSON array */, currentDate, currentDate)
+			message.SenderID, message.RecipientID, updatedMessageArray /* initial empty JSON array */, time.Now(), time.Now())
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -128,9 +131,10 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 			}
 			fmt.Println("Message appended to existing record.")
 		} else {
+			
 			// Create a new record if the existing record is not for the current date
 			_, err := db.Exec("INSERT INTO chat (user_id_1, user_id_2, message_array, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-				message.SenderID, message.RecipientID, messageJSON /* initial empty JSON array */, currentDate, currentDate)
+				message.SenderID, message.RecipientID, messageJSON /* initial empty JSON array */, time.Now(), time.Now())
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -174,27 +178,13 @@ func FetchChatsList(user_id string) ([]*models.ChatMessage, error) {
 	// Query the table to select the most recent row where user_id_1 or user_id_2 is equal to the specified user ID
 	query := `
 	SELECT message_array 
-	FROM chat 
-	WHERE (
-		(user_id_1 = $1 AND user_id_2 != $1)
-		OR
-		(user_id_2 = $1 AND user_id_1 != $1)
-	)
-	AND (
-		(user_id_1 = $1 AND (user_id_2, created_at) IN (
-			SELECT user_id_2, MAX(created_at)
-			FROM chat 
-			WHERE user_id_1 = $1 
-			GROUP BY user_id_2
-		))
-		OR
-		(user_id_2 = $1 AND (user_id_1, created_at) IN (
-			SELECT user_id_1, MAX(created_at)
-			FROM chat 
-			WHERE user_id_2 = $1 
-			GROUP BY user_id_1
-		))
-	)
+		FROM (
+			SELECT *,
+				ROW_NUMBER() OVER (PARTITION BY LEAST(user_id_1, user_id_2), GREATEST(user_id_1, user_id_2) ORDER BY created_at DESC) AS rn
+			FROM chat
+			WHERE user_id_1 = $1 OR user_id_2 = $1
+		) AS subquery
+	WHERE rn = 1 ORDER BY updated_at DESC;			
 	`
 	var msgArrray []*models.ChatMessage
 	rows, err := DBConnection.Query(query, user_id)
@@ -205,6 +195,8 @@ func FetchChatsList(user_id string) ([]*models.ChatMessage, error) {
 
 	// Declare variables to hold JSON data
 	var messages []byte
+	// Declare a variable to hold the unmarshaled JSON data
+	var jsonData interface{}
 
 	// Iterate over the rows
 	for rows.Next() {
@@ -215,47 +207,106 @@ func FetchChatsList(user_id string) ([]*models.ChatMessage, error) {
 			fmt.Println(err)
 		}
 
-		// Unmarshal the JSON data into messageArray
-		err := json.Unmarshal(messages, &messageArray)
-		if err != nil {
+		// Unmarshal the JSON data into the jsonData variable
+		if err := json.Unmarshal(messages, &jsonData); err != nil {
 			fmt.Println("Error unmarshaling JSON:", err)
-			return nil, err
+			continue // Skip to the next row
 		}
-		lastInnerArray := messageArray[len(messageArray)-1]
-		// Map the fields from the map to the ChatMessage struct
-		for key, value := range lastInnerArray {
-			switch key {
-			case "call_duration":
-				chatMsg.CallDuration = int(value.(float64))
-			case "created_at":
-				chatMsg.CreatedAt = value.(string)
-			case "doc_or_attachment_id":
-				chatMsg.DocOrAttachmentID = int(value.(float64))
-			case "document_url":
-				chatMsg.DocumentURL = value.(string)
-			case "id_of_sender":
-				chatMsg.IDOfSender = int(value.(float64))
-			case "message_sent":
-				chatMsg.MessageSent = value.(string)
-			case "message_type":
-				chatMsg.MessageType = value.(string)
-			case "missed_call":
-				chatMsg.MissedCall = value.(bool)
-			case "missed_video_call":
-				chatMsg.MissedVideoCall = value.(bool)
-			case "read_at":
-				chatMsg.ReadAt = value.(string)
-			case "recipient_id":
-				chatMsg.RecipientID = int(value.(float64))
-			case "video_duration":
-				chatMsg.VideoDuration = int(value.(float64))
-			case "voice_record_id":
-				chatMsg.VoiceRecordID = int(value.(float64))
+
+		// Check the type of jsonData
+		switch data := jsonData.(type) {
+		case map[string]interface{}:
+			// It's a 1D array
+			fmt.Println("1D Array:", data)
+			var lastInnerArray map[string]interface{}
+			err := json.Unmarshal(messages, &lastInnerArray)
+			if err != nil {
+				fmt.Println("Error unmarshaling JSON:", err)
+				return nil, err
 			}
+			// Map the fields from the map to the ChatMessage struct
+			for key, value := range lastInnerArray {
+				switch key {
+				case "call_duration":
+					chatMsg.CallDuration = int(value.(float64))
+				case "created_at":
+					chatMsg.CreatedAt = value.(string)
+				case "doc_or_attachment_id":
+					chatMsg.DocOrAttachmentID = int(value.(float64))
+				case "document_url":
+					chatMsg.DocumentURL = value.(string)
+				case "id_of_sender":
+					chatMsg.IDOfSender = int(value.(float64))
+				case "message_sent":
+					chatMsg.MessageSent = value.(string)
+				case "message_type":
+					chatMsg.MessageType = value.(string)
+				case "missed_call":
+					chatMsg.MissedCall = value.(bool)
+				case "missed_video_call":
+					chatMsg.MissedVideoCall = value.(bool)
+				case "read_at":
+					chatMsg.ReadAt = value.(string)
+				case "recipient_id":
+					chatMsg.RecipientID = int(value.(float64))
+				case "video_duration":
+					chatMsg.VideoDuration = int(value.(float64))
+				case "voice_record_id":
+					chatMsg.VoiceRecordID = int(value.(float64))
+				}
+			}
+			// Print the length of the messageArray
+			fmt.Println("Length of messageArray:\n", chatMsg)
+			msgArrray = append(msgArrray, &chatMsg)
+		case []interface{}:
+			// It's a key-value pair array
+			fmt.Println("Key-Value Pair Array:", data)
+			// Unmarshal the JSON data into messageArray
+			err := json.Unmarshal(messages, &messageArray)
+			if err != nil {
+				fmt.Println("Error unmarshaling JSON:", err)
+				return nil, err
+			}
+			lastInnerArray := messageArray[len(messageArray)-1]
+			// Map the fields from the map to the ChatMessage struct
+			for key, value := range lastInnerArray {
+				switch key {
+				case "call_duration":
+					chatMsg.CallDuration = int(value.(float64))
+				case "created_at":
+					chatMsg.CreatedAt = value.(string)
+				case "doc_or_attachment_id":
+					chatMsg.DocOrAttachmentID = int(value.(float64))
+				case "document_url":
+					chatMsg.DocumentURL = value.(string)
+				case "id_of_sender":
+					chatMsg.IDOfSender = int(value.(float64))
+				case "message_sent":
+					chatMsg.MessageSent = value.(string)
+				case "message_type":
+					chatMsg.MessageType = value.(string)
+				case "missed_call":
+					chatMsg.MissedCall = value.(bool)
+				case "missed_video_call":
+					chatMsg.MissedVideoCall = value.(bool)
+				case "read_at":
+					chatMsg.ReadAt = value.(string)
+				case "recipient_id":
+					chatMsg.RecipientID = int(value.(float64))
+				case "video_duration":
+					chatMsg.VideoDuration = int(value.(float64))
+				case "voice_record_id":
+					chatMsg.VoiceRecordID = int(value.(float64))
+				}
+			}
+			// Print the length of the messageArray
+			fmt.Println("Length of messageArray:\n", chatMsg)
+			msgArrray = append(msgArrray, &chatMsg)
+		default:
+			// Unexpected data type
+			fmt.Println("Unexpected data type:", data)
 		}
-		// Print the length of the messageArray
-		fmt.Println("Length of messageArray:\n", chatMsg)
-		msgArrray = append(msgArrray, &chatMsg)
+
 	}
 	return msgArrray, nil
 }
@@ -273,8 +324,7 @@ func FetchUser(user_id int) (models.User, error) {
 	var user models.User
 
 	// Fetch the user with user_id from the users table
-	result := db.Where("id = ?",user_id).First(&user)
-
+	result := db.Where("id = ?", user_id).First(&user)
 
 	// Check for errors
 	if result.Error != nil {
@@ -283,6 +333,80 @@ func FetchUser(user_id int) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+// Function to fetch chat records with pagination
+func GetChatRecords(userId, recipientId string, page, pageSize int) ([]models.ChatMessage, string, string, error) {
+	var chatMessages []models.ChatMessage
+
+	// Paginate the query
+	// offset := (page - 1) * pageSize
+
+	// Execute the SQL query
+	query := `
+		SELECT message_array
+		FROM chat
+		WHERE (user_id_1 = $1 AND user_id_2 = $2) OR (user_id_1 = $2 AND user_id_2 = $1)
+		ORDER BY created_at ASC
+
+	`
+	// query := `
+	// SELECT message_array
+	// FROM chat
+	// WHERE (user_id_1 = 20 AND user_id_2 = 44)
+	// `
+	// OFFSET $3
+	// LIMIT $4
+	rows, err := DBConnection.Query(query, userId, recipientId)
+	//  rows, err := DBConnection.Query(query)
+	fmt.Print(query)
+	// offset, pageSize
+	if err != nil {
+		// Handle error
+		return nil, "", "", err
+	}
+	defer rows.Close()
+
+	// Iterate through the rows and parse chat.MessageArray to ChatMessage struct
+	for rows.Next() {
+		var messageArray []byte
+		if err := rows.Scan(&messageArray); err != nil {
+			// Handle error
+			continue
+		}
+
+		var column1Value string
+		err := rows.Scan(&column1Value)
+		if err != nil {
+			// Handle the error
+			fmt.Println(err)
+		}
+
+		// Print the values
+		fmt.Printf("Column1: %s, Column2: %s\n", strconv.Itoa(len(column1Value)), strconv.Itoa(len(messageArray)))
+		var chatMessage []models.ChatMessage
+		// Parse chat.MessageArray to ChatMessage struct
+		if err := json.Unmarshal(messageArray, &chatMessage); err != nil {
+			// Handle error
+			fmt.Println(err)
+			continue
+		}
+		// Append chatMessage to chatMessages slice
+		chatMessages = append(chatMessages, chatMessage...)
+	}
+
+	// Calculate next and previous page URLs
+	// var nextURL, prevURL string
+	// if len(chatMessages) == pageSize {
+	// 	nextPage := page + 1
+	// 	nextURL = "/chats?page=" + strconv.Itoa(nextPage)
+	// }
+	// if page > 1 {
+	// 	prevPage := page - 1
+	// 	prevURL = "/chats?page=" + strconv.Itoa(prevPage)
+	// }
+	fmt.Println(chatMessages)
+	return chatMessages, "nextURL", "prevURL", nil
 }
 
 func WriteToFileTable(fileDetails models.FileDetails, db *sql.DB) (fileId int, fileUploadError error) {

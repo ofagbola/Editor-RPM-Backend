@@ -61,8 +61,8 @@ func main() {
 
     // Start the HTTP server
     go func() {
-        log.Println("Starting HTTP server on :8082")
-        if err := http.ListenAndServe(":8082", nil); err != nil {
+        log.Println("Starting HTTP server on :8092")
+        if err := http.ListenAndServe(":8092", nil); err != nil {
             log.Fatal("HTTP server error:", err)
         }
     }()
@@ -137,8 +137,8 @@ func mainBlo() {
 
     go func() {
         // Start HTTP server
-        log.Println("Starting HTTP server on :8082")
-        if err := http.ListenAndServe(":8082", nil); err != nil {
+        log.Println("Starting HTTP server on :8092")
+        if err := http.ListenAndServe(":8092", nil); err != nil {
             log.Fatal("WebSocket server error:", err)
         }
     }()

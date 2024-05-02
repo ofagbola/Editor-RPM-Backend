@@ -163,6 +163,7 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 				IsGroupChat  bool     `json:"isGroupChat"`
 				GroupUserIDs []string `json:"groupUserIDs"`
 				Username    string `json:"username"`
+				MessageType    string `json:"messageType"`
 			}
 			// Parse the JSON string into a Bit struct
 
@@ -180,6 +181,7 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 			isGroupChat := parsedBit.IsGroupChat
 			groupUserIDs := parsedBit.GroupUserIDs
 			username := parsedBit.Username
+			messageType := parsedBit.MessageType
 
 			sender_id, err := strconv.ParseInt(SenderID, 10, 64)
 			if err != nil {
@@ -208,7 +210,8 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 						RecipientID:       int(recipient_id),
 						SenderID:          int(sender_id),
 						CreatedAt:         time.Now().UTC(),
-						MessageType:       "text",
+						MessageType:       messageType,
+						ReadAt:    time.Time{}, 
 					}
 					ucm.SendMessage(groupUserID, messageValue, db, message,username)
 					log.Printf("Seng message to user ID %s: %s", groupUserID, string(message.MessageSent))
@@ -229,7 +232,8 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 					RecipientID:       int(recipient_id),
 					SenderID:          int(sender_id),
 					CreatedAt:         time.Now().UTC(),
-					MessageType:       "text",
+					MessageType:      messageType,
+					ReadAt:    time.Time{}, 
 				}
 				// Handle individual chat message
 				ucm.SendMessage(RecipientID, messageValue, db, message,username)
@@ -242,65 +246,6 @@ func HandleWebSocketConnections(ucm *UserConnectionManager, w http.ResponseWrite
 	}
 }
 
-// func HandleFileUpload0(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
-// 	file, fileHeader, err := r.FormFile("file") // Assuming file is uploaded using a form field with name "file"
-// 	if err != nil {
-// 		http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
-// 		return
-// 	}
-// 	defer file.Close()
-
-// 	fileContent, err := io.ReadAll(file)
-// 	if err != nil {
-// 		http.Error(w, "Failed to read file content", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Save the file to a folder called "fileUploads"
-// 	fileName := fileHeader.Filename
-// 	filePath := filepath.Join("fileUploads", fileName)
-// 	err = os.WriteFile(filePath, fileContent, 0644)
-// 	if err != nil {
-// 		http.Error(w, "Failed to save file", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Generate the file URL
-// 	fileURL := fmt.Sprintf("http://localhost:8080/%s", filePath)
-
-// 	// Create a message with the file details
-// 	message := models.Message{
-// 		MessageSent:       "File uploaded",
-// 		DocOrAttachmentID: 0,   // Set the appropriate ID for the document
-// 		RecipientID:       789, // Set the recipient ID
-// 		SenderID:          456, // Set the sender ID
-// 		CreatedAt:         time.Now().UTC(),
-// 		MessageType:       "file",
-// 		DocumentURL:       fileURL,
-// 	}
-
-// 	// Write the file details to the table
-// 	fileDetails := models.FileDetails{
-// 		FileURL:      fileURL,
-// 		FileLocation: filePath,
-// 		FileType:     fileHeader.Header.Get("Content-Type"),
-// 		CreatedAt:    time.Now().UTC(),
-// 		Deleted:      false,
-// 	}
-
-// 	// Call the function to save the file details to the table
-// 	err = dboperations.WriteToFileTable(fileDetails, db)
-// 	if err != nil {
-// 		http.Error(w, "Failed to write file details to table", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Send the message over WebSocket
-// 	ucm.SendMessage(strconv.Itoa(message.RecipientID), message.MessageSent, db, message, fileContent)
-
-// 	// Respond with success message
-// 	w.Write([]byte("File uploaded successfully"))
-// }
 
 func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("File Upload Endpoint Hit")
@@ -409,7 +354,8 @@ func UploadFile(ucm *UserConnectionManager, w http.ResponseWriter, r *http.Reque
 // 	"message": "checking morning",
 //   "sender_id":"34",
 //   "isGroupChat":true,
-//   "groupUserIDs":["20","44"]
+//   "groupUserIDs":["20","44"],
+//	"messageType":"text"
 //   }
 // when connecing user id must be sent like this
 // ws://localhost:8080/ws?userID=20
