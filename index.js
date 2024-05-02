@@ -41,14 +41,14 @@ function generateSignature(
   url,
   params,
   consumerSecret,
-  tokenSecret = "",
+  tokenSecret = ""
 ) {
   // 1. Percent encode every key and value that will be signed
   const encodedParams = Object.fromEntries(
     Object.entries(params).map(([key, value]) => [
       encodeURIComponent(key),
       encodeURIComponent(value),
-    ]),
+    ])
   );
 
   // 2. Sort the list of parameters alphabetically [RFC 5849 Section 3.4.1.3.2]
@@ -67,7 +67,9 @@ function generateSignature(
   ].join("&");
 
   // 4. Use the consumer secret and token secret to generate the signature
-  const signingKey = `${encodeURIComponent(consumerSecret)}&${encodeURIComponent(tokenSecret)}`;
+  const signingKey = `${encodeURIComponent(
+    consumerSecret
+  )}&${encodeURIComponent(tokenSecret)}`;
   const signature = crypto
     .createHmac("sha1", signingKey)
     .update(baseString)
@@ -99,6 +101,8 @@ mongoose
 
 app.use(express.json());
 
+
+// For Garmin
 app.post("/authorize-garmin", async (req, res) => {
   const url = "https://connectapi.garmin.com/oauth-service/oauth/request_token";
   const customerKey = process.env.GARMIN_CUSTOMER_KEY;
@@ -120,25 +124,31 @@ app.post("/authorize-garmin", async (req, res) => {
     url,
     params,
     customerSecret,
-    tokenSecret,
+    tokenSecret
   );
   try {
     // Perform the OAuth request
+
+    const authorizationHeader = `OAuth oauth_nonce="${nonce}", oauth_signature="${encodeURIComponent(
+      signature
+    )}", oauth_consumer_key="${customerKey}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
+
     const response = await axios.post(
       url,
       {},
       {
         headers: {
-          Authorization:
-            `OAuth oauth_nonce=${nonce}, ` +
-            `oauth_signature=${signature}, ` +
-            `oauth_consumer_key=${customerKey}, ` +
-            `oauth_timestamp=${timestamp}, ` +
-            'oauth_signature_method="HMAC-SHA1", ' +
-            'oauth_version="1.0"',
+          Authorization: authorizationHeader,
         },
-      },
+      }
     );
+
+    console.log("##########################################");
+    console.log("##########################################");
+
+    console.log(authorizationHeader);
+
+    console.log(response.data);
 
     const parsedData = queryString.parse(response.data);
 
@@ -155,10 +165,11 @@ app.post("/authorize-garmin", async (req, res) => {
       device: "Garmin",
     });
 
-    const authorization_link = `https://connect.garmin.com/oauthConfirm?oauth_token=${oauth_token}&oauth_callback=https://apis.garmin.com/tools/oauthAuthorizeUser?action=step3`;
+    const authorization_link = `https://connect.garmin.com/oauthConfirm?oauth_token=${oauth_token}&oauth_callback=https%3A%2F%2Fapis.garmin.com%2Ftools%2FoauthAuthorizeUser%3Faction%3Dstep3`;
     // Return the response from the Garmin Connect API
     res.status(response.status).json({
       oauth_tokens: response.data,
+      other_things: "this is another thing",
       authorization_link: authorization_link,
     });
   } catch (error) {
@@ -174,6 +185,7 @@ app.post("/garmin-callback", async (req, res) => {
   const oauth_verifier = req.query.oauth_verifier;
   const oauth_token = req.query.oauth_token;
   const tokenSecret = "";
+  const timestamp = Math.floor(Date.now() / 1000);
 
   const url = "https://connectapi.garmin.com/oauth-service/oauth/access_token";
   const nonce = generateNonce();
@@ -181,40 +193,36 @@ app.post("/garmin-callback", async (req, res) => {
   const params = {
     oauth_consumer_key: consumer_key,
     oauth_nonce: nonce,
-    oauth_timestamp: Math.floor(Date.now() / 1000),
+    oauth_timestamp: timestamp,
     oauth_signature_method: "HMAC-SHA1",
     oauth_version: "1.0",
   };
 
-  const timestamp = Math.floor(Date.now() / 1000);
   const signature = generateSignature(
     "POST",
     url,
     params,
     customerSecret,
-    tokenSecret,
+    tokenSecret
   );
 
-  const authorizationHeader =
-    `OAuth oauth_nonce=${nonce}, ` +
-    `oauth_signature=${signature}, ` +
-    `oauth_consumer_key=${consumer_key}, ` +
-    `oauth_token=${oauth_token}, ` +
-    `oauth_timestamp=${timestamp}, ` +
-    `oauth_verifier=${oauth_verifier}, ` +
-    'oauth_signature_method="HMAC-SHA1", ' +
-    'oauth_version="1.0"';
-
   try {
+    const authorizationHeader = `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_consumer_key="${consumer_key}", oauth_token="${oauth_token}", oauth_timestamp="${timestamp}", oauth_verifier="${oauth_verifier}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
+
+    console.log(authorizationHeader);
+
     const response = await axios.post(
       url,
       {},
       {
         headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
           Authorization: authorizationHeader,
         },
-      },
+      }
     );
+    console.log("##########################################");
+    console.log("##########################################");
 
     console.log("response: ", response);
 
@@ -222,6 +230,10 @@ app.post("/garmin-callback", async (req, res) => {
     return response.data; // Return the data for further processing or usage
   } catch (error) {
     console.error("Error fetching access token:", error.message);
+    if (error.response) {
+      console.error("Error status:", error.response.status);
+      console.error("Error details:", error.response.data);
+    }
   }
 });
 
@@ -236,10 +248,10 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
     const data = response.data[0];
 
     const heartRateData = data.summaries.find(
-      (summary) => summary.summaryType === "heart_rate",
+      (summary) => summary.summaryType === "heart_rate"
     );
     const spo2Data = data.summaries.find(
-      (summary) => summary.summaryType === "spo2",
+      (summary) => summary.summaryType === "spo2"
     );
 
     // Save heart rate data
@@ -265,6 +277,8 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
   }
 });
 
+
+// For FitBit
 app.get("/fitbit-callback", async (req, res) => {
   const code = req.query.code;
   const userId = req.query.userId;
@@ -290,10 +304,10 @@ app.get("/fitbit-callback", async (req, res) => {
           Authorization:
             "Basic " +
             Buffer.from(
-              `${process.env.FITBIT_CLIENT_ID}:${process.env.FITBIT_CLIENT_SECRET}`,
+              `${process.env.FITBIT_CLIENT_ID}:${process.env.FITBIT_CLIENT_SECRET}`
             ).toString("base64"),
         },
-      },
+      }
     );
 
     console.log("Response Data:", response.data);
@@ -317,12 +331,12 @@ app.get("/fitbit-callback", async (req, res) => {
     console.error(
       "Error exchanging code for tokens:",
       error.response?.data?.errors,
-      error.message,
+      error.message
     );
     res
       .status(500)
       .send(
-        "Authorization failed. Please check the server logs for more details.",
+        "Authorization failed. Please check the server logs for more details."
       );
   }
 });
@@ -330,10 +344,10 @@ app.get("/fitbit-callback", async (req, res) => {
 app.get("/authorize-fitbit", async (req, res) => {
   const clientId = process.env.FITBIT_CLIENT_ID;
   const redirectUri = encodeURIComponent(
-    "http://localhost:" + PORT + "/callback",
+    "http://localhost:" + PORT + "/callback"
   );
   const scope = encodeURIComponent(
-    "activity cardio_fitness electrocardiogram heartrate location nutrition oxygen_saturation profile respiratory_rate settings sleep social temperature weight",
+    "activity cardio_fitness electrocardiogram heartrate location nutrition oxygen_saturation profile respiratory_rate settings sleep social temperature weight"
   );
   const responseType = "code";
   const prompt = "login consent";
@@ -375,10 +389,10 @@ app.post("/revoke-fitbit-token", async (req, res) => {
           Authorization:
             "Basic " +
             Buffer.from(
-              `${process.env.FITBIT_CLIENT_ID}:${process.env.FITBIT_CLIENT_SECRET}`,
+              `${process.env.FITBIT_CLIENT_ID}:${process.env.FITBIT_CLIENT_SECRET}`
             ).toString("base64"),
         },
-      },
+      }
     );
     // const token_data = await Tokens.findOneAndDelete({
     //   userId: userId,
@@ -389,13 +403,13 @@ app.post("/revoke-fitbit-token", async (req, res) => {
     console.error(
       "Error exchanging code for tokens:",
       error.response?.data?.errors,
-      error.response,
+      error.response
     );
     res.status(500).send("something went terribly wrong");
   }
 });
 
-app.get("/fetch-spo2", async (req, res) => {
+app.get("/fetch-spo2-from-fitbit", async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
     return res
@@ -446,7 +460,7 @@ app.get("/fetch-spo2", async (req, res) => {
   }
 });
 
-app.get("/fetch-heart-rate", async (req, res) => {
+app.get("/fetch-heart-rate-from-fitbit", async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
     return res.status(400).json({
@@ -490,7 +504,7 @@ app.get("/fetch-heart-rate", async (req, res) => {
   }
 });
 
-app.get("/fetch-user-profile", async (req, res) => {
+app.get("/fetch-user-profile-from-fitbit", async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
     return res.status(400).json({
@@ -526,31 +540,56 @@ app.get("/fetch-user-profile", async (req, res) => {
 });
 
 // For Apple
-app.post("/apple-health-data", async (req, res) => {
+app.post("/apple-heartrate", async (req, res) => {
   try {
     if (
       !req.body.userId ||
-      req.body.heartRate === undefined ||
+      req.body.heartRate === undefined
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const appleHeartRate = new Vitals({
+      dateTime: new Date(),
+      device: "Apple",
+      metricType: "HeartRate",
+      value: req.body.heartRate
+    });
+    await appleHeartRate.save();
+    res
+      .status(201)
+      .json({ message: "Data saved successfully", data: appleHeartRate });
+  } catch (error) {
+    console.error("Failed to save health data", error);
+    res.status(500).json({ message: "Failed to save heart rate data" });
+  }
+});
+
+app.post("/apple-spo2", async (req, res) => {
+  try {
+    if (
+      !req.body.userId ||
       req.body.spo2 === undefined
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-    const newHealthData = new AppleHealthData({
-      userId: req.body.userId,
-      heartRate: req.body.heartRate,
-      spo2: req.body.spo2,
+    const applespo2 = new Vitals({
+      dateTime: new Date(),
+      device: "Apple",
+      metricType: "SpO2",
+      value: req.body.spo2
     });
-    await newHealthData.save();
+    await applespo2.save();
     res
       .status(201)
-      .json({ message: "Data saved successfully", data: newHealthData });
+      .json({ message: "Data saved successfully", data: applespo2 });
   } catch (error) {
     console.error("Failed to save health data", error);
-    res.status(500).json({ message: "Failed to save health data" });
+    res.status(500).json({ message: "Failed to save spo2 data" });
   }
 });
 
-app.get("/fetch-user-data", async (req, res) => {
+// For Editor RPM
+app.get("/fetch-user-spo2", async (req, res) => {
   const { userId, platform } = req.body;
 
   if (!userId || !platform) {
@@ -564,6 +603,7 @@ app.get("/fetch-user-data", async (req, res) => {
       case "Garmin":
         const garminVitals = await Vitals.find({
           userId,
+          metricType: "SpO2"
         }).sort({ createdAt: -1 });
         data = {
           vitals: garminVitals,
@@ -572,13 +612,62 @@ app.get("/fetch-user-data", async (req, res) => {
       case "FitBit":
         const fitbitVitals = await Vitals.find({
           userId,
+          metricType: "SpO2"
         }).sort({ createdAt: -1 });
         data = {
           vitals: fitbitVitals,
         };
         break;
       case "Apple":
-        const appleVitals = await Vitals.find({ userId }).sort({
+        const appleVitals = await Vitals.find({ userId,  metricType: "SpO2" }).sort({
+          createdAt: -1,
+        });
+        data = {
+          vitals: appleVitals,
+        };
+        break;
+
+      default:
+        return res.status(400).json({ message: "Invalid platform specified" });
+    }
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    res.status(500).json({ message: "Failed to fetch user data" });
+  }
+});
+
+app.get("/fetch-user-heartrate", async (req, res) => {
+  const { userId, platform } = req.body;
+
+  if (!userId || !platform) {
+    return res
+      .status(400)
+      .json({ message: "userId and platform are required" });
+  }
+
+  try {
+    switch (platform) {
+      case "Garmin":
+        const garminVitals = await Vitals.find({
+          userId,
+          metricType: "HeartRate"
+        }).sort({ createdAt: -1 });
+        data = {
+          vitals: garminVitals,
+        };
+        break;
+      case "FitBit":
+        const fitbitVitals = await Vitals.find({
+          userId,
+          metricType: "HeartRate"
+        }).sort({ createdAt: -1 });
+        data = {
+          vitals: fitbitVitals,
+        };
+        break;
+      case "Apple":
+        const appleVitals = await Vitals.find({ userId,  metricType: "HeartRate" }).sort({
           createdAt: -1,
         });
         data = {
@@ -597,5 +686,5 @@ app.get("/fetch-user-data", async (req, res) => {
 });
 
 app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`),
+  console.log(`Server running on http://localhost:${PORT}`)
 );
