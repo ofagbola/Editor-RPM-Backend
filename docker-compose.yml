@@ -1,17 +1,17 @@
 version: '3.9'
 
 services:
-  # envoy:
-  #   image: envoyproxy/envoy-alpine:v1.14-latest
-  #   container_name: envoy
-  #   volumes:
-  #     - ./envoy.yaml:/etc/envoy/envoy.yaml
-  #   ports:
-  #     - "8080:8080"
-  #     - "9901:9901"
-  #   command: ["envoy", "-c", "/etc/envoy/envoy.yaml"]
-  #   networks:
-  #     - auth_network
+  envoy:
+    image: envoyproxy/envoy-alpine:v1.14-latest
+    container_name: envoy
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    command: ["envoy", "-c", "/etc/envoy/envoy.yaml"]
+    networks:
+      - auth_network
   auth_db:
     image: postgres
     env_file:
@@ -29,8 +29,17 @@ services:
     depends_on:
       - auth_db
       - notification_service
+    develop:
+      watch:
+        - action: rebuild
+          path: "./auth/src/"
+          ignore:
+            - ./auth/node_modules/
+        - action: rebuild
+          path: "./auth/package.json"
     ports:
       - "4000:4000"
+      - "5770:5770"
     networks:
       - auth_network
   notification_db:
