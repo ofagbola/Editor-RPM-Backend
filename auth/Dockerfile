@@ -3,7 +3,8 @@
 
 FROM node:18.17.0
 
-
+# RUN useradd -ms /bin/sh -u 1001 app
+# USER app
 
 WORKDIR /usr/src/app
 
@@ -16,6 +17,7 @@ COPY package*.json ./
 
 RUN npm install
 
+# COPY --chown=app:app . .
 COPY . .
 
 
