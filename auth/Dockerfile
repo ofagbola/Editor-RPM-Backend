@@ -1,10 +1,5 @@
-
-
-
+# Build stage
 FROM node:18.17.0
-
-
-
 WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get upgrade -y && \
