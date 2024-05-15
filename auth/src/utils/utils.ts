@@ -98,7 +98,7 @@ export const comparePassword = async (
 export const jwtToken = async (payload: {
   [key: string]: any;
 }): Promise<string> => {
-  return await jwt.sign(payload, process.env!.JWTKEY ?? '');
+  return jwt.sign(payload, process.env!.JWTKEY ?? '');
 };
 
 export const jwtVerifyToken = async (

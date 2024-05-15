@@ -11,6 +11,7 @@ COPY package*.json ./
 
 RUN npm install
 
+# COPY --chown=app:app . .
 COPY . .
 
 

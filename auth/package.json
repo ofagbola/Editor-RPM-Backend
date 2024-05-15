@@ -10,6 +10,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/debug": "^4.1.12",
+    "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.9.1",
     "@types/otp-generator": "^4.0.2",
@@ -21,10 +22,13 @@
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "express": "^4.19.2",
     "google-protobuf": "^3.21.2",
+    "grpc-tools": "^1.12.4",
     "grpc-web": "^1.5.0",
     "joi": "^17.12.1",
     "jsonwebtoken": "^9.0.2",
+    "mailtrap": "3.3.0",
     "nocache": "^4.0.0",
     "nodemon": "^3.0.1",
     "otp-generator": "^4.0.1",
@@ -38,12 +42,16 @@
     "winston": "^3.11.0"
   },
   "scripts": {
-    "gen3": "protoc -I=$DIR ./src/protos/auth.proto --js_out=import_style=commonjs:generated --grpc-web_out=import_style=commonjs,mode=grpcwebtext:generated",
+    "gen3": "protoc --plugin=./node_modules/.bin/protoc-gen-grpc-web -I=./src/protos ./src/protos/auth.proto --js_out=import_style=commonjs:generated --grpc-web_out=import_style=commonjs,mode=grpcwebtext:generated",
     "gen2": "protoc --js_out=import_style=commonjs:. --plugin=./node_modules/.bin/protoc-gen-grpc-web  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:./ ./src/protos/auth.proto",
     "gen": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=. ./src/protos/auth.proto ",
     "build": "tsc",
     "build:clean": "rm -rf dist",
     "start": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node --esm ./src/server.ts\"",
     "start:watch": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node --esm ./src/server.ts\""
+  },
+  "devDependencies": {
+    "@types/google-protobuf": "^3.15.12",
+    "grpc_tools_node_protoc_ts": "^5.3.3"
   }
 }
