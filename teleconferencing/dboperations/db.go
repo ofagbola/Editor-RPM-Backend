@@ -63,10 +63,10 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 	// Get the current date
 	currentDate := time.Now().Truncate(24 * time.Hour)
 	// Convert message struct to JSON
-	messageJSON, errr := json.Marshal(message)
-	if errr != nil {
-		fmt.Println(errr)
-	}
+	// messageJSON, errr := json.Marshal(message)
+	// if errr != nil {
+	// 	fmt.Println(errr)
+	// }
 
 	// Check if a record exists for the given user_id_1 and user_id_2
 	var createdAt time.Time
@@ -111,7 +111,7 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 			// Unmarshal the existing message_array into a slice of Message structs
 			var existingMessages []models.Message
 			if unmarshal_err := json.Unmarshal(messageArray, &existingMessages); err != nil {
-				fmt.Println(unmarshal_err)
+				fmt.Println("unmarshal error: ",unmarshal_err)
 			}
 
 			// Append the new message to the existing messages
@@ -124,17 +124,23 @@ func SaveMessageToDb(db *sql.DB, message models.Message) error {
 			}
 
 			// Update the existing record by appending the current message
-			_, err := db.Exec("UPDATE chat SET message_array = message_array || $1, updated_at = $2 WHERE user_id_1 = $3 AND user_id_2 = $4",
+			_, err := db.Exec("UPDATE chat SET message_array = $1, updated_at = $2 WHERE user_id_1 = $3 AND user_id_2 = $4",
 				updatedMessageArray, time.Now(), message.SenderID, message.RecipientID)
 			if err != nil {
 				fmt.Println(err)
 			}
+
 			fmt.Println("Message appended to existing record.")
 		} else {
-			
+
+			var existingMessages []models.Message
+
+		// Append the new message to the existing messages
+		  existingMessages = append(existingMessages, message)
+
 			// Create a new record if the existing record is not for the current date
 			_, err := db.Exec("INSERT INTO chat (user_id_1, user_id_2, message_array, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)",
-				message.SenderID, message.RecipientID, messageJSON /* initial empty JSON array */, time.Now(), time.Now())
+				message.SenderID, message.RecipientID, existingMessages /* initial empty JSON array */, time.Now(), time.Now())
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -194,120 +200,164 @@ func FetchChatsList(user_id string) ([]*models.ChatMessage, error) {
 	defer rows.Close()
 
 	// Declare variables to hold JSON data
-	var messages []byte
+	var messages string
 	// Declare a variable to hold the unmarshaled JSON data
-	var jsonData interface{}
+	// var jsonData []map[string]interface{}
 
 	// Iterate over the rows
 	for rows.Next() {
-		var messageArray []map[string]interface{}
+	
 		var chatMsg models.ChatMessage
 		// Scan the message_array data into the messages variable
 		if err := rows.Scan(&messages); err != nil {
-			fmt.Println(err)
+			fmt.Println("message error:",err)
 		}
 
-		// Unmarshal the JSON data into the jsonData variable
-		if err := json.Unmarshal(messages, &jsonData); err != nil {
-			fmt.Println("Error unmarshaling JSON:", err)
-			continue // Skip to the next row
+		// // Unmarshal the JSON data into the jsonData variabl
+
+		// Unmarshal JSON data into a map
+		var rowMap []map[string]interface{}
+		if err := json.Unmarshal([]byte(messages), &rowMap); err != nil {
+			fmt.Println("unmarshal 1",err)
 		}
 
-		// Check the type of jsonData
-		switch data := jsonData.(type) {
-		case map[string]interface{}:
-			// It's a 1D array
-			fmt.Println("1D Array:", data)
-			var lastInnerArray map[string]interface{}
-			err := json.Unmarshal(messages, &lastInnerArray)
-			if err != nil {
-				fmt.Println("Error unmarshaling JSON:", err)
-				return nil, err
+		// Append the decoded map to the slice
+		// jsonData = append(jsonData, rowMap)
+		fmt.Println(rowMap)
+		// 	fmt.Println("Key-Value Pair Array:", data)
+	
+		lastInnerArray := rowMap[len(rowMap)-1]
+		// Map the fields from the map to the ChatMessage struct
+		for key, value := range lastInnerArray {
+			switch key {
+			case "call_duration":
+				chatMsg.CallDuration = int(value.(float64))
+			case "created_at":
+				chatMsg.CreatedAt = value.(string)
+			case "doc_or_attachment_id":
+				chatMsg.DocOrAttachmentID = int(value.(float64))
+			case "document_url":
+				chatMsg.DocumentURL = value.(string)
+			case "id_of_sender":
+				chatMsg.IDOfSender = int(value.(float64))
+			case "message_sent":
+				chatMsg.MessageSent = value.(string)
+			case "message_type":
+				chatMsg.MessageType = value.(string)
+			case "missed_call":
+				chatMsg.MissedCall = value.(bool)
+			case "missed_video_call":
+				chatMsg.MissedVideoCall = value.(bool)
+			case "read_at":
+				chatMsg.ReadAt = value.(string)
+			case "recipient_id":
+				chatMsg.RecipientID = int(value.(float64))
+			case "video_duration":
+				chatMsg.VideoDuration = int(value.(float64))
+			case "voice_record_id":
+				chatMsg.VoiceRecordID = int(value.(float64))
 			}
-			// Map the fields from the map to the ChatMessage struct
-			for key, value := range lastInnerArray {
-				switch key {
-				case "call_duration":
-					chatMsg.CallDuration = int(value.(float64))
-				case "created_at":
-					chatMsg.CreatedAt = value.(string)
-				case "doc_or_attachment_id":
-					chatMsg.DocOrAttachmentID = int(value.(float64))
-				case "document_url":
-					chatMsg.DocumentURL = value.(string)
-				case "id_of_sender":
-					chatMsg.IDOfSender = int(value.(float64))
-				case "message_sent":
-					chatMsg.MessageSent = value.(string)
-				case "message_type":
-					chatMsg.MessageType = value.(string)
-				case "missed_call":
-					chatMsg.MissedCall = value.(bool)
-				case "missed_video_call":
-					chatMsg.MissedVideoCall = value.(bool)
-				case "read_at":
-					chatMsg.ReadAt = value.(string)
-				case "recipient_id":
-					chatMsg.RecipientID = int(value.(float64))
-				case "video_duration":
-					chatMsg.VideoDuration = int(value.(float64))
-				case "voice_record_id":
-					chatMsg.VoiceRecordID = int(value.(float64))
-				}
-			}
-			// Print the length of the messageArray
-			fmt.Println("Length of messageArray:\n", chatMsg)
-			msgArrray = append(msgArrray, &chatMsg)
-		case []interface{}:
-			// It's a key-value pair array
-			fmt.Println("Key-Value Pair Array:", data)
-			// Unmarshal the JSON data into messageArray
-			err := json.Unmarshal(messages, &messageArray)
-			if err != nil {
-				fmt.Println("Error unmarshaling JSON:", err)
-				return nil, err
-			}
-			lastInnerArray := messageArray[len(messageArray)-1]
-			// Map the fields from the map to the ChatMessage struct
-			for key, value := range lastInnerArray {
-				switch key {
-				case "call_duration":
-					chatMsg.CallDuration = int(value.(float64))
-				case "created_at":
-					chatMsg.CreatedAt = value.(string)
-				case "doc_or_attachment_id":
-					chatMsg.DocOrAttachmentID = int(value.(float64))
-				case "document_url":
-					chatMsg.DocumentURL = value.(string)
-				case "id_of_sender":
-					chatMsg.IDOfSender = int(value.(float64))
-				case "message_sent":
-					chatMsg.MessageSent = value.(string)
-				case "message_type":
-					chatMsg.MessageType = value.(string)
-				case "missed_call":
-					chatMsg.MissedCall = value.(bool)
-				case "missed_video_call":
-					chatMsg.MissedVideoCall = value.(bool)
-				case "read_at":
-					chatMsg.ReadAt = value.(string)
-				case "recipient_id":
-					chatMsg.RecipientID = int(value.(float64))
-				case "video_duration":
-					chatMsg.VideoDuration = int(value.(float64))
-				case "voice_record_id":
-					chatMsg.VoiceRecordID = int(value.(float64))
-				}
-			}
-			// Print the length of the messageArray
-			fmt.Println("Length of messageArray:\n", chatMsg)
-			msgArrray = append(msgArrray, &chatMsg)
-		default:
-			// Unexpected data type
-			fmt.Println("Unexpected data type:", data)
 		}
-
+		// Print the length of the messageArray
+		fmt.Println("Length of messageArray:\n", chatMsg)
+		msgArrray = append(msgArrray, &chatMsg)
 	}
+	// Check the type of jsonData
+	// switch data := jsonData.(type) {
+	// case map[string]interface{}:
+	// It's a 1D array
+	// fmt.Println("1D Array:", data)
+	// var lastInnerArray map[string]interface{}
+	// err := json.Unmarshal(messages, &lastInnerArray)
+	// if err != nil {
+	// 	fmt.Println("Error unmarshaling JSON 2:", err)
+	// 	return nil, err
+	// }
+	// // Map the fields from the map to the ChatMessage struct
+	// for key, value := range lastInnerArray {
+	// 	switch key {
+	// 	case "call_duration":
+	// 		chatMsg.CallDuration = int(value.(float64))
+	// 	case "created_at":
+	// 		chatMsg.CreatedAt = value.(string)
+	// 	case "doc_or_attachment_id":
+	// 		chatMsg.DocOrAttachmentID = int(value.(float64))
+	// 	case "document_url":
+	// 		chatMsg.DocumentURL = value.(string)
+	// 	case "id_of_sender":
+	// 		chatMsg.IDOfSender = int(value.(float64))
+	// 	case "message_sent":
+	// 		chatMsg.MessageSent = value.(string)
+	// 	case "message_type":
+	// 		chatMsg.MessageType = value.(string)
+	// 	case "missed_call":
+	// 		chatMsg.MissedCall = value.(bool)
+	// 	case "missed_video_call":
+	// 		chatMsg.MissedVideoCall = value.(bool)
+	// 	case "read_at":
+	// 		chatMsg.ReadAt = value.(string)
+	// 	case "recipient_id":
+	// 		chatMsg.RecipientID = int(value.(float64))
+	// 	case "video_duration":
+	// 		chatMsg.VideoDuration = int(value.(float64))
+	// 	case "voice_record_id":
+	// 		chatMsg.VoiceRecordID = int(value.(float64))
+	// 	}
+	// }
+	// // Print the length of the messageArray
+	// fmt.Println("Length of messageArray:\n", chatMsg)
+	// msgArrray = append(msgArrray, &chatMsg)
+
+	// case []interface{}:
+	// 	// It's a key-value pair array
+	// 	fmt.Println("Key-Value Pair Array:", data)
+	// 	// Unmarshal the JSON data into messageArray
+	// 	err := json.Unmarshal(messages, &messageArray)
+	// 	if err != nil {
+	// 		fmt.Println("Error unmarshaling JSON:", err)
+	// 		return nil, err
+	// 	}
+	// 	lastInnerArray := messageArray[len(messageArray)-1]
+	// 	// Map the fields from the map to the ChatMessage struct
+	// 	for key, value := range lastInnerArray {
+	// 		switch key {
+	// 		case "call_duration":
+	// 			chatMsg.CallDuration = int(value.(float64))
+	// 		case "created_at":
+	// 			chatMsg.CreatedAt = value.(string)
+	// 		case "doc_or_attachment_id":
+	// 			chatMsg.DocOrAttachmentID = int(value.(float64))
+	// 		case "document_url":
+	// 			chatMsg.DocumentURL = value.(string)
+	// 		case "id_of_sender":
+	// 			chatMsg.IDOfSender = int(value.(float64))
+	// 		case "message_sent":
+	// 			chatMsg.MessageSent = value.(string)
+	// 		case "message_type":
+	// 			chatMsg.MessageType = value.(string)
+	// 		case "missed_call":
+	// 			chatMsg.MissedCall = value.(bool)
+	// 		case "missed_video_call":
+	// 			chatMsg.MissedVideoCall = value.(bool)
+	// 		case "read_at":
+	// 			chatMsg.ReadAt = value.(string)
+	// 		case "recipient_id":
+	// 			chatMsg.RecipientID = int(value.(float64))
+	// 		case "video_duration":
+	// 			chatMsg.VideoDuration = int(value.(float64))
+	// 		case "voice_record_id":
+	// 			chatMsg.VoiceRecordID = int(value.(float64))
+	// 		}
+	// 	}
+	// 	// Print the length of the messageArray
+	// 	fmt.Println("Length of messageArray:\n", chatMsg)
+	// 	msgArrray = append(msgArrray, &chatMsg)
+	// default:
+	// 	// Unexpected data type
+	// 	fmt.Println("Unexpected data type:", data)
+	// }
+
+	// }
 	return msgArrray, nil
 }
 

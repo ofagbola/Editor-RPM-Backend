@@ -3,7 +3,7 @@ CREATE TABLE chat (
    id SERIAL PRIMARY KEY,
    user_id_1 INTEGER NOT NULL,
    user_id_2 INTEGER NOT NULL,
-   message_array JSONB NOT NULL,
+   message_array JSON NOT NULL,
    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -39,3 +39,5 @@ CREATE TABLE clinicians (
 
 CREATE INDEX idx_user_id_1 ON chat (user_id_1);
 CREATE INDEX idx_user_id_2 ON chat (user_id_2);
+CREATE INDEX idx_created_at ON chat (created_at);
+CREATE INDEX idx_deleted ON file (deleted);
