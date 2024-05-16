@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package health_info;
+service HealthInfoService {
+  rpc SaveHealthData (HealthInfoRequest) returns (HealthInfoResponse) {}
+
+  rpc NotifyUser (HealthInfoRequest) returns (HealthInfoResponse) {}
+
+  rpc SendGarminToken (TokenRequest) returns (TokenResponse) {}
+
+}
+
+message HealthInfoRequest {
+string heartRate = 1;
+}
+
+message HealthInfoResponse {
+    bool status = 1;
+    string message = 2;
+    string heartRate = 3;
+}
+
+
+
+
+// The request message containing the user's ID and token.
+message GarminTokenRequest {
+  string userId = 1;
+  string accessToken = 2;
+}
+
+// The response message confirming the token was received.
+message GarminTokenResponse {
+  string message = 1;
+}
+
+// The request message for heart rate data.
+message GarminHeartRateRequest {
+  string userId = 1;
+}
+
+// The response message containing heart rate data.
+message GarminHeartRateResponse {
+  repeated int32 heartRates = 1;
+  repeated string timestamps = 2;
+}
