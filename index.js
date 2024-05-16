@@ -8,7 +8,7 @@ let openGlobal;
   const { default: open } = await import("open");
   openGlobal = open;
 })();
-const queryString = require("querystring");
+const querystring = require("querystring");
 
 const crypto = require("crypto");
 
@@ -33,49 +33,69 @@ function generateCodeChallenge(codeVerifier) {
 }
 
 function generateNonce(length = 32) {
-  return crypto.randomBytes(length).toString("hex");
+  return crypto.randomBytes(length).toString("hex").substr(0, length);
 }
 
-function generateSignature(
-  method,
-  url,
-  params,
-  consumerSecret,
-  tokenSecret = ""
-) {
-  // 1. Percent encode every key and value that will be signed
-  const encodedParams = Object.fromEntries(
-    Object.entries(params).map(([key, value]) => [
-      encodeURIComponent(key),
-      encodeURIComponent(value),
-    ])
-  );
+function generateTimestamp() {
+  return Math.floor(new Date().getTime() / 1000);
+}
 
-  // 2. Sort the list of parameters alphabetically [RFC 5849 Section 3.4.1.3.2]
-  const sortedParams = Object.keys(encodedParams)
-    .sort()
-    .reduce((obj, key) => {
-      obj[key] = encodedParams[key];
-      return obj;
-    }, {});
+// function generateSignature(
+//   method,
+//   url,
+//   params,
+//   consumerSecret,
+//   tokenSecret = ""
+// ) {
+//   // 1. Percent encode every key and value that will be signed
+//   const encodedParams = Object.fromEntries(
+//     Object.entries(params).map(([key, value]) => [
+//       encodeURIComponent(key),
+//       encodeURIComponent(value),
+//     ])
+//   );
 
-  // 3. Concatenate the request elements into a single string
-  const baseString = [
-    method.toUpperCase(),
-    encodeURIComponent(url),
-    encodeURIComponent(queryString.stringify(sortedParams)),
-  ].join("&");
+//   // 2. Sort the list of parameters alphabetically [RFC 5849 Section 3.4.1.3.2]
+//   const sortedParams = Object.keys(encodedParams)
+//     .sort()
+//     .reduce((obj, key) => {
+//       obj[key] = encodedParams[key];
+//       return obj;
+//     }, {});
 
-  // 4. Use the consumer secret and token secret to generate the signature
-  const signingKey = `${encodeURIComponent(
-    consumerSecret
-  )}&${encodeURIComponent(tokenSecret)}`;
-  const signature = crypto
+//   // 3. Concatenate the request elements into a single string
+//   const baseString = [
+//     method.toUpperCase(),
+//     encodeURIComponent(url),
+//     encodeURIComponent(queryString.stringify(sortedParams)),
+//   ].join("&");
+
+//   // 4. Use the consumer secret and token secret to generate the signature
+//   const signingKey = `${encodeURIComponent(
+//     consumerSecret
+//   )}&${encodeURIComponent(tokenSecret)}`;
+//   const signature = crypto
+//     .createHmac("sha1", signingKey)
+//     .update(baseString)
+//     .digest("base64");
+
+//   return signature;
+// }
+
+function generateSignature(method, url, params, consumerSecret) {
+  const paramString = querystring.stringify(params);
+  const baseString =
+    method.toUpperCase() +
+    "&" +
+    encodeURIComponent(url) +
+    "&" +
+    encodeURIComponent(paramString);
+
+  const signingKey = encodeURIComponent(consumerSecret) + "&";
+  return crypto
     .createHmac("sha1", signingKey)
     .update(baseString)
     .digest("base64");
-
-  return signature;
 }
 
 const { Vitals, Tokens, CodeStuff } = require("./models/HealthData");
@@ -101,31 +121,29 @@ mongoose
 
 app.use(express.json());
 
-
 // For Garmin
 app.post("/authorize-garmin", async (req, res) => {
   const url = "https://connectapi.garmin.com/oauth-service/oauth/request_token";
   const customerKey = process.env.GARMIN_CUSTOMER_KEY;
   const customerSecret = process.env.GARMIN_CUSTOMER_SECRET;
-  const tokenSecret = "";
   const nonce = generateNonce();
+  const timestamp = generateTimestamp();
 
   const params = {
     oauth_consumer_key: customerKey,
     oauth_nonce: nonce,
-    oauth_timestamp: Math.floor(Date.now() / 1000),
+    oauth_timestamp: timestamp,
     oauth_signature_method: "HMAC-SHA1",
     oauth_version: "1.0",
   };
 
-  const timestamp = Math.floor(Date.now() / 1000);
-  const signature = generateSignature(
-    "POST",
-    url,
-    params,
-    customerSecret,
-    tokenSecret
-  );
+  const signature = generateSignature("POST", url, params, customerSecret);
+
+  console.log("signature", signature);
+  console.log("url encoded", encodeURIComponent(signature));
+  console.log();
+  console.log();
+
   try {
     // Perform the OAuth request
 
@@ -142,10 +160,6 @@ app.post("/authorize-garmin", async (req, res) => {
         },
       }
     );
-
-    console.log("##########################################");
-    console.log("##########################################");
-
     console.log(authorizationHeader);
 
     console.log(response.data);
@@ -184,7 +198,7 @@ app.post("/garmin-callback", async (req, res) => {
   const customerSecret = process.env.GARMIN_CUSTOMER_SECRET;
   const oauth_verifier = req.query.oauth_verifier;
   const oauth_token = req.query.oauth_token;
-  const tokenSecret = "";
+  const oauth_token_secret = req.query.oauth_token_secret;
   const timestamp = Math.floor(Date.now() / 1000);
 
   const url = "https://connectapi.garmin.com/oauth-service/oauth/access_token";
@@ -203,11 +217,13 @@ app.post("/garmin-callback", async (req, res) => {
     url,
     params,
     customerSecret,
-    tokenSecret
+    oauth_token_secret
   );
 
   try {
-    const authorizationHeader = `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_consumer_key="${consumer_key}", oauth_token="${oauth_token}", oauth_timestamp="${timestamp}", oauth_verifier="${oauth_verifier}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
+    const authorizationHeader = `OAuth oauth_nonce="${nonce}", oauth_signature="${encodeURIComponent(
+      signature
+    )}", oauth_consumer_key="${consumer_key}", oauth_token="${oauth_token}", oauth_timestamp="${timestamp}", oauth_verifier="${oauth_verifier}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
 
     console.log(authorizationHeader);
 
@@ -277,7 +293,6 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
   }
 });
 
-
 // For FitBit
 app.get("/fitbit-callback", async (req, res) => {
   const code = req.query.code;
@@ -291,7 +306,7 @@ app.get("/fitbit-callback", async (req, res) => {
   try {
     const response = await axios.post(
       "https://api.fitbit.com/oauth2/token",
-      queryString.stringify({
+      querystring.stringify({
         clientId: process.env.FITBIT_CLIENT_ID,
         grant_type: "authorization_code",
         redirect_uri: process.env.CALLBACK_URL,
@@ -363,7 +378,7 @@ app.get("/authorize-fitbit", async (req, res) => {
     codeVerifier: codeVerifier,
   });
 
-  const authorizationUrl = `https://www.fitbit.com/oauth2/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=${scope}&prompt=${prompt}`;
+  const authorizationUrl = `https://www.fitbit.com/oauth2/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=${scope}`;
 
   res.json({
     authorization_link: authorizationUrl,
@@ -542,22 +557,35 @@ app.get("/fetch-user-profile-from-fitbit", async (req, res) => {
 // For Apple
 app.post("/apple-heartrate", async (req, res) => {
   try {
-    if (
-      !req.body.userId ||
-      req.body.heartRate === undefined
-    ) {
+    if (!req.body.userId || req.body.heartRate === undefined) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-    const appleHeartRate = new Vitals({
+
+    const appleHeartRate = req.body.heartRate;
+    let appleCows;
+    if (appleHeartRate <= 80) {
+      appleCows = 0;
+    } else if (appleHeartRate > 80 && appleHeartRate <= 100) {
+      appleCows = 1;
+    } else if (appleHeartRate > 100 && appleHeartRate <= 120) {
+      appleCows = 2;
+    } else if (appleHeartRate > 120) {
+      appleCows = 4;
+    } else {
+      appleCows = 0; // default case, though it's unnecessary here
+    }
+    const appleHeartRateData = new Vitals({
       dateTime: new Date(),
       device: "Apple",
       metricType: "HeartRate",
-      value: req.body.heartRate
+      value: req.body.heartRate,
+      cows: appleCows,
+      userId: req.body.userId,
     });
-    await appleHeartRate.save();
+    await appleHeartRateData.save();
     res
       .status(201)
-      .json({ message: "Data saved successfully", data: appleHeartRate });
+      .json({ message: "Data saved successfully", data: appleHeartRateData });
   } catch (error) {
     console.error("Failed to save health data", error);
     res.status(500).json({ message: "Failed to save heart rate data" });
@@ -566,17 +594,15 @@ app.post("/apple-heartrate", async (req, res) => {
 
 app.post("/apple-spo2", async (req, res) => {
   try {
-    if (
-      !req.body.userId ||
-      req.body.spo2 === undefined
-    ) {
+    if (!req.body.userId || req.body.spo2 === undefined) {
       return res.status(400).json({ message: "Missing required fields" });
     }
     const applespo2 = new Vitals({
       dateTime: new Date(),
       device: "Apple",
       metricType: "SpO2",
-      value: req.body.spo2
+      value: req.body.spo2,
+      userId: req.body.userId,
     });
     await applespo2.save();
     res
@@ -590,7 +616,7 @@ app.post("/apple-spo2", async (req, res) => {
 
 // For Editor RPM
 app.get("/fetch-user-spo2", async (req, res) => {
-  const { userId, platform } = req.body;
+  const { userId, platform } = req.query;
 
   if (!userId || !platform) {
     return res
@@ -599,11 +625,13 @@ app.get("/fetch-user-spo2", async (req, res) => {
   }
 
   try {
+    let data;
     switch (platform) {
       case "Garmin":
         const garminVitals = await Vitals.find({
           userId,
-          metricType: "SpO2"
+          metricType: "SpO2",
+          device: "Garmin",
         }).sort({ createdAt: -1 });
         data = {
           vitals: garminVitals,
@@ -612,14 +640,19 @@ app.get("/fetch-user-spo2", async (req, res) => {
       case "FitBit":
         const fitbitVitals = await Vitals.find({
           userId,
-          metricType: "SpO2"
+          metricType: "SpO2",
+          device: "FitBit",
         }).sort({ createdAt: -1 });
         data = {
           vitals: fitbitVitals,
         };
         break;
       case "Apple":
-        const appleVitals = await Vitals.find({ userId,  metricType: "SpO2" }).sort({
+        const appleVitals = await Vitals.find({
+          userId,
+          metricType: "SpO2",
+          device: "Apple",
+        }).sort({
           createdAt: -1,
         });
         data = {
@@ -638,7 +671,7 @@ app.get("/fetch-user-spo2", async (req, res) => {
 });
 
 app.get("/fetch-user-heartrate", async (req, res) => {
-  const { userId, platform } = req.body;
+  const { userId, platform } = req.query;
 
   if (!userId || !platform) {
     return res
@@ -647,11 +680,13 @@ app.get("/fetch-user-heartrate", async (req, res) => {
   }
 
   try {
+    let data;
     switch (platform) {
       case "Garmin":
         const garminVitals = await Vitals.find({
           userId,
-          metricType: "HeartRate"
+          metricType: "HeartRate",
+          device: "Garmin",
         }).sort({ createdAt: -1 });
         data = {
           vitals: garminVitals,
@@ -660,14 +695,19 @@ app.get("/fetch-user-heartrate", async (req, res) => {
       case "FitBit":
         const fitbitVitals = await Vitals.find({
           userId,
-          metricType: "HeartRate"
+          metricType: "HeartRate",
+          device: "FitBit",
         }).sort({ createdAt: -1 });
         data = {
           vitals: fitbitVitals,
         };
         break;
       case "Apple":
-        const appleVitals = await Vitals.find({ userId,  metricType: "HeartRate" }).sort({
+        const appleVitals = await Vitals.find({
+          userId,
+          metricType: "HeartRate",
+          device: "Apple",
+        }).sort({
           createdAt: -1,
         });
         data = {

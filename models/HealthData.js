@@ -20,6 +20,10 @@ const VitalsSchema = new Schema(
     maxValue: Number,
     avgValue: Number,
     additionalData: Map,
+    cows: {
+      type: String,
+      enum: [0,1,2,4]
+    }
   },
   { timestamps: true },
 );
