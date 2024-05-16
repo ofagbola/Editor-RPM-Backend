@@ -1,0 +1,102 @@
+
+# Authentication Documentation
+
+Services available and it's payload.
+
+
+# gRPC API Reference
+
+This document provides the gRPC API reference for the authentication service.
+
+### Auth Services
+```service
+service AuthServices  {
+   rpc PatientSignup(PatientSignupPayload) returns (Response){}
+   rpc ClinicianSignup(ClinicianSignupPayload) returns (Response){}
+   rpc Login(LoginPayload) returns (Response){}
+   rpc VerifyAccount(VerifyAccountPayload) returns (Response){}
+   rpc CreatePassword(CreatePasswordPayload) returns (Response){}
+   rpc VerifyOneTimePassword(VerifyOneTimePasswordPayload) returns (Response){}
+   rpc ForgotPassword(ForgotPayload) returns (Response){}
+   rpc ResetPassword(ResetPayload) returns (Response){}
+   rpc UpdateInsurance(InsurancePayload ) returns (Response){}
+}
+
+
+### Messages
+
+message PatientSignupPayload {
+   string first_name = 1;
+   string last_name = 2;
+   string email = 3;
+   string date_of_birth = 4;
+   string phone_number = 5;
+}
+
+message ClinicianSignupPayload {
+   string first_name = 1;
+   string last_name = 2;
+   string email = 3;
+   string location = 4;
+   repeated string credentials = 5;
+   string ethnicity = 6;
+   string gender = 7;
+   string language = 8;
+   repeated string specialties = 9;
+   string image = 10;
+   string clinic_name = 11;
+   string clinic_id = 12;
+   bool accept_patient = 13;
+   string phone_number = 14;
+}
+
+
+message LoginPayload {
+   string email = 1;
+   string password = 2;
+}
+
+
+message CreatePasswordPayload {
+   string password = 1;
+   string email = 2;
+}
+
+message VerifyAccountPayload {
+   string code = 1;
+   string email = 2;
+}
+
+message VerifyOneTimePasswordPayload {
+   string code = 1;
+   string email = 2;
+}
+
+message ForgotPayload {
+   string email = 1;
+}
+
+
+message ResetPayload {
+   string new_password = 1;
+   string email = 2;
+}
+
+
+
+message InsurancePayload {
+   repeated string medicalHistory = 1;
+   string provider = 2;
+   string out_of_network_expenses = 3;
+   string co_pay = 4;
+   string out_of_pocket_expenses = 5;
+   string email = 6;
+}
+
+
+
+message Response{
+   string message = 1;
+   int32 statusCode = 2;
+   string data = 3;
+}

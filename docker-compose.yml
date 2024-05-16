@@ -1,27 +1,98 @@
-version: '3.8'
-services:
-  app:
-    container_name: editor-rpm-backend
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - MONGO_URI=mongodb://mongo:27017/mydatabase
-    depends_on:
-      - mongo
+version: '3.9'
 
-  mongo:
-    container_name: mongodb
+services:
+  envoy:
+    image: envoyproxy/envoy-alpine:v1.14-latest
+    container_name: envoy
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    command: ["envoy", "-c", "/etc/envoy/envoy.yaml"]
+    networks:
+      - auth_network
+  auth_db:
+    image: postgres
+    env_file:
+       - ./auth/.env
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata2:/var/lib/postgresql/data
+      - ./auth/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - auth_network
+  auth_service:
+    build:
+      context: ./auth
+    depends_on:
+      - auth_db
+      - notification_service
+    develop:
+      watch:
+        - action: rebuild
+          path: "./auth/src/"
+          ignore:
+            - ./auth/node_modules/
+        - action: rebuild
+          path: "./auth/package.json"
+    ports:
+      - "4000:4000"
+      - "5770:5770"
+    networks:
+      - auth_network
+  notification_db:
     image: mongo:latest
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongodb_data:/data/db
+    env_file:
+       - ./notification/.env
+    networks:
+      - auth_network
+  notification_service:
+    build:
+      context: ./notification
+    depends_on:
+      - notification_db
+    ports:
+      - "3000:3000"
+    networks:
+      - auth_network
+  questionnaire_db:
+    image: postgres:16-alpine
+    env_file:
+       - ./questionnaire/app.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - data-questionnaire-volume:/var/lib/postgresql/data
+    networks:
+      - questionnaire-network      
+  questionnaire_service:
+    build:
+      context: ./questionnaire
+    ports:
+      - "8085:8085"
+      - "9091:9091"
+    networks:
+      - questionnaire-network
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
-      - MONGO_INITDB_DATABASE=mydatabase
+      - DB_SOURCE=postgresql://root:hush@questionnaire_db:5432/questionnaire_service_db?sslmode=disable
+    depends_on:
+      - questionnaire_db
+    entrypoint: ["/app/wait-for.sh", "questionnaire_db:5432", "--", "/app/start.sh"]
+    command: [ "/app/main" ]
 
+networks:
+  auth_network:
+    driver: bridge
+  questionnaire-network:
+    driver: bridge  
 volumes:
-  mongo-data:
+  pgdata2:
+  mongodb_data:
+  data-volume:
+  data-questionnaire-volume:
