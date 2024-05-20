@@ -1,11 +1,5 @@
-
-
-
+# Build stage
 FROM node:18.17.0
-
-# RUN useradd -ms /bin/sh -u 1001 app
-# USER app
-
 WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get upgrade -y && \

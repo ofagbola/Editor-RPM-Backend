@@ -22,3 +22,4 @@ TODO
 - prevent duplicate notifications
 - integrate with auth & notification service
 
+<!-- MIGRATION_URL=file://app/db/migration -->
