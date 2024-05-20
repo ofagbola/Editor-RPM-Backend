@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   envoy:
     image: envoyproxy/envoy-alpine:v1.14-latest
@@ -85,14 +83,41 @@ services:
       - questionnaire_db
     entrypoint: ["/app/wait-for.sh", "questionnaire_db:5432", "--", "/app/start.sh"]
     command: [ "/app/main" ]
+  scheduler_db:
+    image: postgres:16-alpine
+    env_file:
+       - ./scheduler/app.env
+    ports:
+      - "5423:5432"
+    volumes:
+      - data-scheduler-volume:/var/lib/postgresql/data
+    networks:
+      - scheduler-network      
+  scheduler_service:
+    build:
+      context: ./scheduler
+    ports:
+      - "8082:8082"
+      - "9090:9090"
+    networks:
+      - scheduler-network
+    environment:
+      - DB_SOURCE=postgresql://root:hush@scheduler_db:5432/scheduler_service_db?sslmode=disable
+    depends_on:
+      - scheduler_db
+    entrypoint: ["/app/wait-for.sh", "scheduler_db:5432", "--", "/app/start.sh"]
+    command: [ "/app/main" ]
 
 networks:
   auth_network:
     driver: bridge
   questionnaire-network:
     driver: bridge  
+  scheduler-network:
+    driver: bridge      
 volumes:
   pgdata2:
   mongodb_data:
   data-volume:
   data-questionnaire-volume:
+  data-scheduler-volume:
