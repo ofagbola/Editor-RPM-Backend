@@ -1,20 +1,21 @@
 CREATE TABLE "users" (
-  "email" varchar UNIQUE NOT NULL,
   "username" varchar PRIMARY KEY,
+  "email" varchar UNIQUE NOT NULL,
+  "role" varchar NOT NULL DEFAULT 'patient',
   "first_name" varchar NOT NULL,
   "last_name" varchar NOT NULL,
-  "dob" date,
+  "dob" date NOT NULL,
   "gender" varchar NOT NULL,
   "location" varchar NOT NULL,
   "language" varchar NOT NULL,
   "ethnicity" varchar NOT NULL,
-  "is_email_verified" boolean NOT NULL DEFAULT false,
+  "hashed_password" varchar NOT NULL,
+  "is_email_verified" bool NOT NULL DEFAULT false,
   "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
-  "role" varchar NOT NULL DEFAULT 'patient',
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "patient_insurance" (
+CREATE TABLE "patients" (
   "id" uuid PRIMARY KEY,
   "username" varchar NOT NULL,
   "medical_history" varchar[] NOT NULL,
@@ -25,7 +26,7 @@ CREATE TABLE "patient_insurance" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "clinician" (
+CREATE TABLE "clinicians" (
   "id" uuid PRIMARY KEY,
   "username" varchar NOT NULL,
   "credentials" varchar[] NOT NULL,
@@ -51,17 +52,16 @@ CREATE TABLE "sessions" (
 CREATE TABLE "verify_emails" (
   "id" uuid PRIMARY KEY,
   "username" varchar NOT NULL,
-  "refresh_token" varchar NOT NULL,
-  "user_agent" varchar NOT NULL,
-  "client_ip" varchar NOT NULL,
-  "is_blocked" boolean NOT NULL DEFAULT false,
-  "expires_at" timestamptz NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT (now())
+  "email" varchar NOT NULL,
+  "secret_code" varchar NOT NULL,
+  "is_used" boolean NOT NULL DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "expires_at" timestamptz NOT NULL DEFAULT (now() + interval '15 minutes')
 );
 
-ALTER TABLE "patient_insurance" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+ALTER TABLE "patients" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
-ALTER TABLE "clinician" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+ALTER TABLE "clinicians" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "sessions" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
