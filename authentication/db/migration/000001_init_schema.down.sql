@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS patient_insurance;
+DROP TABLE IF EXISTS clinician;
+DROP TABLE IF EXISTS verify_emails;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;
