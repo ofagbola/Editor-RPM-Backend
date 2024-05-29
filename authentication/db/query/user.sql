@@ -24,6 +24,9 @@ WHERE username = $1 LIMIT 1;
 UPDATE users
 SET
   hashed_password = COALESCE(sqlc.narg(hashed_password), hashed_password),
+  password_changed_at = COALESCE(sqlc.narg(password_changed_at), password_changed_at),
+  first_name = COALESCE(sqlc.narg(first_name), first_name),
+  last_name = COALESCE(sqlc.narg(last_name), last_name),
   location = COALESCE(sqlc.narg(location), location),
   email = COALESCE(sqlc.narg(email), email),
   is_email_verified = COALESCE(sqlc.narg(is_email_verified), is_email_verified)

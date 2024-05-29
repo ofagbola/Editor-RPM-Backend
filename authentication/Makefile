@@ -11,8 +11,19 @@ createdb:
 	docker exec -it authentication-service-postgres-container createdb --username=root --owner=root authentication_service_db
 dropdb:
 	docker exec -it authentication-service-postgres-container dropdb authentication_service_db	
+migrateup1:
+	migrate -path db/migration -database "$(DB_URL)" -verbose up 1
+
+migratedown1:
+	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
+db_docs:
+	dbdocs build doc/db.dbml
+db_schema:
+	dbml2sql --postgres -o doc/schema.sql doc/db.dbml
 sqlc:
 	sqlc generate	
+redis:
+	docker run --name redis -p 6379:6379 -d redis:7.2-alpine
 network: 
 	docker network create authentication-network
 createContainer:
@@ -32,4 +43,4 @@ proto:
 server:
 	go run main.go
 
-.PHONY: postgres createdb dropdb migrateup migratedown new_migration sqlc proto server
+.PHONY: postgres createdb dropdb migrateup migratedown new_migration sqlc proto server migratedown1 migrateup1 db_docs db_schema redis

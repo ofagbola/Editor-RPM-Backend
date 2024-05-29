@@ -4,7 +4,7 @@ CREATE TABLE "users" (
   "role" varchar NOT NULL DEFAULT 'patient',
   "first_name" varchar NOT NULL,
   "last_name" varchar NOT NULL,
-  "dob" date NOT NULL,
+  "dob" varchar NOT NULL,
   "gender" varchar NOT NULL,
   "location" varchar NOT NULL,
   "language" varchar NOT NULL,
