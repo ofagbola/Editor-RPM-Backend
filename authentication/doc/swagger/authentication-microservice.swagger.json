@@ -1,0 +1,716 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Editor RPM API",
+    "version": "1.0",
+    "contact": {
+      "name": "Editor RPM",
+      "url": "https://github.com/ofagbola/Editor-RPM-Backend/authentication",
+      "email": "it@evonmedics.org"
+    }
+  },
+  "tags": [
+    {
+      "name": "AuthenticationService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/create_clinician": {
+      "post": {
+        "summary": "Create new clinician",
+        "description": "Use this API to create a new clinician",
+        "operationId": "AuthenticationService_CreateClinician",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateClinicianResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateClinicianRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/create_patient": {
+      "post": {
+        "summary": "Create new patient",
+        "description": "Use this API to create a new patient",
+        "operationId": "AuthenticationService_CreatePatient",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreatePatientResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreatePatientRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/create_user": {
+      "post": {
+        "summary": "Create new user",
+        "description": "Use this API to create a new user",
+        "operationId": "AuthenticationService_CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/login_user": {
+      "post": {
+        "summary": "Login user",
+        "description": "Use this API to login user and get access token \u0026 refresh token",
+        "operationId": "AuthenticationService_LoginUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbLoginUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbLoginUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/update_clinician": {
+      "patch": {
+        "summary": "Update clinician",
+        "description": "Use this API to update clinician",
+        "operationId": "AuthenticationService_UpdateClinician",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUpdateClinicianResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbUpdateClinicianRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/update_patient": {
+      "patch": {
+        "summary": "Update patient",
+        "description": "Use this API to update patient",
+        "operationId": "AuthenticationService_UpdatePatient",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUpdatePatientResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbUpdatePatientRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/update_user": {
+      "patch": {
+        "summary": "Update user",
+        "description": "Use this API to update user",
+        "operationId": "AuthenticationService_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUpdateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbUpdateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/verify_email": {
+      "get": {
+        "summary": "Verify email",
+        "description": "Use this API to verify user's email address",
+        "operationId": "AuthenticationService_VerifyEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbVerifyEmailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "emailId",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "secretCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "pbClinician": {
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "specialities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clinicName": {
+          "type": "string"
+        },
+        "clinicId": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "acceptPatient": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbCreateClinicianRequest": {
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "specialities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clinicName": {
+          "type": "string"
+        },
+        "clinicId": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "acceptPatient": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbCreateClinicianResponse": {
+      "type": "object",
+      "properties": {
+        "clinician": {
+          "$ref": "#/definitions/pbClinician"
+        }
+      }
+    },
+    "pbCreatePatientRequest": {
+      "type": "object",
+      "properties": {
+        "medicalHistory": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provider": {
+          "type": "string"
+        },
+        "outOfNetworkExpenses": {
+          "type": "string"
+        },
+        "outOfPocketExpenses": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "coPay": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreatePatientResponse": {
+      "type": "object",
+      "properties": {
+        "patient": {
+          "$ref": "#/definitions/pbPatient"
+        }
+      }
+    },
+    "pbCreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "ethnicity": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
+        }
+      }
+    },
+    "pbLoginUserRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "pbLoginUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "accessTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "refreshTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbPatient": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "medicalHistory": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provider": {
+          "type": "string"
+        },
+        "outOfNetworkExpenses": {
+          "type": "string"
+        },
+        "outOfPocketExpenses": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "coPay": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbUpdateClinicianRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "credentials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "specialities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clinicName": {
+          "type": "string"
+        },
+        "clinicId": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "acceptPatient": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbUpdateClinicianResponse": {
+      "type": "object",
+      "properties": {
+        "clinician": {
+          "$ref": "#/definitions/pbClinician"
+        }
+      }
+    },
+    "pbUpdatePatientRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "medicalHistory": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provider": {
+          "type": "string"
+        },
+        "outOfNetworkExpenses": {
+          "type": "string"
+        },
+        "outOfPocketExpenses": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "coPay": {
+          "type": "string"
+        }
+      }
+    },
+    "pbUpdatePatientResponse": {
+      "type": "object",
+      "properties": {
+        "patient": {
+          "$ref": "#/definitions/pbPatient"
+        }
+      }
+    },
+    "pbUpdateUserRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        }
+      }
+    },
+    "pbUpdateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
+        }
+      }
+    },
+    "pbUser": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "ethnicity": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "passwordChangedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbVerifyEmailResponse": {
+      "type": "object",
+      "properties": {
+        "isVerified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

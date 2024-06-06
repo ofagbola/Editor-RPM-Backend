@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+import "rpc_create_user.proto";
+import "rpc_update_user.proto";
+import "rpc_create_clinician.proto";
+import "rpc_update_clinician.proto";
+import "rpc_create_patient.proto";
+import "rpc_update_patient.proto";
+import "rpc_login_user.proto";
+import "rpc_verify_email.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Editor RPM API";
+        version: "1.0";
+        contact: {
+            name: "Editor RPM";
+            url: "https://github.com/ofagbola/Editor-RPM-Backend/authentication";
+            email: "it@evonmedics.org";
+        };
+    };
+};
+
+service AuthenticationService {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/create_user"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create a new user";
+            summary: "Create new user";
+        };
+    }
+    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+        option (google.api.http) = {
+            patch: "/v1/update_user"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to update user";
+            summary: "Update user";
+        };
+    }
+    rpc CreateClinician (CreateClinicianRequest) returns (CreateClinicianResponse) {
+        option (google.api.http) = {
+            post: "/v1/create_clinician"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create a new clinician";
+            summary: "Create new clinician";
+        };
+    }
+    rpc UpdateClinician (UpdateClinicianRequest) returns (UpdateClinicianResponse) {
+        option (google.api.http) = {
+            patch: "/v1/update_clinician"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to update clinician";
+            summary: "Update clinician";
+        };
+    }
+    rpc CreatePatient (CreatePatientRequest) returns (CreatePatientResponse) {
+        option (google.api.http) = {
+            post: "/v1/create_patient"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create a new patient";
+            summary: "Create new patient";
+        };
+    }
+    rpc UpdatePatient (UpdatePatientRequest) returns (UpdatePatientResponse) {
+        option (google.api.http) = {
+            patch: "/v1/update_patient"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to update patient";
+            summary: "Update patient";
+        };
+    }
+    rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/login_user"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to login user and get access token & refresh token";
+            summary: "Login user";
+        };
+    }
+    rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
+        option (google.api.http) = {
+            get: "/v1/verify_email"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to verify user's email address";
+            summary: "Verify email";
+        };
+    }
+}

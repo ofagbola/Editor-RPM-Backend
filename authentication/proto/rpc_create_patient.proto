@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pb;
+
+import "patient.proto";
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+message CreatePatientRequest {
+    repeated string medical_history = 1;
+    string provider = 2;
+    string out_of_network_expenses = 3;
+    string out_of_pocket_expenses = 4;
+    string image = 5;
+    string co_pay = 6;
+}
+
+message CreatePatientResponse {
+    Patient patient = 1;
+}  

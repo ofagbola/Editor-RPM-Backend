@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb;
+
+import "user.proto";
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+message UpdateUserRequest {
+    string username = 1;
+    optional string email = 2;
+    optional string password = 3;
+    optional string first_name = 4;
+    optional string last_name = 5;
+    optional string location = 6;
+}
+
+message UpdateUserResponse {
+    User user = 1;
+}
