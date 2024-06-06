@@ -17,25 +17,25 @@ INSERT INTO clinicians (
   id,  
   username,
   credentials,
-  specialties,
+  specialities,
   clinic_name,
   clinic_id,
   image,
   accept_patient
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8
-) RETURNING id, username, credentials, specialties, clinic_name, clinic_id, image, accept_patient, created_at
+) RETURNING id, username, credentials, specialities, clinic_name, clinic_id, image, accept_patient, created_at
 `
 
 type CreateClinicianParams struct {
-	ID            uuid.UUID   `json:"id"`
-	Username      string      `json:"username"`
-	Credentials   []string    `json:"credentials"`
-	Specialties   []string    `json:"specialties"`
-	ClinicName    string      `json:"clinic_name"`
-	ClinicID      string      `json:"clinic_id"`
-	Image         pgtype.Text `json:"image"`
-	AcceptPatient bool        `json:"accept_patient"`
+	ID            uuid.UUID `json:"id"`
+	Username      string    `json:"username"`
+	Credentials   []string  `json:"credentials"`
+	Specialities  []string  `json:"specialities"`
+	ClinicName    string    `json:"clinic_name"`
+	ClinicID      string    `json:"clinic_id"`
+	Image         string    `json:"image"`
+	AcceptPatient bool      `json:"accept_patient"`
 }
 
 func (q *Queries) CreateClinician(ctx context.Context, arg CreateClinicianParams) (Clinician, error) {
@@ -43,7 +43,7 @@ func (q *Queries) CreateClinician(ctx context.Context, arg CreateClinicianParams
 		arg.ID,
 		arg.Username,
 		arg.Credentials,
-		arg.Specialties,
+		arg.Specialities,
 		arg.ClinicName,
 		arg.ClinicID,
 		arg.Image,
@@ -54,7 +54,7 @@ func (q *Queries) CreateClinician(ctx context.Context, arg CreateClinicianParams
 		&i.ID,
 		&i.Username,
 		&i.Credentials,
-		&i.Specialties,
+		&i.Specialities,
 		&i.ClinicName,
 		&i.ClinicID,
 		&i.Image,
@@ -65,7 +65,7 @@ func (q *Queries) CreateClinician(ctx context.Context, arg CreateClinicianParams
 }
 
 const getClinician = `-- name: GetClinician :one
-SELECT id, username, credentials, specialties, clinic_name, clinic_id, image, accept_patient, created_at FROM clinicians
+SELECT id, username, credentials, specialities, clinic_name, clinic_id, image, accept_patient, created_at FROM clinicians
 WHERE username = $1 LIMIT 1
 `
 
@@ -76,7 +76,7 @@ func (q *Queries) GetClinician(ctx context.Context, username string) (Clinician,
 		&i.ID,
 		&i.Username,
 		&i.Credentials,
-		&i.Specialties,
+		&i.Specialities,
 		&i.ClinicName,
 		&i.ClinicID,
 		&i.Image,
@@ -90,36 +90,42 @@ const updateClinician = `-- name: UpdateClinician :one
 UPDATE clinicians
 SET
   credentials = COALESCE($1, credentials),
-  specialties = COALESCE($2, specialties),
+  specialities = COALESCE($2, specialities),
   clinic_name = COALESCE($3, clinic_name),
-  clinic_id = COALESCE($4, clinic_id)
+  clinic_id = COALESCE($4, clinic_id),
+  accept_patient = COALESCE($5, accept_patient),
+  image = COALESCE($6, image)
 WHERE
-  username = $5
-RETURNING id, username, credentials, specialties, clinic_name, clinic_id, image, accept_patient, created_at
+  username = $7
+RETURNING id, username, credentials, specialities, clinic_name, clinic_id, image, accept_patient, created_at
 `
 
 type UpdateClinicianParams struct {
-	Credentials []string    `json:"credentials"`
-	Specialties []string    `json:"specialties"`
-	ClinicName  pgtype.Text `json:"clinic_name"`
-	ClinicID    pgtype.Text `json:"clinic_id"`
-	Username    string      `json:"username"`
+	Credentials   []string    `json:"credentials"`
+	Specialities  []string    `json:"specialities"`
+	ClinicName    pgtype.Text `json:"clinic_name"`
+	ClinicID      pgtype.Text `json:"clinic_id"`
+	AcceptPatient pgtype.Bool `json:"accept_patient"`
+	Image         pgtype.Text `json:"image"`
+	Username      string      `json:"username"`
 }
 
 func (q *Queries) UpdateClinician(ctx context.Context, arg UpdateClinicianParams) (Clinician, error) {
 	row := q.db.QueryRow(ctx, updateClinician,
 		arg.Credentials,
-		arg.Specialties,
+		arg.Specialities,
 		arg.ClinicName,
 		arg.ClinicID,
+		arg.AcceptPatient,
+		arg.Image,
 		arg.Username,
 	)
 	var i Clinician
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Username, 
 		&i.Credentials,
-		&i.Specialties,
+		&i.Specialities,
 		&i.ClinicName,
 		&i.ClinicID,
 		&i.Image,

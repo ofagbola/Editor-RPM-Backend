@@ -10,10 +10,11 @@ INSERT INTO users (
   language,
   ethnicity,
   role,
+  phone_number,
   hashed_password,
   is_email_verified
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
 ) RETURNING *;
 
 -- name: GetUser :one

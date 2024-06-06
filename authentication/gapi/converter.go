@@ -22,3 +22,27 @@ func convertUser(user db.User) *pb.User {
 		CreatedAt:         timestamppb.New(user.CreatedAt),
 	}
 }
+
+func convertPatient(patient db.Patient) *pb.Patient {
+	return &pb.Patient{
+		MedicalHistory:       patient.MedicalHistory,
+		Provider:             patient.Provider,
+		OutOfNetworkExpenses: patient.OutOfNetworkExpenses,
+		OutOfPocketExpenses:  patient.OutOfPocketExpenses,
+		Image:                patient.Image,
+		CoPay:                patient.CoPay,
+		CreatedAt:            timestamppb.New(patient.CreatedAt),
+	}
+}
+
+func convertClinician(clinician db.Clinician) *pb.Clinician {
+	return &pb.Clinician{
+		Credentials:   clinician.Credentials,
+		Specialities:  clinician.Specialities,
+		ClinicName:    clinician.ClinicName,
+		ClinicId:      clinician.ClinicID,
+		Image:         clinician.Image,
+		AcceptPatient: clinician.AcceptPatient,
+		CreatedAt:     timestamppb.New(clinician.CreatedAt),
+	}
+}

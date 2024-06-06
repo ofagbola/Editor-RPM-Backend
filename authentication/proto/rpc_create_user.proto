@@ -16,7 +16,8 @@ message CreateUserRequest {
     string location = 8;
     string language = 9;
     string ethnicity = 10;
-    string password = 11;
+    string phone_number = 11;
+    string password = 12;
 }
 
 message CreateUserResponse {

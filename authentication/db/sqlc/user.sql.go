@@ -23,11 +23,12 @@ INSERT INTO users (
   language,
   ethnicity,
   role,
+  phone_number,
   hashed_password,
   is_email_verified
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
-) RETURNING username, email, role, first_name, last_name, dob, gender, location, language, ethnicity, hashed_password, is_email_verified, password_changed_at, created_at
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+) RETURNING username, email, role, first_name, last_name, dob, gender, location, language, ethnicity, phone_number, hashed_password, is_email_verified, password_changed_at, created_at
 `
 
 type CreateUserParams struct {
@@ -41,6 +42,7 @@ type CreateUserParams struct {
 	Language        string `json:"language"`
 	Ethnicity       string `json:"ethnicity"`
 	Role            string `json:"role"`
+	PhoneNumber     string `json:"phone_number"`
 	HashedPassword  string `json:"hashed_password"`
 	IsEmailVerified bool   `json:"is_email_verified"`
 }
@@ -57,6 +59,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Language,
 		arg.Ethnicity,
 		arg.Role,
+		arg.PhoneNumber,
 		arg.HashedPassword,
 		arg.IsEmailVerified,
 	)
@@ -72,6 +75,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Location,
 		&i.Language,
 		&i.Ethnicity,
+		&i.PhoneNumber,
 		&i.HashedPassword,
 		&i.IsEmailVerified,
 		&i.PasswordChangedAt,
@@ -81,7 +85,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUser = `-- name: GetUser :one
-SELECT username, email, role, first_name, last_name, dob, gender, location, language, ethnicity, hashed_password, is_email_verified, password_changed_at, created_at FROM users
+SELECT username, email, role, first_name, last_name, dob, gender, location, language, ethnicity, phone_number, hashed_password, is_email_verified, password_changed_at, created_at FROM users
 WHERE username = $1 LIMIT 1
 `
 
@@ -99,6 +103,7 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.Location,
 		&i.Language,
 		&i.Ethnicity,
+		&i.PhoneNumber,
 		&i.HashedPassword,
 		&i.IsEmailVerified,
 		&i.PasswordChangedAt,
@@ -119,7 +124,7 @@ SET
   is_email_verified = COALESCE($7, is_email_verified)
 WHERE
   username = $8
-RETURNING username, email, role, first_name, last_name, dob, gender, location, language, ethnicity, hashed_password, is_email_verified, password_changed_at, created_at
+RETURNING username, email, role, first_name, last_name, dob, gender, location, language, ethnicity, phone_number, hashed_password, is_email_verified, password_changed_at, created_at
 `
 
 type UpdateUserParams struct {
@@ -156,6 +161,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Location,
 		&i.Language,
 		&i.Ethnicity,
+		&i.PhoneNumber,
 		&i.HashedPassword,
 		&i.IsEmailVerified,
 		&i.PasswordChangedAt,

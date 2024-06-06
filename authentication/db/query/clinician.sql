@@ -3,7 +3,7 @@ INSERT INTO clinicians (
   id,  
   username,
   credentials,
-  specialties,
+  specialities,
   clinic_name,
   clinic_id,
   image,
@@ -20,9 +20,11 @@ WHERE username = $1 LIMIT 1;
 UPDATE clinicians
 SET
   credentials = COALESCE(sqlc.narg(credentials), credentials),
-  specialties = COALESCE(sqlc.narg(specialties), specialties),
+  specialities = COALESCE(sqlc.narg(specialities), specialities),
   clinic_name = COALESCE(sqlc.narg(clinic_name), clinic_name),
-  clinic_id = COALESCE(sqlc.narg(clinic_id), clinic_id)
+  clinic_id = COALESCE(sqlc.narg(clinic_id), clinic_id),
+  accept_patient = COALESCE(sqlc.narg(accept_patient), accept_patient),
+  image = COALESCE(sqlc.narg(image), image)
 WHERE
   username = sqlc.arg(username)
-RETURNING *;
+RETURNING *; 

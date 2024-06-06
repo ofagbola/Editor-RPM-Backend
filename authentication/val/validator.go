@@ -8,7 +8,7 @@ import (
 
 var (
 	isValidUsername = regexp.MustCompile(`^[a-z0-9_]+$`).MatchString
-	isValidFirstName = regexp.MustCompile(`^[a-zA-Z\s]+$`).MatchString
+	isValidName = regexp.MustCompile(`^[a-zA-Z\s]+$`).MatchString
 	isValidPhoneNumber = regexp.MustCompile(`^\+(?:[0-9] ?){6,14}[0-9]$`).MatchString
 )
 
@@ -30,11 +30,11 @@ func ValidateUsername(value string) error {
 	return nil
 }
 
-func ValidateFirstName(value string) error {
+func ValidateName(value string) error {
 	if err := ValidateString(value, 3, 100); err != nil {
 		return err
 	}
-	if !isValidFirstName(value) {
+	if !isValidName(value) {
 		return fmt.Errorf("must contain only letters or spaces")
 	}
 	return nil

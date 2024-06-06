@@ -19,10 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AuthenticationService_CreateUser_FullMethodName  = "/pb.AuthenticationService/CreateUser"
-	AuthenticationService_UpdateUser_FullMethodName  = "/pb.AuthenticationService/UpdateUser"
-	AuthenticationService_LoginUser_FullMethodName   = "/pb.AuthenticationService/LoginUser"
-	AuthenticationService_VerifyEmail_FullMethodName = "/pb.AuthenticationService/VerifyEmail"
+	AuthenticationService_CreateUser_FullMethodName      = "/pb.AuthenticationService/CreateUser"
+	AuthenticationService_UpdateUser_FullMethodName      = "/pb.AuthenticationService/UpdateUser"
+	AuthenticationService_CreateClinician_FullMethodName = "/pb.AuthenticationService/CreateClinician"
+	AuthenticationService_UpdateClinician_FullMethodName = "/pb.AuthenticationService/UpdateClinician"
+	AuthenticationService_CreatePatient_FullMethodName   = "/pb.AuthenticationService/CreatePatient"
+	AuthenticationService_UpdatePatient_FullMethodName   = "/pb.AuthenticationService/UpdatePatient"
+	AuthenticationService_LoginUser_FullMethodName       = "/pb.AuthenticationService/LoginUser"
+	AuthenticationService_VerifyEmail_FullMethodName     = "/pb.AuthenticationService/VerifyEmail"
 )
 
 // AuthenticationServiceClient is the client API for AuthenticationService service.
@@ -31,6 +35,10 @@ const (
 type AuthenticationServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	CreateClinician(ctx context.Context, in *CreateClinicianRequest, opts ...grpc.CallOption) (*CreateClinicianResponse, error)
+	UpdateClinician(ctx context.Context, in *UpdateClinicianRequest, opts ...grpc.CallOption) (*UpdateClinicianResponse, error)
+	CreatePatient(ctx context.Context, in *CreatePatientRequest, opts ...grpc.CallOption) (*CreatePatientResponse, error)
+	UpdatePatient(ctx context.Context, in *UpdatePatientRequest, opts ...grpc.CallOption) (*UpdatePatientResponse, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 }
@@ -61,6 +69,42 @@ func (c *authenticationServiceClient) UpdateUser(ctx context.Context, in *Update
 	return out, nil
 }
 
+func (c *authenticationServiceClient) CreateClinician(ctx context.Context, in *CreateClinicianRequest, opts ...grpc.CallOption) (*CreateClinicianResponse, error) {
+	out := new(CreateClinicianResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_CreateClinician_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) UpdateClinician(ctx context.Context, in *UpdateClinicianRequest, opts ...grpc.CallOption) (*UpdateClinicianResponse, error) {
+	out := new(UpdateClinicianResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_UpdateClinician_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) CreatePatient(ctx context.Context, in *CreatePatientRequest, opts ...grpc.CallOption) (*CreatePatientResponse, error) {
+	out := new(CreatePatientResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_CreatePatient_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) UpdatePatient(ctx context.Context, in *UpdatePatientRequest, opts ...grpc.CallOption) (*UpdatePatientResponse, error) {
+	out := new(UpdatePatientResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_UpdatePatient_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authenticationServiceClient) LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error) {
 	out := new(LoginUserResponse)
 	err := c.cc.Invoke(ctx, AuthenticationService_LoginUser_FullMethodName, in, out, opts...)
@@ -85,6 +129,10 @@ func (c *authenticationServiceClient) VerifyEmail(ctx context.Context, in *Verif
 type AuthenticationServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	CreateClinician(context.Context, *CreateClinicianRequest) (*CreateClinicianResponse, error)
+	UpdateClinician(context.Context, *UpdateClinicianRequest) (*UpdateClinicianResponse, error)
+	CreatePatient(context.Context, *CreatePatientRequest) (*CreatePatientResponse, error)
+	UpdatePatient(context.Context, *UpdatePatientRequest) (*UpdatePatientResponse, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	mustEmbedUnimplementedAuthenticationServiceServer()
@@ -99,6 +147,18 @@ func (UnimplementedAuthenticationServiceServer) CreateUser(context.Context, *Cre
 }
 func (UnimplementedAuthenticationServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) CreateClinician(context.Context, *CreateClinicianRequest) (*CreateClinicianResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateClinician not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) UpdateClinician(context.Context, *UpdateClinicianRequest) (*UpdateClinicianResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateClinician not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) CreatePatient(context.Context, *CreatePatientRequest) (*CreatePatientResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePatient not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) UpdatePatient(context.Context, *UpdatePatientRequest) (*UpdatePatientResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePatient not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
@@ -155,6 +215,78 @@ func _AuthenticationService_UpdateUser_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthenticationService_CreateClinician_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateClinicianRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).CreateClinician(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_CreateClinician_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).CreateClinician(ctx, req.(*CreateClinicianRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_UpdateClinician_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateClinicianRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).UpdateClinician(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_UpdateClinician_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).UpdateClinician(ctx, req.(*UpdateClinicianRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_CreatePatient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePatientRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).CreatePatient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_CreatePatient_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).CreatePatient(ctx, req.(*CreatePatientRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_UpdatePatient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePatientRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).UpdatePatient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_UpdatePatient_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).UpdatePatient(ctx, req.(*UpdatePatientRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthenticationService_LoginUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LoginUserRequest)
 	if err := dec(in); err != nil {
@@ -205,6 +337,22 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUser",
 			Handler:    _AuthenticationService_UpdateUser_Handler,
+		},
+		{
+			MethodName: "CreateClinician",
+			Handler:    _AuthenticationService_CreateClinician_Handler,
+		},
+		{
+			MethodName: "UpdateClinician",
+			Handler:    _AuthenticationService_UpdateClinician_Handler,
+		},
+		{
+			MethodName: "CreatePatient",
+			Handler:    _AuthenticationService_CreatePatient_Handler,
+		},
+		{
+			MethodName: "UpdatePatient",
+			Handler:    _AuthenticationService_UpdatePatient_Handler,
 		},
 		{
 			MethodName: "LoginUser",

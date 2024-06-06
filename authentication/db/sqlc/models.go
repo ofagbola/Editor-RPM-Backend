@@ -8,19 +8,18 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Clinician struct {
-	ID            uuid.UUID   `json:"id"`
-	Username      string      `json:"username"`
-	Credentials   []string    `json:"credentials"`
-	Specialties   []string    `json:"specialties"`
-	ClinicName    string      `json:"clinic_name"`
-	ClinicID      string      `json:"clinic_id"`
-	Image         pgtype.Text `json:"image"`
-	AcceptPatient bool        `json:"accept_patient"`
-	CreatedAt     time.Time   `json:"created_at"`
+	ID            uuid.UUID `json:"id"`
+	Username      string    `json:"username"`
+	Credentials   []string  `json:"credentials"`
+	Specialities  []string  `json:"specialities"`
+	ClinicName    string    `json:"clinic_name"`
+	ClinicID      string    `json:"clinic_id"`
+	Image         string    `json:"image"`
+	AcceptPatient bool      `json:"accept_patient"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 type Patient struct {
@@ -31,6 +30,7 @@ type Patient struct {
 	OutOfNetworkExpenses string    `json:"out_of_network_expenses"`
 	OutOfPocketExpenses  string    `json:"out_of_pocket_expenses"`
 	CoPay                string    `json:"co_pay"`
+	Image                string    `json:"image"`
 	CreatedAt            time.Time `json:"created_at"`
 }
 
@@ -56,6 +56,7 @@ type User struct {
 	Location          string    `json:"location"`
 	Language          string    `json:"language"`
 	Ethnicity         string    `json:"ethnicity"`
+	PhoneNumber       string    `json:"phone_number"`
 	HashedPassword    string    `json:"hashed_password"`
 	IsEmailVerified   bool      `json:"is_email_verified"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`

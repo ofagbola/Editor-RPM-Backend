@@ -93,8 +93,8 @@ func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violations []*errdeta
 	}
 
 	if req.FirstName != nil {
-		if err := val.ValidateFirstName(req.GetFirstName()); err != nil {
-			violations = append(violations, fieldViolation("full_name", err))
+		if err := val.ValidateName(req.GetFirstName()); err != nil {
+			violations = append(violations, fieldViolation("first_name", err))
 		}
 	}
 

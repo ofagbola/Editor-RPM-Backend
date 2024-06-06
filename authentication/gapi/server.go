@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	db "github.com/ofagbola/Editor-RPM-Backend/authentication/db/sqlc"
-	"github.com/ofagbola/Editor-RPM-Backend/authentication/pb"
+	pb "github.com/ofagbola/Editor-RPM-Backend/authentication/pb"
 	"github.com/ofagbola/Editor-RPM-Backend/authentication/token"
 	"github.com/ofagbola/Editor-RPM-Backend/authentication/util"
 	"github.com/ofagbola/Editor-RPM-Backend/authentication/worker"

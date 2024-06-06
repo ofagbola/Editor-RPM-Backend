@@ -37,6 +37,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 			Location:       req.GetLocation(),
 			Language:       req.GetLanguage(),
 			Ethnicity:      req.GetEthnicity(),
+			PhoneNumber:    req.GetPhoneNumber(),
 			HashedPassword: hashedPassword,
 			Email:          req.GetEmail(),
 		},
@@ -77,12 +78,20 @@ func validateCreateUserRequest(req *pb.CreateUserRequest) (violations []*errdeta
 		violations = append(violations, fieldViolation("password", err))
 	}
 
-	if err := val.ValidateFirstName(req.GetFirstName()); err != nil {
+	if err := val.ValidateName(req.GetFirstName()); err != nil {
 		violations = append(violations, fieldViolation("first_name", err))
+	}
+
+	if err := val.ValidateName(req.GetLastName()); err != nil {
+		violations = append(violations, fieldViolation("last_name", err))
 	}
 
 	if err := val.ValidateEmail(req.GetEmail()); err != nil {
 		violations = append(violations, fieldViolation("email", err))
+	}
+
+	if err := val.ValidatePhoneNumber(req.GetPhoneNumber()); err != nil {
+		violations = append(violations, fieldViolation("phone_number", err))
 	}
 
 	return violations

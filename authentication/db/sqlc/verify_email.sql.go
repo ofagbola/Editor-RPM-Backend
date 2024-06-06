@@ -7,8 +7,6 @@ package db
 
 import (
 	"context"
-
-	// "github.com/google/uuid"
 )
 
 const createVerifyEmail = `-- name: CreateVerifyEmail :one
@@ -56,7 +54,7 @@ RETURNING id, username, email, secret_code, is_used, created_at, expires_at
 
 type UpdateVerifyEmailParams struct {
 	ID         int64  `json:"id"`
-	SecretCode string    `json:"secret_code"`
+	SecretCode string `json:"secret_code"`
 }
 
 func (q *Queries) UpdateVerifyEmail(ctx context.Context, arg UpdateVerifyEmailParams) (VerifyEmail, error) {

@@ -5,6 +5,10 @@ package pb;
 import "google/api/annotations.proto";
 import "rpc_create_user.proto";
 import "rpc_update_user.proto";
+import "rpc_create_clinician.proto";
+import "rpc_update_clinician.proto";
+import "rpc_create_patient.proto";
+import "rpc_update_patient.proto";
 import "rpc_login_user.proto";
 import "rpc_verify_email.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -42,6 +46,46 @@ service AuthenticationService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Use this API to update user";
             summary: "Update user";
+        };
+    }
+    rpc CreateClinician (CreateClinicianRequest) returns (CreateClinicianResponse) {
+        option (google.api.http) = {
+            post: "/v1/create_clinician"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create a new clinician";
+            summary: "Create new clinician";
+        };
+    }
+    rpc UpdateClinician (UpdateClinicianRequest) returns (UpdateClinicianResponse) {
+        option (google.api.http) = {
+            patch: "/v1/update_clinician"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to update clinician";
+            summary: "Update clinician";
+        };
+    }
+    rpc CreatePatient (CreatePatientRequest) returns (CreatePatientResponse) {
+        option (google.api.http) = {
+            post: "/v1/create_patient"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to create a new patient";
+            summary: "Create new patient";
+        };
+    }
+    rpc UpdatePatient (UpdatePatientRequest) returns (UpdatePatientResponse) {
+        option (google.api.http) = {
+            patch: "/v1/update_patient"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to update patient";
+            summary: "Update patient";
         };
     }
     rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {

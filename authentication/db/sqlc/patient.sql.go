@@ -19,21 +19,23 @@ INSERT INTO patients (
   medical_history,
   provider,
   out_of_network_expenses,
-  out_of_network_expenses,
+  out_of_pocket_expenses,
+  image,
   co_pay
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7
-) RETURNING id, username, medical_history, provider, out_of_network_expenses, out_of_pocket_expenses, co_pay, created_at
+  $1, $2, $3, $4, $5, $6, $7, $8
+) RETURNING id, username, medical_history, provider, out_of_network_expenses, out_of_pocket_expenses, co_pay, image, created_at
 `
 
 type CreatePatientParams struct {
-	ID                     uuid.UUID `json:"id"`
-	Username               string    `json:"username"`
-	MedicalHistory         []string  `json:"medical_history"`
-	Provider               string    `json:"provider"`
-	OutOfNetworkExpenses   string    `json:"out_of_network_expenses"`
-	OutOfNetworkExpenses_2 string    `json:"out_of_network_expenses_2"`
-	CoPay                  string    `json:"co_pay"`
+	ID                   uuid.UUID `json:"id"`
+	Username             string    `json:"username"`
+	MedicalHistory       []string  `json:"medical_history"`
+	Provider             string    `json:"provider"`
+	OutOfNetworkExpenses string    `json:"out_of_network_expenses"`
+	OutOfPocketExpenses  string    `json:"out_of_pocket_expenses"`
+	Image                string    `json:"image"`
+	CoPay                string    `json:"co_pay"`
 }
 
 func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (Patient, error) {
@@ -43,7 +45,8 @@ func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (P
 		arg.MedicalHistory,
 		arg.Provider,
 		arg.OutOfNetworkExpenses,
-		arg.OutOfNetworkExpenses_2,
+		arg.OutOfPocketExpenses,
+		arg.Image,
 		arg.CoPay,
 	)
 	var i Patient
@@ -55,13 +58,14 @@ func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (P
 		&i.OutOfNetworkExpenses,
 		&i.OutOfPocketExpenses,
 		&i.CoPay,
+		&i.Image,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getPatient = `-- name: GetPatient :one
-SELECT id, username, medical_history, provider, out_of_network_expenses, out_of_pocket_expenses, co_pay, created_at FROM patients
+SELECT id, username, medical_history, provider, out_of_network_expenses, out_of_pocket_expenses, co_pay, image, created_at FROM patients
 WHERE username = $1 LIMIT 1
 `
 
@@ -76,6 +80,7 @@ func (q *Queries) GetPatient(ctx context.Context, username string) (Patient, err
 		&i.OutOfNetworkExpenses,
 		&i.OutOfPocketExpenses,
 		&i.CoPay,
+		&i.Image,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -87,17 +92,20 @@ SET
   medical_history = COALESCE($1, medical_history),
   provider = COALESCE($2, provider),
   out_of_network_expenses = COALESCE($3, out_of_network_expenses),
-  out_of_network_expenses = COALESCE($3, out_of_network_expenses),
-  co_pay = COALESCE($4, co_pay)
+  out_of_pocket_expenses = COALESCE($4, out_of_pocket_expenses),
+  image = COALESCE($5, image),
+  co_pay = COALESCE($6, co_pay)
 WHERE
-  username = $5
-RETURNING id, username, medical_history, provider, out_of_network_expenses, out_of_pocket_expenses, co_pay, created_at
+  username = $7
+RETURNING id, username, medical_history, provider, out_of_network_expenses, out_of_pocket_expenses, co_pay, image, created_at
 `
 
 type UpdatePatientParams struct {
 	MedicalHistory       []string    `json:"medical_history"`
 	Provider             pgtype.Text `json:"provider"`
 	OutOfNetworkExpenses pgtype.Text `json:"out_of_network_expenses"`
+	OutOfPocketExpenses  pgtype.Text `json:"out_of_pocket_expenses"`
+	Image                pgtype.Text `json:"image"`
 	CoPay                pgtype.Text `json:"co_pay"`
 	Username             string      `json:"username"`
 }
@@ -107,6 +115,8 @@ func (q *Queries) UpdatePatient(ctx context.Context, arg UpdatePatientParams) (P
 		arg.MedicalHistory,
 		arg.Provider,
 		arg.OutOfNetworkExpenses,
+		arg.OutOfPocketExpenses,
+		arg.Image,
 		arg.CoPay,
 		arg.Username,
 	)
@@ -119,6 +129,7 @@ func (q *Queries) UpdatePatient(ctx context.Context, arg UpdatePatientParams) (P
 		&i.OutOfNetworkExpenses,
 		&i.OutOfPocketExpenses,
 		&i.CoPay,
+		&i.Image,
 		&i.CreatedAt,
 	)
 	return i, err
