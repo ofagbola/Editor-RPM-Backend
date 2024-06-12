@@ -1,6 +1,12 @@
 services:
   redis:
-    image: redis:7.2-alpine
+    image: redis:latest
+    ports:
+      - "6379:6379"    
+    networks:
+      - authentication-network
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
+
   authentication_db:
     image: postgres:16-alpine
     env_file:
@@ -10,7 +16,8 @@ services:
     volumes:
       - data-authentication-volume:/var/lib/postgresql/data
     networks:
-      - authentication-network      
+      - authentication-network
+
   authentication_service:
     build:
       context: ./authentication
@@ -27,6 +34,7 @@ services:
       - redis
     entrypoint: ["/app/wait-for.sh", "authentication_db:5432", "--", "/app/start.sh"]
     command: [ "/app/main" ]
+
   notification_db:
     image: mongo:latest
     ports:
@@ -37,6 +45,7 @@ services:
        - ./notification/.env
     networks:
       - notification-network
+
   notification_service:
     build:
       context: ./notification
@@ -46,6 +55,7 @@ services:
       - "3000:3000"
     networks:
       - notification-network
+
   questionnaire_db:
     image: postgres:16-alpine
     env_file:
@@ -56,6 +66,7 @@ services:
       - data-questionnaire-volume:/var/lib/postgresql/data
     networks:
       - questionnaire-network      
+
   questionnaire_service:
     build:
       context: ./questionnaire
@@ -70,6 +81,7 @@ services:
       - questionnaire_db
     entrypoint: ["/app/wait-for.sh", "questionnaire_db:5432", "--", "/app/start.sh"]
     command: [ "/app/main" ]
+
   scheduler_db:
     image: postgres:16-alpine
     env_file:
@@ -80,6 +92,7 @@ services:
       - data-scheduler-volume:/var/lib/postgresql/data
     networks:
       - scheduler-network      
+
   scheduler_service:
     build:
       context: ./scheduler
@@ -106,9 +119,7 @@ networks:
     driver: bridge      
 
 volumes:
-  pgdata2:
   mongodb_data:
-  data-volume:
   data-questionnaire-volume:
   data-authentication-volume:
   data-scheduler-volume:
