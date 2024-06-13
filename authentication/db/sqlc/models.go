@@ -54,7 +54,7 @@ type User struct {
 	Dob               string    `json:"dob"`
 	Gender            string    `json:"gender"`
 	Location          string    `json:"location"`
-	Language          string    `json:"language"`
+	Languages         []string  `json:"languages"`
 	Ethnicity         string    `json:"ethnicity"`
 	PhoneNumber       string    `json:"phone_number"`
 	HashedPassword    string    `json:"hashed_password"`
@@ -67,8 +67,8 @@ type VerifyEmail struct {
 	ID         int64     `json:"id"`
 	Username   string    `json:"username"`
 	Email      string    `json:"email"`
-	SecretCode string    `json:"secret_code"`
+	SecretCode int64     `json:"secret_code"`
 	IsUsed     bool      `json:"is_used"`
 	CreatedAt  time.Time `json:"created_at"`
-	ExpiresAt  time.Time `json:"expires_at"`
+	ExpiredAt  time.Time `json:"expired_at"`
 }

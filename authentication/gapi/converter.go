@@ -15,9 +15,10 @@ func convertUser(user db.User) *pb.User {
 		Dob:               user.Dob,
 		Gender:            user.Gender,
 		Location:          user.Location,
-		Language:          user.Language,
+		Languages:         user.Languages,
 		Ethnicity:         user.Ethnicity,
 		Email:             user.Email,
+		PhoneNumber:       user.PhoneNumber,
 		PasswordChangedAt: timestamppb.New(user.PasswordChangedAt),
 		CreatedAt:         timestamppb.New(user.CreatedAt),
 	}

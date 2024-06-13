@@ -6,7 +6,7 @@ option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
 
 message VerifyEmailRequest {
     int64 email_id = 1;
-    string secret_code = 2;
+    int64 secret_code = 2;
 }
 
 message VerifyEmailResponse {

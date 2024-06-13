@@ -8,7 +8,7 @@ import (
 
 type VerifyEmailTxParams struct {
 	EmailId    int64
-	SecretCode string
+	SecretCode int64
 }
 
 type VerifyEmailTxResult struct {

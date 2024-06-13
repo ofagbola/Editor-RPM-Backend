@@ -18,6 +18,13 @@ func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min+1)
 }
 
+
+// Generate6DigitRandomInt generates a 6-digit random integer
+func Generate6DigitRandomInt() int64 {
+	rand.Seed(time.Now().UnixNano()) // Seed the random number generator
+	return RandomInt(100000, 999999)
+}
+
 // RandomString generates a random string of length n
 func RandomString(n int) string {
 	var sb strings.Builder

@@ -123,7 +123,7 @@ func (q *Queries) UpdateClinician(ctx context.Context, arg UpdateClinicianParams
 	var i Clinician
 	err := row.Scan(
 		&i.ID,
-		&i.Username, 
+		&i.Username,
 		&i.Credentials,
 		&i.Specialities,
 		&i.ClinicName,

@@ -13,6 +13,8 @@ message UpdateUserRequest {
     optional string first_name = 4;
     optional string last_name = 5;
     optional string location = 6;
+    repeated string languages = 7;
+    optional string phone_number = 8;
 }
 
 message UpdateUserResponse {

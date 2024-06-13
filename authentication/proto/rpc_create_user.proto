@@ -3,6 +3,7 @@ syntax = "proto3";
 package pb;
 
 import "user.proto";
+// import "google/protobuf/timestamp.proto";
 option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
 
 message CreateUserRequest {
@@ -14,7 +15,7 @@ message CreateUserRequest {
     string dob = 6;
     string gender = 7;
     string location = 8;
-    string language = 9;
+    repeated string languages = 9;
     string ethnicity = 10;
     string phone_number = 11;
     string password = 12;
@@ -22,4 +23,9 @@ message CreateUserRequest {
 
 message CreateUserResponse {
     User user = 1;
+    // string session_id = 2;
+    // string access_token = 3;
+    // string refresh_token = 4;
+    // google.protobuf.Timestamp access_token_expires_at = 5;
+    // google.protobuf.Timestamp refresh_token_expires_at = 6;
 }

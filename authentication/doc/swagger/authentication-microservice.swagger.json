@@ -290,7 +290,8 @@
             "name": "secretCode",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -431,8 +432,11 @@
         "location": {
           "type": "string"
         },
-        "language": {
-          "type": "string"
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "ethnicity": {
           "type": "string"
@@ -449,7 +453,8 @@
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/pbUser"
+          "$ref": "#/definitions/pbUser",
+          "title": "string session_id = 2;\n string access_token = 3;\n string refresh_token = 4;\n google.protobuf.Timestamp access_token_expires_at = 5;\n google.protobuf.Timestamp refresh_token_expires_at = 6;"
         }
       }
     },
@@ -619,6 +624,15 @@
         },
         "location": {
           "type": "string"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "phoneNumber": {
+          "type": "string"
         }
       }
     },
@@ -657,8 +671,11 @@
         "location": {
           "type": "string"
         },
-        "language": {
-          "type": "string"
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "ethnicity": {
           "type": "string"

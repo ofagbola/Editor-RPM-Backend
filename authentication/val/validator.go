@@ -76,6 +76,9 @@ func ValidatePhoneNumber(value string) error {
 	return nil
 }
 
-func ValidateSecretCode(value string) error {
-	return ValidateString(value, 32, 128)
+func ValidateSecretCode(value int64) error {
+	if value <= 0 {
+		return fmt.Errorf("must be a positive integer")
+	}
+	return nil
 }

@@ -15,7 +15,7 @@ message User {
     string dob = 6;
     string gender = 7;
     string location = 8;
-    string language = 9;
+    repeated string languages = 9;
     string ethnicity = 10;
     string phone_number = 11;
     google.protobuf.Timestamp password_changed_at = 12;

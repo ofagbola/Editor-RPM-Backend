@@ -32,6 +32,7 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 	arg := db.UpdateUserParams{
 		Username: req.GetUsername(),
+		Languages: req.GetLanguages(),
 		FirstName: pgtype.Text{
 			String: req.GetFirstName(),
 			Valid:  req.FirstName != nil,
@@ -47,6 +48,10 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		Email: pgtype.Text{
 			String: req.GetEmail(),
 			Valid:  req.Email != nil,
+		},
+		PhoneNumber: pgtype.Text{
+			String: req.GetPhoneNumber(),
+			Valid:  req.PhoneNumber != nil,
 		},
 	}
 

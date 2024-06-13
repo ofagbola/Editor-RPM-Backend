@@ -52,7 +52,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 	verifyEmail, err := processor.store.CreateVerifyEmail(ctx, db.CreateVerifyEmailParams{
 		Username:   user.Username,
 		Email:      user.Email,
-		SecretCode: util.RandomString(32),
+		SecretCode: util.Generate6DigitRandomInt(),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create verify email: %w", err)
@@ -60,11 +60,9 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 
 	subject := "Welcome to Editor RPM"
 	// TODO: replace this URL with an environment variable that points to a front-end page
-	verifyUrl := fmt.Sprintf("http://localhost:8080/v1/verify_email?email_id=%d&secret_code=%s",
+	verifyUrl := fmt.Sprintf("http://localhost:8089/v1/verify_email?email_id=%d&secret_code=%d",
 		verifyEmail.ID, verifyEmail.SecretCode)
-	content := fmt.Sprintf(`Hello %s,<br/>
-	Thank you for registering with us!<br/>
-	Please <a href="%s">click here</a> to verify your email address.<br/>
+	content := fmt.Sprintf(`Hello %s,<br/>Thank you for registering with us!<br/> Please <a href="%s">click here</a> to verify your email address.<br/>
 	`, user.FirstName, verifyUrl)
 	to := []string{user.Email}
 

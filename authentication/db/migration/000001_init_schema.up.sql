@@ -7,7 +7,7 @@ CREATE TABLE "users" (
   "dob" varchar NOT NULL,
   "gender" varchar NOT NULL,
   "location" varchar NOT NULL,
-  "language" varchar NOT NULL,
+  "languages" varchar[] NOT NULL,
   "ethnicity" varchar NOT NULL,
   "phone_number" varchar NOT NULL,
   "hashed_password" varchar NOT NULL,
@@ -55,10 +55,10 @@ CREATE TABLE "verify_emails" (
   "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "email" varchar NOT NULL,
-  "secret_code" varchar NOT NULL,
+  "secret_code" bigint NOT NULL,
   "is_used" boolean NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "expires_at" timestamptz NOT NULL DEFAULT (now() + interval '15 minutes')
+  "expired_at" timestamptz NOT NULL DEFAULT (now() + interval '15 minutes')
 );
 
 ALTER TABLE "patients" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
