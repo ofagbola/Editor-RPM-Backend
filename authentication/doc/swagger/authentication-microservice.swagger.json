@@ -453,8 +453,24 @@
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/pbUser",
-          "title": "string session_id = 2;\n string access_token = 3;\n string refresh_token = 4;\n google.protobuf.Timestamp access_token_expires_at = 5;\n google.protobuf.Timestamp refresh_token_expires_at = 6;"
+          "$ref": "#/definitions/pbUser"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "accessTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "refreshTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

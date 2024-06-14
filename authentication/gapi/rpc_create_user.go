@@ -2,7 +2,7 @@ package gapi
 
 import (
 	"context"
-	// "errors"
+	"errors"
 	"time"
 
 	"github.com/hibiken/asynq"
@@ -14,7 +14,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-		// "google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
@@ -53,53 +53,17 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 				asynq.ProcessIn(10 * time.Second),
 				asynq.Queue(worker.QueueCritical),
 			}
-
-			return server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
-
-
 			
+			if err := server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...); err != nil {
+				return status.Errorf(codes.Internal, "failed to distribute verify email task: %s", err)
+			}
+			
+			return nil
+
 		},
 	}
 
-	// user, err := server.store.GetUser(ctx, req.GetUsername())
-	// if err != nil {
-	// 	if errors.Is(err, db.ErrRecordNotFound) {
-	// 		return nil, status.Errorf(codes.NotFound, "user not found")
-	// 	}
-	// 	return nil, status.Errorf(codes.Internal, "failed to find user")
-	// }
 
-	// accessToken, accessPayload, err := server.tokenMaker.CreateToken(
-	// 	req.GetUsername(),
-	// 	req.GetRole(),
-	// 	server.config.AccessTokenDuration,
-	// )
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Internal, "failed to create access token")
-	// }
-
-	// refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(
-	// 	req.GetUsername(),
-	// 	req.GetRole(),
-	// 	server.config.RefreshTokenDuration,
-	// )
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Internal, "failed to create refresh token")
-	// }
-
-	// mtdt := server.extractMetadata(ctx)
-	// session, err := server.store.CreateSession(ctx, db.CreateSessionParams{
-	// 	ID:           refreshPayload.ID,
-	// 	Username:     req.GetUsername(),
-	// 	RefreshToken: refreshToken,
-	// 	UserAgent:    mtdt.UserAgent,
-	// 	ClientIp:     mtdt.ClientIP,
-	// 	IsBlocked:    false,
-	// 	ExpiresAt:    refreshPayload.ExpiredAt,
-	// })
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Internal, "failed to create session")
-	// }
 
 
 
@@ -112,13 +76,56 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
 	}
 
+
+	user, err := server.store.GetUser(ctx, req.GetUsername())
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.NotFound, "user not found")
+		}
+		return nil, status.Errorf(codes.Internal, "failed to find user")
+	}
+
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(
+		user.Username,
+		user.Role,
+		server.config.AccessTokenDuration,
+	)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to create access token")
+	}
+
+	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(
+		user.Username,
+		user.Role,
+		server.config.RefreshTokenDuration,
+	)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to create refresh token")
+	}
+
+	mtdt := server.extractMetadata(ctx)
+	session, err := server.store.CreateSession(ctx, db.CreateSessionParams{
+		ID:           refreshPayload.ID,
+		Username:     user.Username,
+		RefreshToken: refreshToken,
+		UserAgent:    mtdt.UserAgent,
+		ClientIp:     mtdt.ClientIP,
+		IsBlocked:    false,
+		ExpiresAt:    refreshPayload.ExpiredAt,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to create session")
+	}
+
+
+
 	rsp := &pb.CreateUserResponse{
 		User: convertUser(txResult.User),
-		// SessionId:             session.ID.String(),
-		// AccessToken:           accessToken,
-		// RefreshToken:          refreshToken,
-		// AccessTokenExpiresAt:  timestamppb.New(accessPayload.ExpiredAt),
-		// RefreshTokenExpiresAt: timestamppb.New(refreshPayload.ExpiredAt),
+		SessionId:             session.ID.String(),
+		AccessToken:           accessToken,
+		RefreshToken:          refreshToken,
+		AccessTokenExpiresAt:  timestamppb.New(accessPayload.ExpiredAt),
+		RefreshTokenExpiresAt: timestamppb.New(refreshPayload.ExpiredAt),
 	}
 	return rsp, nil
 }
