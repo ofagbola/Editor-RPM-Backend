@@ -7,12 +7,11 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
 
 message Patient {
-    string username = 1;
-    repeated string medical_history = 2;
-    string provider = 3;
-    string out_of_network_expenses = 4;
-    string out_of_pocket_expenses = 5;
-    string image = 6;
-    string co_pay = 7;
-    google.protobuf.Timestamp created_at = 8;
+    repeated string medical_history = 1;
+    string provider = 2;
+    string out_of_network_expenses = 3;
+    string out_of_pocket_expenses = 4;
+    string image = 5;
+    string co_pay = 6;
+    google.protobuf.Timestamp created_at = 7;
 }

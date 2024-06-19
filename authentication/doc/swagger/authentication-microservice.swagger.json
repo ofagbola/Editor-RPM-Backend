@@ -123,6 +123,38 @@
         ]
       }
     },
+    "/v1/get_email_id": {
+      "get": {
+        "summary": "get verify email id",
+        "description": "Use this API to get verify user's email id",
+        "operationId": "AuthenticationService_GetVerifyEmailId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetVerifyEmailIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
     "/v1/login_user": {
       "post": {
         "summary": "Login user",
@@ -474,6 +506,15 @@
         }
       }
     },
+    "pbGetVerifyEmailIdResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "pbLoginUserRequest": {
       "type": "object",
       "properties": {
@@ -513,9 +554,6 @@
     "pbPatient": {
       "type": "object",
       "properties": {
-        "username": {
-          "type": "string"
-        },
         "medicalHistory": {
           "type": "array",
           "items": {

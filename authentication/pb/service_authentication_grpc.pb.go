@@ -19,14 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AuthenticationService_CreateUser_FullMethodName      = "/pb.AuthenticationService/CreateUser"
-	AuthenticationService_UpdateUser_FullMethodName      = "/pb.AuthenticationService/UpdateUser"
-	AuthenticationService_CreateClinician_FullMethodName = "/pb.AuthenticationService/CreateClinician"
-	AuthenticationService_UpdateClinician_FullMethodName = "/pb.AuthenticationService/UpdateClinician"
-	AuthenticationService_CreatePatient_FullMethodName   = "/pb.AuthenticationService/CreatePatient"
-	AuthenticationService_UpdatePatient_FullMethodName   = "/pb.AuthenticationService/UpdatePatient"
-	AuthenticationService_LoginUser_FullMethodName       = "/pb.AuthenticationService/LoginUser"
-	AuthenticationService_VerifyEmail_FullMethodName     = "/pb.AuthenticationService/VerifyEmail"
+	AuthenticationService_CreateUser_FullMethodName       = "/pb.AuthenticationService/CreateUser"
+	AuthenticationService_UpdateUser_FullMethodName       = "/pb.AuthenticationService/UpdateUser"
+	AuthenticationService_CreateClinician_FullMethodName  = "/pb.AuthenticationService/CreateClinician"
+	AuthenticationService_UpdateClinician_FullMethodName  = "/pb.AuthenticationService/UpdateClinician"
+	AuthenticationService_CreatePatient_FullMethodName    = "/pb.AuthenticationService/CreatePatient"
+	AuthenticationService_UpdatePatient_FullMethodName    = "/pb.AuthenticationService/UpdatePatient"
+	AuthenticationService_LoginUser_FullMethodName        = "/pb.AuthenticationService/LoginUser"
+	AuthenticationService_VerifyEmail_FullMethodName      = "/pb.AuthenticationService/VerifyEmail"
+	AuthenticationService_GetVerifyEmailId_FullMethodName = "/pb.AuthenticationService/GetVerifyEmailId"
 )
 
 // AuthenticationServiceClient is the client API for AuthenticationService service.
@@ -41,6 +42,7 @@ type AuthenticationServiceClient interface {
 	UpdatePatient(ctx context.Context, in *UpdatePatientRequest, opts ...grpc.CallOption) (*UpdatePatientResponse, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
+	GetVerifyEmailId(ctx context.Context, in *GetVerifyEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyEmailIdResponse, error)
 }
 
 type authenticationServiceClient struct {
@@ -123,6 +125,15 @@ func (c *authenticationServiceClient) VerifyEmail(ctx context.Context, in *Verif
 	return out, nil
 }
 
+func (c *authenticationServiceClient) GetVerifyEmailId(ctx context.Context, in *GetVerifyEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyEmailIdResponse, error) {
+	out := new(GetVerifyEmailIdResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_GetVerifyEmailId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticationServiceServer is the server API for AuthenticationService service.
 // All implementations must embed UnimplementedAuthenticationServiceServer
 // for forward compatibility
@@ -135,6 +146,7 @@ type AuthenticationServiceServer interface {
 	UpdatePatient(context.Context, *UpdatePatientRequest) (*UpdatePatientResponse, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
+	GetVerifyEmailId(context.Context, *GetVerifyEmailIdRequest) (*GetVerifyEmailIdResponse, error)
 	mustEmbedUnimplementedAuthenticationServiceServer()
 }
 
@@ -165,6 +177,9 @@ func (UnimplementedAuthenticationServiceServer) LoginUser(context.Context, *Logi
 }
 func (UnimplementedAuthenticationServiceServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) GetVerifyEmailId(context.Context, *GetVerifyEmailIdRequest) (*GetVerifyEmailIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVerifyEmailId not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) mustEmbedUnimplementedAuthenticationServiceServer() {}
 
@@ -323,6 +338,24 @@ func _AuthenticationService_VerifyEmail_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthenticationService_GetVerifyEmailId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetVerifyEmailIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).GetVerifyEmailId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_GetVerifyEmailId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).GetVerifyEmailId(ctx, req.(*GetVerifyEmailIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthenticationService_ServiceDesc is the grpc.ServiceDesc for AuthenticationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -361,6 +394,10 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyEmail",
 			Handler:    _AuthenticationService_VerifyEmail_Handler,
+		},
+		{
+			MethodName: "GetVerifyEmailId",
+			Handler:    _AuthenticationService_GetVerifyEmailId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

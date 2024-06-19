@@ -11,6 +11,7 @@ import "rpc_create_patient.proto";
 import "rpc_update_patient.proto";
 import "rpc_login_user.proto";
 import "rpc_verify_email.proto";
+import "rpc_get_verify_email_id.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
@@ -105,6 +106,15 @@ service AuthenticationService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Use this API to verify user's email address";
             summary: "Verify email";
+        };
+    }
+    rpc GetVerifyEmailId (GetVerifyEmailIdRequest) returns (GetVerifyEmailIdResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_email_id"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to get verify user's email id";
+            summary: "get verify email id";
         };
     }
 }

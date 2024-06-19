@@ -40,6 +40,30 @@ func (q *Queries) CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailPa
 	return i, err
 }
 
+const getVerifyEmail = `-- name: GetVerifyEmail :one
+SELECT id, username, email, secret_code, is_used, created_at, expired_at 
+FROM verify_emails
+WHERE username = $1 
+  AND expired_at > now()
+ORDER BY created_at DESC 
+LIMIT 1
+`
+
+func (q *Queries) GetVerifyEmail(ctx context.Context, username string) (VerifyEmail, error) {
+	row := q.db.QueryRow(ctx, getVerifyEmail, username)
+	var i VerifyEmail
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.SecretCode,
+		&i.IsUsed,
+		&i.CreatedAt,
+		&i.ExpiredAt,
+	)
+	return i, err
+}
+
 const updateVerifyEmail = `-- name: UpdateVerifyEmail :one
 UPDATE verify_emails
 SET

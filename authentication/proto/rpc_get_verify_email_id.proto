@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+message GetVerifyEmailIdRequest {
+    string username = 1;
+}
+
+message GetVerifyEmailIdResponse {
+    int64 id = 1;
+}

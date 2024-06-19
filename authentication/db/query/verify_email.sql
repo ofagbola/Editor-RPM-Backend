@@ -7,6 +7,14 @@ INSERT INTO verify_emails (
     $1, $2, $3
 ) RETURNING *;
 
+-- name: GetVerifyEmail :one
+SELECT * FROM verify_emails
+WHERE username = $1 
+  AND expired_at > now()
+ORDER BY created_at DESC 
+LIMIT 1;
+
+
 -- name: UpdateVerifyEmail :one
 UPDATE verify_emails
 SET
