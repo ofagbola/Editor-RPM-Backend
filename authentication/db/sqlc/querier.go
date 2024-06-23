@@ -21,7 +21,6 @@ type Querier interface {
 	GetPatient(ctx context.Context, username string) (Patient, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetUser(ctx context.Context, username string) (User, error)
-	GetUserArg(ctx context.Context, username string) (User, error)
 	GetVerifyEmail(ctx context.Context, username string) (VerifyEmail, error)
 	GetVerifyForgotPassword(ctx context.Context, username string) (VerifyForgotPassword, error)
 	UpdateClinician(ctx context.Context, arg UpdateClinicianParams) (Clinician, error)

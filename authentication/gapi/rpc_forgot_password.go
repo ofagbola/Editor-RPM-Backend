@@ -15,7 +15,7 @@ import (
 )
 
 func (server *Server) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequest) (*pb.ForgotPasswordResponse, error) {
-	user, err := server.store.GetUserArg(ctx, req.GetUsername())
+	user, err := server.store.GetUser(ctx, req.GetUsername())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")

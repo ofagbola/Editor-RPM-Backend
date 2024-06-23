@@ -285,6 +285,40 @@
         ]
       }
     },
+    "/v1/reset_password": {
+      "post": {
+        "summary": "reset id",
+        "description": "reset password",
+        "operationId": "AuthenticationService_ResetPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbResetPasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbResetPasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
     "/v1/update_clinician": {
       "patch": {
         "summary": "Update clinician",
@@ -756,6 +790,25 @@
         "createdAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "pbResetPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "pbResetPasswordResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
         }
       }
     },

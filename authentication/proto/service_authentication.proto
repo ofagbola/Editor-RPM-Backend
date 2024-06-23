@@ -6,6 +6,7 @@ import "google/api/annotations.proto";
 import "rpc_get_user.proto";
 import "rpc_create_user.proto";
 import "rpc_update_user.proto";
+import "rpc_reset_password.proto";
 import "rpc_create_clinician.proto";
 import "rpc_update_clinician.proto";
 import "rpc_create_patient.proto";
@@ -155,6 +156,16 @@ service AuthenticationService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Use this API to get user's email id for the reset password mail";
             summary: "get forgot password (reset) email id";
+        };
+    }
+    rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse) {
+        option (google.api.http) = {
+            post: "/v1/reset_password"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "reset password";
+            summary: "reset id";
         };
     }
 }

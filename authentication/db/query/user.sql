@@ -19,12 +19,7 @@ INSERT INTO users (
 
 -- name: GetUser :one
 SELECT * FROM users
-WHERE username = $1 LIMIT 1;
-
--- name: GetUserArg :one
-SELECT * FROM users
 WHERE username = $1 OR email = $1 LIMIT 1;
-
 
 -- name: UpdateUser :one
 UPDATE users

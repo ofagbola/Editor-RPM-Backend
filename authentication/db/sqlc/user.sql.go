@@ -86,39 +86,11 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 
 const getUser = `-- name: GetUser :one
 SELECT username, email, role, first_name, last_name, dob, gender, location, languages, ethnicity, phone_number, hashed_password, is_email_verified, password_changed_at, created_at FROM users
-WHERE username = $1 LIMIT 1
+WHERE username = $1 OR email = $1 LIMIT 1
 `
 
 func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 	row := q.db.QueryRow(ctx, getUser, username)
-	var i User
-	err := row.Scan(
-		&i.Username,
-		&i.Email,
-		&i.Role,
-		&i.FirstName,
-		&i.LastName,
-		&i.Dob,
-		&i.Gender,
-		&i.Location,
-		&i.Languages,
-		&i.Ethnicity,
-		&i.PhoneNumber,
-		&i.HashedPassword,
-		&i.IsEmailVerified,
-		&i.PasswordChangedAt,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
-const getUserArg = `-- name: GetUserArg :one
-SELECT username, email, role, first_name, last_name, dob, gender, location, languages, ethnicity, phone_number, hashed_password, is_email_verified, password_changed_at, created_at FROM users
-WHERE username = $1 OR email = $1 LIMIT 1
-`
-
-func (q *Queries) GetUserArg(ctx context.Context, username string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserArg, username)
 	var i User
 	err := row.Scan(
 		&i.Username,

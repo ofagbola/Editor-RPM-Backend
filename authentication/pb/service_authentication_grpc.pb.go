@@ -32,6 +32,7 @@ const (
 	AuthenticationService_ForgotPassword_FullMethodName           = "/pb.AuthenticationService/ForgotPassword"
 	AuthenticationService_VerifyForgotPassword_FullMethodName     = "/pb.AuthenticationService/VerifyForgotPassword"
 	AuthenticationService_GetForgotPasswordEmailId_FullMethodName = "/pb.AuthenticationService/GetForgotPasswordEmailId"
+	AuthenticationService_ResetPassword_FullMethodName            = "/pb.AuthenticationService/ResetPassword"
 )
 
 // AuthenticationServiceClient is the client API for AuthenticationService service.
@@ -51,6 +52,7 @@ type AuthenticationServiceClient interface {
 	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordResponse, error)
 	VerifyForgotPassword(ctx context.Context, in *VerifyForgotPasswordRequest, opts ...grpc.CallOption) (*VerifyForgotPasswordResponse, error)
 	GetForgotPasswordEmailId(ctx context.Context, in *GetVerifyForgotPasswordEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyForgotPasswordEmailIdResponse, error)
+	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
 }
 
 type authenticationServiceClient struct {
@@ -178,6 +180,15 @@ func (c *authenticationServiceClient) GetForgotPasswordEmailId(ctx context.Conte
 	return out, nil
 }
 
+func (c *authenticationServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error) {
+	out := new(ResetPasswordResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_ResetPassword_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticationServiceServer is the server API for AuthenticationService service.
 // All implementations must embed UnimplementedAuthenticationServiceServer
 // for forward compatibility
@@ -195,6 +206,7 @@ type AuthenticationServiceServer interface {
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error)
 	VerifyForgotPassword(context.Context, *VerifyForgotPasswordRequest) (*VerifyForgotPasswordResponse, error)
 	GetForgotPasswordEmailId(context.Context, *GetVerifyForgotPasswordEmailIdRequest) (*GetVerifyForgotPasswordEmailIdResponse, error)
+	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
 	mustEmbedUnimplementedAuthenticationServiceServer()
 }
 
@@ -240,6 +252,9 @@ func (UnimplementedAuthenticationServiceServer) VerifyForgotPassword(context.Con
 }
 func (UnimplementedAuthenticationServiceServer) GetForgotPasswordEmailId(context.Context, *GetVerifyForgotPasswordEmailIdRequest) (*GetVerifyForgotPasswordEmailIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetForgotPasswordEmailId not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) mustEmbedUnimplementedAuthenticationServiceServer() {}
 
@@ -488,6 +503,24 @@ func _AuthenticationService_GetForgotPasswordEmailId_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthenticationService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_ResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).ResetPassword(ctx, req.(*ResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthenticationService_ServiceDesc is the grpc.ServiceDesc for AuthenticationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -546,6 +579,10 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetForgotPasswordEmailId",
 			Handler:    _AuthenticationService_GetForgotPasswordEmailId_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _AuthenticationService_ResetPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

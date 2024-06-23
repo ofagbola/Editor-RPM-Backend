@@ -45,7 +45,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendForgotPasswordToEmail(ctx co
 		return fmt.Errorf("failed to unmarshal payload: %w", asynq.SkipRetry)
 	}
 
-	user, err := processor.store.GetUserArg(ctx, payload.Username)
+	user, err := processor.store.GetUser(ctx, payload.Username)
 	if err != nil {
 		return fmt.Errorf("failed to get user: %w", err)
 	}
