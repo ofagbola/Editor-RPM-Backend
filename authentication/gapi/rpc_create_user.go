@@ -63,11 +63,6 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		},
 	}
 
-
-
-
-
-
 	txResult, err := server.store.CreateUserTx(ctx, arg)
 	if err != nil {
 		if db.ErrorCode(err) == db.UniqueViolation {

@@ -41,8 +41,7 @@ func (q *Queries) CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailPa
 }
 
 const getVerifyEmail = `-- name: GetVerifyEmail :one
-SELECT id, username, email, secret_code, is_used, created_at, expired_at 
-FROM verify_emails
+SELECT id, username, email, secret_code, is_used, created_at, expired_at FROM verify_emails
 WHERE username = $1 
   AND expired_at > now()
 ORDER BY created_at DESC 

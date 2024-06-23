@@ -61,6 +61,16 @@ CREATE TABLE "verify_emails" (
   "expired_at" timestamptz NOT NULL DEFAULT (now() + interval '15 minutes')
 );
 
+CREATE TABLE "verify_forgot_passwords" (
+  "id" bigserial PRIMARY KEY,
+  "username" varchar NOT NULL,
+  "email" varchar NOT NULL,
+  "secret_code" bigint NOT NULL,
+  "is_used" boolean NOT NULL DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "expired_at" timestamptz NOT NULL DEFAULT (now() + interval '15 minutes')
+);
+
 ALTER TABLE "patients" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "clinicians" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
@@ -68,3 +78,5 @@ ALTER TABLE "clinicians" ADD FOREIGN KEY ("username") REFERENCES "users" ("usern
 ALTER TABLE "sessions" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "verify_emails" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+
+ALTER TABLE "verify_forgot_passwords" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");

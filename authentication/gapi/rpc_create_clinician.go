@@ -4,7 +4,7 @@ import (
 	"context"
 
 	db "github.com/ofagbola/Editor-RPM-Backend/authentication/db/sqlc"
-	"github.com/ofagbola/Editor-RPM-Backend/authentication/pb"
+	pb "github.com/ofagbola/Editor-RPM-Backend/authentication/pb"
 	"github.com/ofagbola/Editor-RPM-Backend/authentication/util"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

@@ -19,15 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AuthenticationService_CreateUser_FullMethodName       = "/pb.AuthenticationService/CreateUser"
-	AuthenticationService_UpdateUser_FullMethodName       = "/pb.AuthenticationService/UpdateUser"
-	AuthenticationService_CreateClinician_FullMethodName  = "/pb.AuthenticationService/CreateClinician"
-	AuthenticationService_UpdateClinician_FullMethodName  = "/pb.AuthenticationService/UpdateClinician"
-	AuthenticationService_CreatePatient_FullMethodName    = "/pb.AuthenticationService/CreatePatient"
-	AuthenticationService_UpdatePatient_FullMethodName    = "/pb.AuthenticationService/UpdatePatient"
-	AuthenticationService_LoginUser_FullMethodName        = "/pb.AuthenticationService/LoginUser"
-	AuthenticationService_VerifyEmail_FullMethodName      = "/pb.AuthenticationService/VerifyEmail"
-	AuthenticationService_GetVerifyEmailId_FullMethodName = "/pb.AuthenticationService/GetVerifyEmailId"
+	AuthenticationService_CreateUser_FullMethodName               = "/pb.AuthenticationService/CreateUser"
+	AuthenticationService_GetUser_FullMethodName                  = "/pb.AuthenticationService/GetUser"
+	AuthenticationService_UpdateUser_FullMethodName               = "/pb.AuthenticationService/UpdateUser"
+	AuthenticationService_CreateClinician_FullMethodName          = "/pb.AuthenticationService/CreateClinician"
+	AuthenticationService_UpdateClinician_FullMethodName          = "/pb.AuthenticationService/UpdateClinician"
+	AuthenticationService_CreatePatient_FullMethodName            = "/pb.AuthenticationService/CreatePatient"
+	AuthenticationService_UpdatePatient_FullMethodName            = "/pb.AuthenticationService/UpdatePatient"
+	AuthenticationService_LoginUser_FullMethodName                = "/pb.AuthenticationService/LoginUser"
+	AuthenticationService_VerifyEmail_FullMethodName              = "/pb.AuthenticationService/VerifyEmail"
+	AuthenticationService_GetVerifyEmailId_FullMethodName         = "/pb.AuthenticationService/GetVerifyEmailId"
+	AuthenticationService_ForgotPassword_FullMethodName           = "/pb.AuthenticationService/ForgotPassword"
+	AuthenticationService_VerifyForgotPassword_FullMethodName     = "/pb.AuthenticationService/VerifyForgotPassword"
+	AuthenticationService_GetForgotPasswordEmailId_FullMethodName = "/pb.AuthenticationService/GetForgotPasswordEmailId"
 )
 
 // AuthenticationServiceClient is the client API for AuthenticationService service.
@@ -35,6 +39,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthenticationServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	CreateClinician(ctx context.Context, in *CreateClinicianRequest, opts ...grpc.CallOption) (*CreateClinicianResponse, error)
 	UpdateClinician(ctx context.Context, in *UpdateClinicianRequest, opts ...grpc.CallOption) (*UpdateClinicianResponse, error)
@@ -43,6 +48,9 @@ type AuthenticationServiceClient interface {
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 	GetVerifyEmailId(ctx context.Context, in *GetVerifyEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyEmailIdResponse, error)
+	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordResponse, error)
+	VerifyForgotPassword(ctx context.Context, in *VerifyForgotPasswordRequest, opts ...grpc.CallOption) (*VerifyForgotPasswordResponse, error)
+	GetForgotPasswordEmailId(ctx context.Context, in *GetVerifyForgotPasswordEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyForgotPasswordEmailIdResponse, error)
 }
 
 type authenticationServiceClient struct {
@@ -56,6 +64,15 @@ func NewAuthenticationServiceClient(cc grpc.ClientConnInterface) AuthenticationS
 func (c *authenticationServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
 	out := new(CreateUserResponse)
 	err := c.cc.Invoke(ctx, AuthenticationService_CreateUser_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
+	out := new(GetUserResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_GetUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,11 +151,39 @@ func (c *authenticationServiceClient) GetVerifyEmailId(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *authenticationServiceClient) ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordResponse, error) {
+	out := new(ForgotPasswordResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_ForgotPassword_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) VerifyForgotPassword(ctx context.Context, in *VerifyForgotPasswordRequest, opts ...grpc.CallOption) (*VerifyForgotPasswordResponse, error) {
+	out := new(VerifyForgotPasswordResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_VerifyForgotPassword_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) GetForgotPasswordEmailId(ctx context.Context, in *GetVerifyForgotPasswordEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyForgotPasswordEmailIdResponse, error) {
+	out := new(GetVerifyForgotPasswordEmailIdResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_GetForgotPasswordEmailId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthenticationServiceServer is the server API for AuthenticationService service.
 // All implementations must embed UnimplementedAuthenticationServiceServer
 // for forward compatibility
 type AuthenticationServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	CreateClinician(context.Context, *CreateClinicianRequest) (*CreateClinicianResponse, error)
 	UpdateClinician(context.Context, *UpdateClinicianRequest) (*UpdateClinicianResponse, error)
@@ -147,6 +192,9 @@ type AuthenticationServiceServer interface {
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	GetVerifyEmailId(context.Context, *GetVerifyEmailIdRequest) (*GetVerifyEmailIdResponse, error)
+	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error)
+	VerifyForgotPassword(context.Context, *VerifyForgotPasswordRequest) (*VerifyForgotPasswordResponse, error)
+	GetForgotPasswordEmailId(context.Context, *GetVerifyForgotPasswordEmailIdRequest) (*GetVerifyForgotPasswordEmailIdResponse, error)
 	mustEmbedUnimplementedAuthenticationServiceServer()
 }
 
@@ -156,6 +204,9 @@ type UnimplementedAuthenticationServiceServer struct {
 
 func (UnimplementedAuthenticationServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
@@ -180,6 +231,15 @@ func (UnimplementedAuthenticationServiceServer) VerifyEmail(context.Context, *Ve
 }
 func (UnimplementedAuthenticationServiceServer) GetVerifyEmailId(context.Context, *GetVerifyEmailIdRequest) (*GetVerifyEmailIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVerifyEmailId not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ForgotPassword not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) VerifyForgotPassword(context.Context, *VerifyForgotPasswordRequest) (*VerifyForgotPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyForgotPassword not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) GetForgotPasswordEmailId(context.Context, *GetVerifyForgotPasswordEmailIdRequest) (*GetVerifyForgotPasswordEmailIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetForgotPasswordEmailId not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) mustEmbedUnimplementedAuthenticationServiceServer() {}
 
@@ -208,6 +268,24 @@ func _AuthenticationService_CreateUser_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).GetUser(ctx, req.(*GetUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -356,6 +434,60 @@ func _AuthenticationService_GetVerifyEmailId_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthenticationService_ForgotPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ForgotPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).ForgotPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_ForgotPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).ForgotPassword(ctx, req.(*ForgotPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_VerifyForgotPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyForgotPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).VerifyForgotPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_VerifyForgotPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).VerifyForgotPassword(ctx, req.(*VerifyForgotPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_GetForgotPasswordEmailId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetVerifyForgotPasswordEmailIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).GetForgotPasswordEmailId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_GetForgotPasswordEmailId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).GetForgotPasswordEmailId(ctx, req.(*GetVerifyForgotPasswordEmailIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthenticationService_ServiceDesc is the grpc.ServiceDesc for AuthenticationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -366,6 +498,10 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateUser",
 			Handler:    _AuthenticationService_CreateUser_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _AuthenticationService_GetUser_Handler,
 		},
 		{
 			MethodName: "UpdateUser",
@@ -398,6 +534,18 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetVerifyEmailId",
 			Handler:    _AuthenticationService_GetVerifyEmailId_Handler,
+		},
+		{
+			MethodName: "ForgotPassword",
+			Handler:    _AuthenticationService_ForgotPassword_Handler,
+		},
+		{
+			MethodName: "VerifyForgotPassword",
+			Handler:    _AuthenticationService_VerifyForgotPassword_Handler,
+		},
+		{
+			MethodName: "GetForgotPasswordEmailId",
+			Handler:    _AuthenticationService_GetForgotPasswordEmailId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

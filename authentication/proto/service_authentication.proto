@@ -3,6 +3,7 @@ syntax = "proto3";
 package pb;
 
 import "google/api/annotations.proto";
+import "rpc_get_user.proto";
 import "rpc_create_user.proto";
 import "rpc_update_user.proto";
 import "rpc_create_clinician.proto";
@@ -11,7 +12,10 @@ import "rpc_create_patient.proto";
 import "rpc_update_patient.proto";
 import "rpc_login_user.proto";
 import "rpc_verify_email.proto";
+import "rpc_forgot_password.proto";
+import "rpc_verify_forgot_password.proto";
 import "rpc_get_verify_email_id.proto";
+import "rpc_get_forgot_password_email_id.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
@@ -37,6 +41,15 @@ service AuthenticationService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Use this API to create a new user";
             summary: "Create new user";
+        };
+    }
+    rpc GetUser (GetUserRequest) returns (GetUserResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_user"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to get user record";
+            summary: "get user";
         };
     }
     rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
@@ -115,6 +128,33 @@ service AuthenticationService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Use this API to get verify user's email id";
             summary: "get verify email id";
+        };
+    }
+    rpc ForgotPassword (ForgotPasswordRequest) returns (ForgotPasswordResponse) {
+        option (google.api.http) = {
+            get: "/v1/forgot_password"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to send user a reset password token";
+            summary: "Forgot password";
+        };
+    }
+    rpc VerifyForgotPassword (VerifyForgotPasswordRequest) returns (VerifyForgotPasswordResponse) {
+        option (google.api.http) = {
+            get: "/v1/verify_forgot_password"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to verify user's token authencity";
+            summary: "Verify Forgot password email authencity";
+        };
+    }
+    rpc GetForgotPasswordEmailId (GetVerifyForgotPasswordEmailIdRequest) returns (GetVerifyForgotPasswordEmailIdResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_forgot_password_id"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to get user's email id for the reset password mail";
+            summary: "get forgot password (reset) email id";
         };
     }
 }

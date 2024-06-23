@@ -123,6 +123,38 @@
         ]
       }
     },
+    "/v1/forgot_password": {
+      "get": {
+        "summary": "Forgot password",
+        "description": "Use this API to send user a reset password token",
+        "operationId": "AuthenticationService_ForgotPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbForgotPasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
     "/v1/get_email_id": {
       "get": {
         "summary": "get verify email id",
@@ -133,6 +165,70 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/pbGetVerifyEmailIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/get_forgot_password_id": {
+      "get": {
+        "summary": "get forgot password (reset) email id",
+        "description": "Use this API to get user's email id for the reset password mail",
+        "operationId": "AuthenticationService_GetForgotPasswordEmailId",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetVerifyForgotPasswordEmailIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/get_user": {
+      "get": {
+        "summary": "get user",
+        "description": "Use this API to get user record",
+        "operationId": "AuthenticationService_GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetUserResponse"
             }
           },
           "default": {
@@ -301,6 +397,46 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/pbVerifyEmailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "emailId",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "secretCode",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/verify_forgot_password": {
+      "get": {
+        "summary": "Verify Forgot password email authencity",
+        "description": "Use this API to verify user's token authencity",
+        "operationId": "AuthenticationService_VerifyForgotPassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbVerifyForgotPasswordResponse"
             }
           },
           "default": {
@@ -506,7 +642,49 @@
         }
       }
     },
+    "pbForgotPasswordResponse": {
+      "type": "object",
+      "properties": {
+        "successful": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbGetUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "accessTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "refreshTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "pbGetVerifyEmailIdResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "pbGetVerifyForgotPasswordEmailIdResponse": {
       "type": "object",
       "properties": {
         "id": {
@@ -751,6 +929,14 @@
       "type": "object",
       "properties": {
         "isVerified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbVerifyForgotPasswordResponse": {
+      "type": "object",
+      "properties": {
+        "isUsed": {
           "type": "boolean"
         }
       }
