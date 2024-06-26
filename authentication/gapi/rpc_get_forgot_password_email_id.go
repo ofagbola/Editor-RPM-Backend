@@ -5,25 +5,19 @@ import (
 	"errors"
 
 	db "github.com/ofagbola/Editor-RPM-Backend/authentication/db/sqlc"
-	// "github.com/ofagbola/Editor-RPM-Backend/authentication/util"
-	// "github.com/ofagbola/Editor-RPM-Backend/authentication/val"
+	"github.com/ofagbola/Editor-RPM-Backend/authentication/val"
 	"github.com/ofagbola/Editor-RPM-Backend/authentication/pb"
-	// "google.golang.org/genproto/googleapis/rpc/errdetails"
-	"google.golang.org/grpc/status"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/status" 
 	"google.golang.org/grpc/codes"
 )
 
 func (server *Server) GetForgotPasswordEmailId(ctx context.Context, req *pb.GetVerifyForgotPasswordEmailIdRequest) (*pb.GetVerifyForgotPasswordEmailIdResponse, error) {
 
-	// violations := validateGetVerifyForgotPasswordIdRequest(req)
-	// if violations != nil {
-	// 	return nil, invalidArgumentError(violations)
-	// }
-
-	// _, err := server.authorizeUser(ctx, []string{util.ClinicianRole, util.AdminRole,  util.PatientRole})
-	// if err != nil {
-	// 	return nil, unauthenticatedError(err)
-	// }
+	violations := validateGetVerifyForgotPasswordIdRequest(req)
+	if violations != nil {
+		return nil, invalidArgumentError(violations)
+	}
 	
 	verify, err := server.store.GetVerifyForgotPassword(ctx, req.GetUsername())
 	if err != nil {
@@ -40,10 +34,10 @@ func (server *Server) GetForgotPasswordEmailId(ctx context.Context, req *pb.GetV
 	return rsp, nil
 }
 
-// func validateGetVerifyForgotPasswordIdRequest(req *pb.GetVerifyForgotPasswordIdRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-// 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
-// 		violations = append(violations, fieldViolation("username", err))
-// 	}
+func validateGetVerifyForgotPasswordIdRequest(req *pb.GetVerifyForgotPasswordEmailIdRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+	if err := val.ValidateUsername(req.GetUsername()); err != nil {
+		violations = append(violations, fieldViolation("username", err))
+	}
 
-// 	return violations
-// }
+	return violations
+} 

@@ -160,7 +160,7 @@ service AuthenticationService {
     }
     rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse) {
         option (google.api.http) = {
-            post: "/v1/reset_password"
+            patch: "/v1/reset_password"
             body: "*"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

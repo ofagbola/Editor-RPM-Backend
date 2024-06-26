@@ -20,7 +20,8 @@ func (server *Server) VerifyEmail(ctx context.Context, req *pb.VerifyEmailReques
 	}
 
 	txResult, err := server.store.VerifyEmailTx(ctx, db.VerifyEmailTxParams{
-		EmailId:    req.GetEmailId(),
+		// EmailId:    req.GetEmailId(),
+		Username:    req.GetUsername(),
 		SecretCode: req.GetSecretCode(),
 	})
 	if err != nil {
@@ -36,8 +37,12 @@ func (server *Server) VerifyEmail(ctx context.Context, req *pb.VerifyEmailReques
 }
 
 func validateVerifyEmailRequest(req *pb.VerifyEmailRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateEmailId(req.GetEmailId()); err != nil {
-		violations = append(violations, fieldViolation("email_id", err))
+	// if err := val.ValidateEmailId(req.GetEmailId()); err != nil {
+	// 	violations = append(violations, fieldViolation("email_id", err))
+	// }
+
+	if err := val.ValidateUsername(req.GetUsername()); err != nil {
+		violations = append(violations, fieldViolation("username", err))
 	}
 
 	if err := val.ValidateSecretCode(req.GetSecretCode()); err != nil {

@@ -7,7 +7,7 @@ import (
 )
 
 type VerifyEmailTxParams struct {
-	EmailId    int64
+	Username   string
 	SecretCode int64
 }
 
@@ -20,10 +20,11 @@ func (store *SQLStore) VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParam
 	var result VerifyEmailTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
-		var err error 
+		var err error
 
 		result.VerifyEmail, err = q.UpdateVerifyEmail(ctx, UpdateVerifyEmailParams{
-			ID:        arg.EmailId,
+			// ID:        arg.EmailId,
+			Username:   arg.Username,
 			SecretCode: arg.SecretCode,
 		})
 		if err != nil {
@@ -35,7 +36,7 @@ func (store *SQLStore) VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParam
 			IsEmailVerified: pgtype.Bool{
 				Bool:  true,
 				Valid: true,
-			},	
+			},
 		})
 		return err
 	})

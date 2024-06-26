@@ -22,25 +22,26 @@ func (server *Server) ResetPassword(ctx context.Context, req *pb.ResetPasswordRe
 		return nil, invalidArgumentError(violations)
 	}
 
+	// implement a secure mesure to ensure it's a user account
+	// check if verify forgot email returns true and username is equal to provided username
+
 	arg := db.UpdateUserParams{
 		Username: req.GetUsername(),
 	}
 
-	if req.Password != nil {
-		hashedPassword, err := util.HashPassword(req.GetPassword())
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to hash password: %s", err)
-		}
+	hashedPassword, err := util.HashPassword(req.GetPassword())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to hash password: %s", err)
+	}
 
-		arg.HashedPassword = pgtype.Text{
-			String: hashedPassword,
-			Valid:  true,
-		}
+	arg.HashedPassword = pgtype.Text{
+		String: hashedPassword,
+		Valid:  true,
+	}
 
-		arg.PasswordChangedAt = pgtype.Timestamptz{
-			Time:  time.Now(),
-			Valid: true,
-		}
+	arg.PasswordChangedAt = pgtype.Timestamptz{
+		Time:  time.Now(),
+		Valid: true,
 	}
 
 	user, err := server.store.UpdateUser(ctx, arg)
@@ -59,10 +60,9 @@ func (server *Server) ResetPassword(ctx context.Context, req *pb.ResetPasswordRe
 
 func validateResetPasswordRequest(req *pb.ResetPasswordRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 
-	if req.Password != nil {
-		if err := val.ValidatePassword(req.GetPassword()); err != nil {
-			violations = append(violations, fieldViolation("password", err))
-		}
+	if err := val.ValidatePassword(req.GetPassword()); err != nil {
+		violations = append(violations, fieldViolation("password", err))
+
 	}
 
 	return violations

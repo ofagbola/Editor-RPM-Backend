@@ -286,7 +286,7 @@
       }
     },
     "/v1/reset_password": {
-      "post": {
+      "patch": {
         "summary": "reset id",
         "description": "reset password",
         "operationId": "AuthenticationService_ResetPassword",
@@ -442,11 +442,11 @@
         },
         "parameters": [
           {
-            "name": "emailId",
+            "name": "username",
+            "description": "int64 email_id = 1;",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "string"
           },
           {
             "name": "secretCode",
