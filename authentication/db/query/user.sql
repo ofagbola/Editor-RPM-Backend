@@ -12,9 +12,10 @@ INSERT INTO users (
   role,
   phone_number,
   hashed_password,
-  is_email_verified
+  is_email_verified,
+  is_user_onboarded
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
 ) RETURNING *;
 
 -- name: GetUser :one
@@ -32,7 +33,8 @@ SET
   languages = COALESCE(sqlc.narg(languages), languages),
   location = COALESCE(sqlc.narg(location), location),
   email = COALESCE(sqlc.narg(email), email),
-  is_email_verified = COALESCE(sqlc.narg(is_email_verified), is_email_verified)
+  is_email_verified = COALESCE(sqlc.narg(is_email_verified), is_email_verified),
+  is_user_onboarded = COALESCE(sqlc.narg(is_user_onboarded), is_user_onboarded)
 WHERE
   username = sqlc.arg(username)
 RETURNING *;

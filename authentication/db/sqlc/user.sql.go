@@ -25,10 +25,11 @@ INSERT INTO users (
   role,
   phone_number,
   hashed_password,
-  is_email_verified
+  is_email_verified,
+  is_user_onboarded
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
-) RETURNING username, email, role, first_name, last_name, dob, gender, location, languages, ethnicity, phone_number, hashed_password, is_email_verified, password_changed_at, created_at
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+) RETURNING username, email, role, first_name, last_name, dob, gender, location, languages, ethnicity, phone_number, hashed_password, is_email_verified, is_user_onboarded, password_changed_at, created_at
 `
 
 type CreateUserParams struct {
@@ -45,6 +46,7 @@ type CreateUserParams struct {
 	PhoneNumber     string   `json:"phone_number"`
 	HashedPassword  string   `json:"hashed_password"`
 	IsEmailVerified bool     `json:"is_email_verified"`
+	IsUserOnboarded bool     `json:"is_user_onboarded"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -62,6 +64,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.PhoneNumber,
 		arg.HashedPassword,
 		arg.IsEmailVerified,
+		arg.IsUserOnboarded,
 	)
 	var i User
 	err := row.Scan(
@@ -78,6 +81,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.PhoneNumber,
 		&i.HashedPassword,
 		&i.IsEmailVerified,
+		&i.IsUserOnboarded,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 	)
@@ -85,7 +89,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUser = `-- name: GetUser :one
-SELECT username, email, role, first_name, last_name, dob, gender, location, languages, ethnicity, phone_number, hashed_password, is_email_verified, password_changed_at, created_at FROM users
+SELECT username, email, role, first_name, last_name, dob, gender, location, languages, ethnicity, phone_number, hashed_password, is_email_verified, is_user_onboarded, password_changed_at, created_at FROM users
 WHERE username = $1 OR email = $1 LIMIT 1
 `
 
@@ -106,6 +110,7 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.PhoneNumber,
 		&i.HashedPassword,
 		&i.IsEmailVerified,
+		&i.IsUserOnboarded,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 	)
@@ -123,10 +128,11 @@ SET
   languages = COALESCE($6, languages),
   location = COALESCE($7, location),
   email = COALESCE($8, email),
-  is_email_verified = COALESCE($9, is_email_verified)
+  is_email_verified = COALESCE($9, is_email_verified),
+  is_user_onboarded = COALESCE($10, is_user_onboarded)
 WHERE
-  username = $10
-RETURNING username, email, role, first_name, last_name, dob, gender, location, languages, ethnicity, phone_number, hashed_password, is_email_verified, password_changed_at, created_at
+  username = $11
+RETURNING username, email, role, first_name, last_name, dob, gender, location, languages, ethnicity, phone_number, hashed_password, is_email_verified, is_user_onboarded, password_changed_at, created_at
 `
 
 type UpdateUserParams struct {
@@ -139,6 +145,7 @@ type UpdateUserParams struct {
 	Location          pgtype.Text        `json:"location"`
 	Email             pgtype.Text        `json:"email"`
 	IsEmailVerified   pgtype.Bool        `json:"is_email_verified"`
+	IsUserOnboarded   pgtype.Bool        `json:"is_user_onboarded"`
 	Username          string             `json:"username"`
 }
 
@@ -153,6 +160,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.Location,
 		arg.Email,
 		arg.IsEmailVerified,
+		arg.IsUserOnboarded,
 		arg.Username,
 	)
 	var i User
@@ -170,6 +178,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.PhoneNumber,
 		&i.HashedPassword,
 		&i.IsEmailVerified,
+		&i.IsUserOnboarded,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 	)

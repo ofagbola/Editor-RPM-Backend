@@ -53,6 +53,16 @@ service AuthenticationService {
             summary: "get user";
         };
     }
+
+    rpc GetProfile (GetUserRequest) returns (GetUserResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_profile"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to get user personal record";
+            summary: "get user profile";
+        };
+    }
     rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
         option (google.api.http) = {
             patch: "/v1/update_user"

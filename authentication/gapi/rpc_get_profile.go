@@ -16,16 +16,20 @@ import (
 
 )
 
-func (server *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+func (server *Server) GetProfile(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 
-	violations := validateGetUserRequest(req)
+	authPayload, err := server.authorizeUser(ctx, []string{util.PatientRole, util.ClinicianRole, util.AdminRole})
+	if err != nil {
+		return nil, unauthenticatedError(err)
+	}
+
+	violations := validateGetProfileRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
 	}
 
-	_, err := server.authorizeUser(ctx, []string{util.ClinicianRole, util.AdminRole,  util.PatientRole})
-	if err != nil {
-		return nil, unauthenticatedError(err)
+	if authPayload.Role != util.AdminRole && authPayload.Username != req.GetUsername() {
+		return nil, status.Errorf(codes.PermissionDenied, "cannot view other user's info")
 	}
 	
 	user, err := server.store.GetUser(ctx, req.GetUsername())
@@ -82,7 +86,7 @@ func (server *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.
 	return rsp, nil
 }
 
-func validateGetUserRequest(req *pb.GetUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateGetProfileRequest(req *pb.GetUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}

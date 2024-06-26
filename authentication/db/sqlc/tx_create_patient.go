@@ -1,12 +1,17 @@
 package db
 
-import "context"
+import (
+	"context"
+	
+	"github.com/jackc/pgx/v5/pgtype"
+)
 
 type CreatePatientTxParams struct {
 	CreatePatientParams
 }
 
 type CreatePatientTxResult struct {
+	User    User
 	Patient Patient
 }
 
@@ -20,6 +25,14 @@ func (store *SQLStore) CreatePatientTx(ctx context.Context, arg CreatePatientTxP
 		if err != nil {
 			return err
 		}
+
+		result.User, err = q.UpdateUser(ctx, UpdateUserParams{
+			Username: result.Patient.Username,
+			IsUserOnboarded: pgtype.Bool{
+				Bool:  true,
+				Valid: true,
+			},
+		})
 		return err
 	})
 

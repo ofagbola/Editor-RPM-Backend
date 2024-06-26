@@ -59,6 +59,7 @@ type User struct {
 	PhoneNumber       string    `json:"phone_number"`
 	HashedPassword    string    `json:"hashed_password"`
 	IsEmailVerified   bool      `json:"is_email_verified"`
+	IsUserOnboarded   bool      `json:"is_user_onboarded"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
 }

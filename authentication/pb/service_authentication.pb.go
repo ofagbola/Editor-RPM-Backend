@@ -54,7 +54,7 @@ var file_service_authentication_proto_rawDesc = []byte{
 	0x6c, 0x5f, 0x69, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x63, 0x2d, 0x67, 0x65, 0x6e, 0x2d, 0x6f, 0x70, 0x65, 0x6e, 0x61, 0x70, 0x69, 0x76, 0x32,
 	0x2f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xb3, 0x12, 0x0a, 0x15, 0x41,
+	0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xc3, 0x13, 0x0a, 0x15, 0x41,
 	0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72,
 	0x76, 0x69, 0x63, 0x65, 0x12, 0x8e, 0x01, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x55,
 	0x73, 0x65, 0x72, 0x12, 0x15, 0x2e, 0x70, 0x62, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x55,
@@ -72,7 +72,16 @@ var file_service_authentication_proto_rawDesc = []byte{
 	0x67, 0x65, 0x74, 0x20, 0x75, 0x73, 0x65, 0x72, 0x1a, 0x1f, 0x55, 0x73, 0x65, 0x20, 0x74, 0x68,
 	0x69, 0x73, 0x20, 0x41, 0x50, 0x49, 0x20, 0x74, 0x6f, 0x20, 0x67, 0x65, 0x74, 0x20, 0x75, 0x73,
 	0x65, 0x72, 0x20, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x0e, 0x12,
-	0x0c, 0x2f, 0x76, 0x31, 0x2f, 0x67, 0x65, 0x74, 0x5f, 0x75, 0x73, 0x65, 0x72, 0x12, 0x84, 0x01,
+	0x0c, 0x2f, 0x76, 0x31, 0x2f, 0x67, 0x65, 0x74, 0x5f, 0x75, 0x73, 0x65, 0x72, 0x12, 0x8d, 0x01,
+	0x0a, 0x0a, 0x47, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x12, 0x12, 0x2e, 0x70,
+	0x62, 0x2e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x13, 0x2e, 0x70, 0x62, 0x2e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x56, 0x92, 0x41, 0x3c, 0x12, 0x10, 0x67, 0x65, 0x74, 0x20,
+	0x75, 0x73, 0x65, 0x72, 0x20, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x1a, 0x28, 0x55, 0x73,
+	0x65, 0x20, 0x74, 0x68, 0x69, 0x73, 0x20, 0x41, 0x50, 0x49, 0x20, 0x74, 0x6f, 0x20, 0x67, 0x65,
+	0x74, 0x20, 0x75, 0x73, 0x65, 0x72, 0x20, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x61, 0x6c, 0x20,
+	0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x11, 0x12, 0x0f, 0x2f, 0x76,
+	0x31, 0x2f, 0x67, 0x65, 0x74, 0x5f, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x12, 0x84, 0x01,
 	0x0a, 0x0a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x12, 0x15, 0x2e, 0x70,
 	0x62, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x70, 0x62, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55,
@@ -249,34 +258,36 @@ var file_service_authentication_proto_goTypes = []interface{}{
 var file_service_authentication_proto_depIdxs = []int32{
 	0,  // 0: pb.AuthenticationService.CreateUser:input_type -> pb.CreateUserRequest
 	1,  // 1: pb.AuthenticationService.GetUser:input_type -> pb.GetUserRequest
-	2,  // 2: pb.AuthenticationService.UpdateUser:input_type -> pb.UpdateUserRequest
-	3,  // 3: pb.AuthenticationService.CreateClinician:input_type -> pb.CreateClinicianRequest
-	4,  // 4: pb.AuthenticationService.UpdateClinician:input_type -> pb.UpdateClinicianRequest
-	5,  // 5: pb.AuthenticationService.CreatePatient:input_type -> pb.CreatePatientRequest
-	6,  // 6: pb.AuthenticationService.UpdatePatient:input_type -> pb.UpdatePatientRequest
-	7,  // 7: pb.AuthenticationService.LoginUser:input_type -> pb.LoginUserRequest
-	8,  // 8: pb.AuthenticationService.VerifyEmail:input_type -> pb.VerifyEmailRequest
-	9,  // 9: pb.AuthenticationService.GetVerifyEmailId:input_type -> pb.GetVerifyEmailIdRequest
-	10, // 10: pb.AuthenticationService.ForgotPassword:input_type -> pb.ForgotPasswordRequest
-	11, // 11: pb.AuthenticationService.VerifyForgotPassword:input_type -> pb.VerifyForgotPasswordRequest
-	12, // 12: pb.AuthenticationService.GetForgotPasswordEmailId:input_type -> pb.GetVerifyForgotPasswordEmailIdRequest
-	13, // 13: pb.AuthenticationService.ResetPassword:input_type -> pb.ResetPasswordRequest
-	14, // 14: pb.AuthenticationService.CreateUser:output_type -> pb.CreateUserResponse
-	15, // 15: pb.AuthenticationService.GetUser:output_type -> pb.GetUserResponse
-	16, // 16: pb.AuthenticationService.UpdateUser:output_type -> pb.UpdateUserResponse
-	17, // 17: pb.AuthenticationService.CreateClinician:output_type -> pb.CreateClinicianResponse
-	18, // 18: pb.AuthenticationService.UpdateClinician:output_type -> pb.UpdateClinicianResponse
-	19, // 19: pb.AuthenticationService.CreatePatient:output_type -> pb.CreatePatientResponse
-	20, // 20: pb.AuthenticationService.UpdatePatient:output_type -> pb.UpdatePatientResponse
-	21, // 21: pb.AuthenticationService.LoginUser:output_type -> pb.LoginUserResponse
-	22, // 22: pb.AuthenticationService.VerifyEmail:output_type -> pb.VerifyEmailResponse
-	23, // 23: pb.AuthenticationService.GetVerifyEmailId:output_type -> pb.GetVerifyEmailIdResponse
-	24, // 24: pb.AuthenticationService.ForgotPassword:output_type -> pb.ForgotPasswordResponse
-	25, // 25: pb.AuthenticationService.VerifyForgotPassword:output_type -> pb.VerifyForgotPasswordResponse
-	26, // 26: pb.AuthenticationService.GetForgotPasswordEmailId:output_type -> pb.GetVerifyForgotPasswordEmailIdResponse
-	27, // 27: pb.AuthenticationService.ResetPassword:output_type -> pb.ResetPasswordResponse
-	14, // [14:28] is the sub-list for method output_type
-	0,  // [0:14] is the sub-list for method input_type
+	1,  // 2: pb.AuthenticationService.GetProfile:input_type -> pb.GetUserRequest
+	2,  // 3: pb.AuthenticationService.UpdateUser:input_type -> pb.UpdateUserRequest
+	3,  // 4: pb.AuthenticationService.CreateClinician:input_type -> pb.CreateClinicianRequest
+	4,  // 5: pb.AuthenticationService.UpdateClinician:input_type -> pb.UpdateClinicianRequest
+	5,  // 6: pb.AuthenticationService.CreatePatient:input_type -> pb.CreatePatientRequest
+	6,  // 7: pb.AuthenticationService.UpdatePatient:input_type -> pb.UpdatePatientRequest
+	7,  // 8: pb.AuthenticationService.LoginUser:input_type -> pb.LoginUserRequest
+	8,  // 9: pb.AuthenticationService.VerifyEmail:input_type -> pb.VerifyEmailRequest
+	9,  // 10: pb.AuthenticationService.GetVerifyEmailId:input_type -> pb.GetVerifyEmailIdRequest
+	10, // 11: pb.AuthenticationService.ForgotPassword:input_type -> pb.ForgotPasswordRequest
+	11, // 12: pb.AuthenticationService.VerifyForgotPassword:input_type -> pb.VerifyForgotPasswordRequest
+	12, // 13: pb.AuthenticationService.GetForgotPasswordEmailId:input_type -> pb.GetVerifyForgotPasswordEmailIdRequest
+	13, // 14: pb.AuthenticationService.ResetPassword:input_type -> pb.ResetPasswordRequest
+	14, // 15: pb.AuthenticationService.CreateUser:output_type -> pb.CreateUserResponse
+	15, // 16: pb.AuthenticationService.GetUser:output_type -> pb.GetUserResponse
+	15, // 17: pb.AuthenticationService.GetProfile:output_type -> pb.GetUserResponse
+	16, // 18: pb.AuthenticationService.UpdateUser:output_type -> pb.UpdateUserResponse
+	17, // 19: pb.AuthenticationService.CreateClinician:output_type -> pb.CreateClinicianResponse
+	18, // 20: pb.AuthenticationService.UpdateClinician:output_type -> pb.UpdateClinicianResponse
+	19, // 21: pb.AuthenticationService.CreatePatient:output_type -> pb.CreatePatientResponse
+	20, // 22: pb.AuthenticationService.UpdatePatient:output_type -> pb.UpdatePatientResponse
+	21, // 23: pb.AuthenticationService.LoginUser:output_type -> pb.LoginUserResponse
+	22, // 24: pb.AuthenticationService.VerifyEmail:output_type -> pb.VerifyEmailResponse
+	23, // 25: pb.AuthenticationService.GetVerifyEmailId:output_type -> pb.GetVerifyEmailIdResponse
+	24, // 26: pb.AuthenticationService.ForgotPassword:output_type -> pb.ForgotPasswordResponse
+	25, // 27: pb.AuthenticationService.VerifyForgotPassword:output_type -> pb.VerifyForgotPasswordResponse
+	26, // 28: pb.AuthenticationService.GetForgotPasswordEmailId:output_type -> pb.GetVerifyForgotPasswordEmailIdResponse
+	27, // 29: pb.AuthenticationService.ResetPassword:output_type -> pb.ResetPasswordResponse
+	15, // [15:30] is the sub-list for method output_type
+	0,  // [0:15] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

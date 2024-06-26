@@ -219,6 +219,38 @@
         ]
       }
     },
+    "/v1/get_profile": {
+      "get": {
+        "summary": "get user profile",
+        "description": "Use this API to get user personal record",
+        "operationId": "AuthenticationService_GetProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
     "/v1/get_user": {
       "get": {
         "summary": "get user",
