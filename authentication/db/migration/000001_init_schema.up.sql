@@ -29,6 +29,14 @@ CREATE TABLE "patients" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
+CREATE TABLE "invitations" (
+  "id" uuid PRIMARY KEY,
+  "sender" varchar NOT NULL,
+  "recepient_email" varchar NOT NULL,
+  "is_accepted" bool NOT NULL DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
 CREATE TABLE "clinicians" (
   "id" uuid PRIMARY KEY,
   "username" varchar NOT NULL,
@@ -73,6 +81,8 @@ CREATE TABLE "verify_forgot_passwords" (
 );
 
 ALTER TABLE "patients" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+
+ALTER TABLE "invitations" ADD FOREIGN KEY ("sender") REFERENCES "users" ("username");
 
 ALTER TABLE "clinicians" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 

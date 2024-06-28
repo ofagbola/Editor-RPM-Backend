@@ -7,6 +7,7 @@ import "rpc_get_user.proto";
 import "rpc_create_user.proto";
 import "rpc_update_user.proto";
 import "rpc_reset_password.proto";
+import "rpc_renew_access.proto";
 import "rpc_create_clinician.proto";
 import "rpc_update_clinician.proto";
 import "rpc_create_patient.proto";
@@ -63,6 +64,18 @@ service AuthenticationService {
             summary: "get user profile";
         };
     }
+
+    rpc RenewAccess (RenewAccessRequest) returns (RenewAccessResponse) {
+        option (google.api.http) = {
+            post: "/v1/renew_access"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Renew Access";
+            summary: "renew user access";
+        };
+    }
+
     rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
         option (google.api.http) = {
             patch: "/v1/update_user"

@@ -22,6 +22,7 @@ const (
 	AuthenticationService_CreateUser_FullMethodName               = "/pb.AuthenticationService/CreateUser"
 	AuthenticationService_GetUser_FullMethodName                  = "/pb.AuthenticationService/GetUser"
 	AuthenticationService_GetProfile_FullMethodName               = "/pb.AuthenticationService/GetProfile"
+	AuthenticationService_RenewAccess_FullMethodName              = "/pb.AuthenticationService/RenewAccess"
 	AuthenticationService_UpdateUser_FullMethodName               = "/pb.AuthenticationService/UpdateUser"
 	AuthenticationService_CreateClinician_FullMethodName          = "/pb.AuthenticationService/CreateClinician"
 	AuthenticationService_UpdateClinician_FullMethodName          = "/pb.AuthenticationService/UpdateClinician"
@@ -43,6 +44,7 @@ type AuthenticationServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	GetProfile(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
+	RenewAccess(ctx context.Context, in *RenewAccessRequest, opts ...grpc.CallOption) (*RenewAccessResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	CreateClinician(ctx context.Context, in *CreateClinicianRequest, opts ...grpc.CallOption) (*CreateClinicianResponse, error)
 	UpdateClinician(ctx context.Context, in *UpdateClinicianRequest, opts ...grpc.CallOption) (*UpdateClinicianResponse, error)
@@ -86,6 +88,15 @@ func (c *authenticationServiceClient) GetUser(ctx context.Context, in *GetUserRe
 func (c *authenticationServiceClient) GetProfile(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
 	out := new(GetUserResponse)
 	err := c.cc.Invoke(ctx, AuthenticationService_GetProfile_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) RenewAccess(ctx context.Context, in *RenewAccessRequest, opts ...grpc.CallOption) (*RenewAccessResponse, error) {
+	out := new(RenewAccessResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_RenewAccess_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -207,6 +218,7 @@ type AuthenticationServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	GetProfile(context.Context, *GetUserRequest) (*GetUserResponse, error)
+	RenewAccess(context.Context, *RenewAccessRequest) (*RenewAccessResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	CreateClinician(context.Context, *CreateClinicianRequest) (*CreateClinicianResponse, error)
 	UpdateClinician(context.Context, *UpdateClinicianRequest) (*UpdateClinicianResponse, error)
@@ -234,6 +246,9 @@ func (UnimplementedAuthenticationServiceServer) GetUser(context.Context, *GetUse
 }
 func (UnimplementedAuthenticationServiceServer) GetProfile(context.Context, *GetUserRequest) (*GetUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) RenewAccess(context.Context, *RenewAccessRequest) (*RenewAccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RenewAccess not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
@@ -334,6 +349,24 @@ func _AuthenticationService_GetProfile_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServiceServer).GetProfile(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_RenewAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenewAccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).RenewAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_RenewAccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).RenewAccess(ctx, req.(*RenewAccessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -572,6 +605,10 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfile",
 			Handler:    _AuthenticationService_GetProfile_Handler,
+		},
+		{
+			MethodName: "RenewAccess",
+			Handler:    _AuthenticationService_RenewAccess_Handler,
 		},
 		{
 			MethodName: "UpdateUser",
