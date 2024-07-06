@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pb;
+
+import "clinician.proto";
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+message GetClinicianRequest {
+    string username = 1;
+}
+
+message GetClinicianResponse {
+    Clinician clinician = 1;
+}

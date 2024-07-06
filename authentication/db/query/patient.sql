@@ -1,6 +1,5 @@
 -- name: CreatePatient :one
 INSERT INTO patients (
-  id,  
   username,
   medical_history,
   provider,
@@ -9,7 +8,7 @@ INSERT INTO patients (
   image,
   co_pay
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8
+  $1, $2, $3, $4, $5, $6, $7
 ) RETURNING *;
 
 -- name: GetPatient :one

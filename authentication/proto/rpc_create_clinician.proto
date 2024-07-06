@@ -7,7 +7,7 @@ option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
 
 message CreateClinicianRequest {
     repeated string credentials = 1;
-    repeated string specialities  = 2;
+    repeated string specialties  = 2;
     string clinic_name = 3;
     string clinic_id = 4;
     string image = 5;  

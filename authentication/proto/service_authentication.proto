@@ -5,13 +5,17 @@ package pb;
 import "google/api/annotations.proto";
 import "rpc_get_user.proto";
 import "rpc_create_user.proto";
-import "rpc_update_user.proto";
+import "rpc_update_user.proto"; 
 import "rpc_reset_password.proto";
+import "rpc_change_password.proto";
 import "rpc_renew_access.proto";
+import "rpc_get_clinician.proto";
 import "rpc_create_clinician.proto";
 import "rpc_update_clinician.proto";
 import "rpc_create_patient.proto";
+import "rpc_get_patient.proto";
 import "rpc_update_patient.proto";
+import "rpc_send_invitation.proto";
 import "rpc_login_user.proto";
 import "rpc_verify_email.proto";
 import "rpc_forgot_password.proto";
@@ -86,6 +90,7 @@ service AuthenticationService {
             summary: "Update user";
         };
     }
+
     rpc CreateClinician (CreateClinicianRequest) returns (CreateClinicianResponse) {
         option (google.api.http) = {
             post: "/v1/create_clinician"
@@ -96,6 +101,17 @@ service AuthenticationService {
             summary: "Create new clinician";
         };
     }
+
+    rpc GetClinician (GetClinicianRequest) returns (GetClinicianResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_clinician"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to get clinician record";
+            summary: "get clinician";
+        };
+    }
+
     rpc UpdateClinician (UpdateClinicianRequest) returns (UpdateClinicianResponse) {
         option (google.api.http) = {
             patch: "/v1/update_clinician"
@@ -106,6 +122,7 @@ service AuthenticationService {
             summary: "Update clinician";
         };
     }
+
     rpc CreatePatient (CreatePatientRequest) returns (CreatePatientResponse) {
         option (google.api.http) = {
             post: "/v1/create_patient"
@@ -116,6 +133,17 @@ service AuthenticationService {
             summary: "Create new patient";
         };
     }
+
+    rpc GetPatient (GetPatientRequest) returns (GetPatientResponse) {
+        option (google.api.http) = {
+            get: "/v1/get_patient"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Use this API to get patient record";
+            summary: "get patient";
+        };
+    }
+
     rpc UpdatePatient (UpdatePatientRequest) returns (UpdatePatientResponse) {
         option (google.api.http) = {
             patch: "/v1/update_patient"
@@ -126,6 +154,7 @@ service AuthenticationService {
             summary: "Update patient";
         };
     }
+
     rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
         option (google.api.http) = {
             post: "/v1/login_user"
@@ -136,6 +165,7 @@ service AuthenticationService {
             summary: "Login user";
         };
     }
+
     rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
         option (google.api.http) = {
             get: "/v1/verify_email"
@@ -145,6 +175,7 @@ service AuthenticationService {
             summary: "Verify email";
         };
     }
+
     rpc GetVerifyEmailId (GetVerifyEmailIdRequest) returns (GetVerifyEmailIdResponse) {
         option (google.api.http) = {
             get: "/v1/get_email_id"
@@ -154,6 +185,7 @@ service AuthenticationService {
             summary: "get verify email id";
         };
     }
+
     rpc ForgotPassword (ForgotPasswordRequest) returns (ForgotPasswordResponse) {
         option (google.api.http) = {
             get: "/v1/forgot_password"
@@ -163,6 +195,7 @@ service AuthenticationService {
             summary: "Forgot password";
         };
     }
+
     rpc VerifyForgotPassword (VerifyForgotPasswordRequest) returns (VerifyForgotPasswordResponse) {
         option (google.api.http) = {
             get: "/v1/verify_forgot_password"
@@ -172,6 +205,7 @@ service AuthenticationService {
             summary: "Verify Forgot password email authencity";
         };
     }
+
     rpc GetForgotPasswordEmailId (GetVerifyForgotPasswordEmailIdRequest) returns (GetVerifyForgotPasswordEmailIdResponse) {
         option (google.api.http) = {
             get: "/v1/get_forgot_password_id"
@@ -181,6 +215,7 @@ service AuthenticationService {
             summary: "get forgot password (reset) email id";
         };
     }
+
     rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse) {
         option (google.api.http) = {
             patch: "/v1/reset_password"
@@ -189,6 +224,28 @@ service AuthenticationService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "reset password";
             summary: "reset id";
+        };
+    }
+
+    rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordResponse) {
+        option (google.api.http) = {
+            patch: "/v1/change_password"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "change password";
+            summary: "change id";
+        };
+    }
+
+    rpc SendInvitation (SendInvitationRequest) returns (SendInvitationResponse) {
+        option (google.api.http) = {
+            post: "/v1/send_invitation"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "send invitation to either clinician / patient to join network";
+            summary: "send invitation";
         };
     }
 }

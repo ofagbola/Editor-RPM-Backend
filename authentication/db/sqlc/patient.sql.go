@@ -8,13 +8,11 @@ package db
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createPatient = `-- name: CreatePatient :one
 INSERT INTO patients (
-  id,  
   username,
   medical_history,
   provider,
@@ -23,24 +21,22 @@ INSERT INTO patients (
   image,
   co_pay
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8
+  $1, $2, $3, $4, $5, $6, $7
 ) RETURNING id, username, medical_history, provider, out_of_network_expenses, out_of_pocket_expenses, co_pay, image, created_at
 `
 
 type CreatePatientParams struct {
-	ID                   uuid.UUID `json:"id"`
-	Username             string    `json:"username"`
-	MedicalHistory       []string  `json:"medical_history"`
-	Provider             string    `json:"provider"`
-	OutOfNetworkExpenses string    `json:"out_of_network_expenses"`
-	OutOfPocketExpenses  string    `json:"out_of_pocket_expenses"`
-	Image                string    `json:"image"`
-	CoPay                string    `json:"co_pay"`
+	Username             string   `json:"username"`
+	MedicalHistory       []string `json:"medical_history"`
+	Provider             string   `json:"provider"`
+	OutOfNetworkExpenses string   `json:"out_of_network_expenses"`
+	OutOfPocketExpenses  string   `json:"out_of_pocket_expenses"`
+	Image                string   `json:"image"`
+	CoPay                string   `json:"co_pay"`
 }
 
 func (q *Queries) CreatePatient(ctx context.Context, arg CreatePatientParams) (Patient, error) {
 	row := q.db.QueryRow(ctx, createPatient,
-		arg.ID,
 		arg.Username,
 		arg.MedicalHistory,
 		arg.Provider,

@@ -8,13 +8,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Clinician struct {
-	ID            uuid.UUID `json:"id"`
+	ID            int64     `json:"id"`
 	Username      string    `json:"username"`
 	Credentials   []string  `json:"credentials"`
-	Specialities  []string  `json:"specialities"`
+	Specialties   []string  `json:"specialties"`
 	ClinicName    string    `json:"clinic_name"`
 	ClinicID      string    `json:"clinic_id"`
 	Image         string    `json:"image"`
@@ -22,8 +23,19 @@ type Clinician struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 
+type Invitation struct {
+	ID                int64       `json:"id"`
+	Sender            string      `json:"sender"`
+	RecepientUsername pgtype.Text `json:"recepient_username"`
+	RecepientEmail    string      `json:"recepient_email"`
+	SecretCode        int64       `json:"secret_code"`
+	IsAccepted        bool        `json:"is_accepted"`
+	CreatedAt         time.Time   `json:"created_at"`
+	ExpiredAt         time.Time   `json:"expired_at"`
+}
+
 type Patient struct {
-	ID                   uuid.UUID `json:"id"`
+	ID                   int64     `json:"id"`
 	Username             string    `json:"username"`
 	MedicalHistory       []string  `json:"medical_history"`
 	Provider             string    `json:"provider"`

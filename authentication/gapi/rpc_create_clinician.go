@@ -21,7 +21,7 @@ func (server *Server) CreateClinician(ctx context.Context, req *pb.CreateClinici
 		CreateClinicianParams: db.CreateClinicianParams{
 			Username:      authPayload.Username,
 			Credentials:   req.GetCredentials(),
-			Specialities:  req.GetSpecialities(),
+			Specialties:   req.GetSpecialties(),
 			ClinicName:    req.GetClinicName(),
 			ClinicID:      req.GetClinicId(),
 			Image:         req.GetImage(),

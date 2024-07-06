@@ -21,6 +21,40 @@
     "application/json"
   ],
   "paths": {
+    "/v1/change_password": {
+      "patch": {
+        "summary": "change id",
+        "description": "change password",
+        "operationId": "AuthenticationService_ChangePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbChangePasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbChangePasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
     "/v1/create_clinician": {
       "post": {
         "summary": "Create new clinician",
@@ -155,6 +189,38 @@
         ]
       }
     },
+    "/v1/get_clinician": {
+      "get": {
+        "summary": "get clinician",
+        "description": "Use this API to get clinician record",
+        "operationId": "AuthenticationService_GetClinician",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetClinicianResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
     "/v1/get_email_id": {
       "get": {
         "summary": "get verify email id",
@@ -197,6 +263,38 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/pbGetVerifyForgotPasswordEmailIdResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/get_patient": {
+      "get": {
+        "summary": "get patient",
+        "description": "Use this API to get patient record",
+        "operationId": "AuthenticationService_GetPatient",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetPatientResponse"
             }
           },
           "default": {
@@ -377,6 +475,40 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/pbResetPasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
+    "/v1/send_invitation": {
+      "post": {
+        "summary": "send invitation",
+        "description": "send invitation to either clinician / patient to join network",
+        "operationId": "AuthenticationService_SendInvitation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbSendInvitationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbSendInvitationRequest"
             }
           }
         ],
@@ -569,6 +701,28 @@
     }
   },
   "definitions": {
+    "pbChangePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "currentPassword": {
+          "type": "string"
+        },
+        "newPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "pbChangePasswordResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
+        }
+      }
+    },
     "pbClinician": {
       "type": "object",
       "properties": {
@@ -578,7 +732,7 @@
             "type": "string"
           }
         },
-        "specialities": {
+        "specialties": {
           "type": "array",
           "items": {
             "type": "string"
@@ -599,6 +753,9 @@
         "createdAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "username": {
+          "type": "string"
         }
       }
     },
@@ -611,7 +768,7 @@
             "type": "string"
           }
         },
-        "specialities": {
+        "specialties": {
           "type": "array",
           "items": {
             "type": "string"
@@ -747,6 +904,22 @@
       "properties": {
         "successful": {
           "type": "boolean"
+        }
+      }
+    },
+    "pbGetClinicianResponse": {
+      "type": "object",
+      "properties": {
+        "clinician": {
+          "$ref": "#/definitions/pbClinician"
+        }
+      }
+    },
+    "pbGetPatientResponse": {
+      "type": "object",
+      "properties": {
+        "patient": {
+          "$ref": "#/definitions/pbPatient"
         }
       }
     },
@@ -898,6 +1071,35 @@
         }
       }
     },
+    "pbSendInvitationRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "secretCode": {
+          "type": "string",
+          "format": "int64"
+        },
+        "recepientUsername": {
+          "type": "string"
+        },
+        "recepientEmail": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        }
+      }
+    },
+    "pbSendInvitationResponse": {
+      "type": "object",
+      "properties": {
+        "isSuccessful": {
+          "type": "boolean"
+        }
+      }
+    },
     "pbUpdateClinicianRequest": {
       "type": "object",
       "properties": {
@@ -910,7 +1112,7 @@
             "type": "string"
           }
         },
-        "specialities": {
+        "specialties": {
           "type": "array",
           "items": {
             "type": "string"

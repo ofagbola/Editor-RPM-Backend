@@ -18,7 +18,7 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "patients" (
-  "id" uuid PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "medical_history" varchar[] NOT NULL,
   "provider" varchar NOT NULL,
@@ -30,18 +30,21 @@ CREATE TABLE "patients" (
 );
 
 CREATE TABLE "invitations" (
-  "id" uuid PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "sender" varchar NOT NULL,
+  "recepient_username" varchar,
   "recepient_email" varchar NOT NULL,
+  "secret_code" bigint NOT NULL,
   "is_accepted" bool NOT NULL DEFAULT false,
-  "created_at" timestamptz NOT NULL DEFAULT (now())
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "expired_at" timestamptz NOT NULL DEFAULT (now() + interval '60 minutes')
 );
 
 CREATE TABLE "clinicians" (
-  "id" uuid PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "credentials" varchar[] NOT NULL,
-  "specialities" varchar[] NOT NULL,
+  "specialties" varchar[] NOT NULL,
   "clinic_name" varchar NOT NULL,
   "clinic_id" varchar NOT NULL,
   "image" varchar NOT NULL DEFAULT '',

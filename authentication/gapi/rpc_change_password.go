@@ -15,27 +15,29 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest) (*pb.ResetPasswordResponse, error) {
+func (server *Server) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
 
-	violations := validateResetPasswordRequest(req)
+	authPayload, err := server.authorizeUser(ctx, []string{util.PatientRole, util.ClinicianRole, util.AdminRole})
+	if err != nil {
+		return nil, unauthenticatedError(err)
+	}
+
+	violations := validateChangePasswordRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
 	}
 
-	
-	// verify if the forgot password verification is set to true
-	verifyIsUsed, err := server.store.GetVerifyForgotPassword(ctx, req.GetUsername())
-	if err != nil {
-		if errors.Is(err, db.ErrRecordNotFound) {
-			return nil, status.Errorf(codes.NotFound, "verify-forgot-password not found")
-		}
-		return nil, status.Errorf(codes.Internal, "failed to find verify-forgot-password")
+	if authPayload.Role != util.AdminRole && authPayload.Username != req.GetUsername() {
+		return nil, status.Errorf(codes.PermissionDenied, "cannot update other user's info")
 	}
 
-	if !verifyIsUsed.IsUsed {
-		return nil, status.Errorf(codes.Internal, "forgot password can't be set; error verifying verify-forgot-password authencity")
+	arg := db.UpdateUserParams{
+		Username: req.GetUsername(),
 	}
 
+	if req.CurrentPassword == req.NewPassword {
+		return nil, status.Errorf(codes.PermissionDenied, "current and new password cannot be the same")
+	}
 
 	userPasswordCheck, err := server.store.GetUser(ctx, req.GetUsername())
 	if err != nil {
@@ -45,17 +47,12 @@ func (server *Server) ResetPassword(ctx context.Context, req *pb.ResetPasswordRe
 		return nil, status.Errorf(codes.Internal, "failed to find user")
 	}
 
-	if userPasswordCheck.Email != verifyIsUsed.Email {
-		return nil, status.Errorf(codes.Internal, "forgot password can't be set; data inconsistency found")
-
+	err = util.CheckPassword(req.CurrentPassword, userPasswordCheck.HashedPassword)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "incorrect password")
 	}
 
-
-	arg := db.UpdateUserParams{
-		Username: req.GetUsername(),
-	}
-
-	hashedPassword, err := util.HashPassword(req.GetPassword())
+	hashedPassword, err := util.HashPassword(req.GetNewPassword())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to hash password: %s", err)
 	}
@@ -75,21 +72,25 @@ func (server *Server) ResetPassword(ctx context.Context, req *pb.ResetPasswordRe
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
 		}
+	
 		return nil, status.Errorf(codes.Internal, "failed to reset password: %s", err)
 	}
 
-	rsp := &pb.ResetPasswordResponse{
+	rsp := &pb.ChangePasswordResponse{
 		User: convertUser(user),
 	}
 	return rsp, nil
 }
 
-func validateResetPasswordRequest(req *pb.ResetPasswordRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateChangePasswordRequest(req *pb.ChangePasswordRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 
-	if err := val.ValidatePassword(req.GetPassword()); err != nil {
+	if err := val.ValidatePassword(req.GetNewPassword()); err != nil {
+		violations = append(violations, fieldViolation("password", err))
+	}
+
+	if err := val.ValidatePassword(req.GetCurrentPassword()); err != nil {
 		violations = append(violations, fieldViolation("password", err))
 
 	}
-
 	return violations
 }

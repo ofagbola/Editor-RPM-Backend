@@ -13,9 +13,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+func (server *Server) GetClinician(ctx context.Context, req *pb.GetClinicianRequest) (*pb.GetClinicianResponse, error) {
 
-	violations := validateGetUserRequest(req)
+	violations := validateGetClinicianRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
 	}
@@ -25,21 +25,21 @@ func (server *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.
 		return nil, unauthenticatedError(err)
 	}
 
-	user, err := server.store.GetUser(ctx, req.GetUsername())
+	clinician, err := server.store.GetClinician(ctx, req.GetUsername())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
-			return nil, status.Errorf(codes.NotFound, "user not found")
+			return nil, status.Errorf(codes.NotFound, "clinician not found")
 		}
-		return nil, status.Errorf(codes.Internal, "failed to find user")
+		return nil, status.Errorf(codes.Internal, "failed to find clinician")
 	}
 
-	rsp := &pb.GetUserResponse{
-		User: convertUser(user),
+	rsp := &pb.GetClinicianResponse{
+		Clinician: convertClinician(clinician),
 	}
 	return rsp, nil
 }
 
-func validateGetUserRequest(req *pb.GetUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateGetClinicianRequest(req *pb.GetClinicianRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}

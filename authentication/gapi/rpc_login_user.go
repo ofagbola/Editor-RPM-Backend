@@ -65,7 +65,7 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		return nil, status.Errorf(codes.Internal, "failed to create session")
 	}
 
-	rsp := &pb.LoginUserResponse{
+	rsp := &pb.LoginUserResponse{ 
 		User:                  convertUser(user),
 		SessionId:             session.ID.String(),
 		AccessToken:           accessToken,

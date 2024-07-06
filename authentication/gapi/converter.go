@@ -39,7 +39,7 @@ func convertPatient(patient db.Patient) *pb.Patient {
 func convertClinician(clinician db.Clinician) *pb.Clinician {
 	return &pb.Clinician{
 		Credentials:   clinician.Credentials,
-		Specialities:  clinician.Specialities,
+		Specialties:   clinician.Specialties,
 		ClinicName:    clinician.ClinicName,
 		ClinicId:      clinician.ClinicID,
 		Image:         clinician.Image,

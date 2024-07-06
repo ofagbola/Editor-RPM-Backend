@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+message SendInvitationRequest {
+    string username = 1;
+    int64 secret_code = 2;
+    string recepient_username = 3;
+    string recepient_email = 4;
+    string sender = 5;
+
+}
+
+message SendInvitationResponse {
+    bool is_successful = 1;
+}

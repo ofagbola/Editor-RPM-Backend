@@ -13,33 +13,33 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+func (server *Server) GetPatient(ctx context.Context, req *pb.GetPatientRequest) (*pb.GetPatientResponse, error) {
 
-	violations := validateGetUserRequest(req)
+	violations := validateGetPatientRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
 	}
 
-	_, err := server.authorizeUser(ctx, []string{util.ClinicianRole, util.AdminRole, util.PatientRole})
+	_, err := server.authorizeUser(ctx, []string{util.PatientRole, util.AdminRole, util.PatientRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
 	}
 
-	user, err := server.store.GetUser(ctx, req.GetUsername())
+	patient, err := server.store.GetPatient(ctx, req.GetUsername())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
-			return nil, status.Errorf(codes.NotFound, "user not found")
+			return nil, status.Errorf(codes.NotFound, "patient not found")
 		}
-		return nil, status.Errorf(codes.Internal, "failed to find user")
+		return nil, status.Errorf(codes.Internal, "failed to find patient")
 	}
 
-	rsp := &pb.GetUserResponse{
-		User: convertUser(user),
+	rsp := &pb.GetPatientResponse{
+		Patient: convertPatient(patient),
 	}
 	return rsp, nil
 }
 
-func validateGetUserRequest(req *pb.GetUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+func validateGetPatientRequest(req *pb.GetPatientRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUsername(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}

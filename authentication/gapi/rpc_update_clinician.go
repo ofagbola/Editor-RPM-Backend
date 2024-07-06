@@ -1,6 +1,6 @@
 package gapi
 
-import ( 
+import (
 	"context"
 	"errors"
 
@@ -22,27 +22,27 @@ func (server *Server) UpdateClinician(ctx context.Context, req *pb.UpdateClinici
 	if authPayload.Role != util.AdminRole && authPayload.Username != req.GetUsername() {
 		return nil, status.Errorf(codes.PermissionDenied, "cannot update other clinician's info")
 	}
-	
+
 	arg := db.UpdateClinicianParams{
-		Username: req.GetUsername(),
+		Username:    req.GetUsername(),
 		Credentials: req.GetCredentials(),
-		Specialities: req.GetSpecialities(),
- 
-		ClinicName: pgtype.Text{   
+		Specialties: req.GetSpecialties(),
+
+		ClinicName: pgtype.Text{
 			String: req.GetClinicName(),
 			Valid:  req.ClinicName != nil,
 		},
 
 		ClinicID: pgtype.Text{
 			String: req.GetClinicId(),
-			Valid:  req.ClinicId != nil, 
+			Valid:  req.ClinicId != nil,
 		},
 
 		AcceptPatient: pgtype.Bool{
-			Bool: req.GetAcceptPatient(),
+			Bool:  req.GetAcceptPatient(),
 			Valid: req.AcceptPatient != nil,
 		},
- 
+
 		Image: pgtype.Text{
 			String: req.GetImage(),
 			Valid:  req.Image != nil,
