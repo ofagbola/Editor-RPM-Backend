@@ -35,7 +35,7 @@ func (server *Server) GetForgotPasswordEmailId(ctx context.Context, req *pb.GetV
 }
 
 func validateGetVerifyForgotPasswordIdRequest(req *pb.GetVerifyForgotPasswordEmailIdRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateUsername(req.GetUsername()); err != nil {
+	if err := val.ValidateUsernameOrEmail(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}
 

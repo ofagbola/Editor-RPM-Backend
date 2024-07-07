@@ -41,7 +41,7 @@ func (server *Server) GetVerifyEmailId(ctx context.Context, req *pb.GetVerifyEma
 }
 
 func validateGetVerifyEmailIdRequest(req *pb.GetVerifyEmailIdRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateUsername(req.GetUsername()); err != nil {
+	if err := val.ValidateUsernameOrEmail(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}
 

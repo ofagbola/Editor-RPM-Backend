@@ -87,7 +87,7 @@ func (server *Server) GetProfile(ctx context.Context, req *pb.GetUserRequest) (*
 }
 
 func validateGetProfileRequest(req *pb.GetUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateUsername(req.GetUsername()); err != nil {
+	if err := val.ValidateUsernameOrEmail(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}
 

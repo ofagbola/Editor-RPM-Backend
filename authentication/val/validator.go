@@ -62,6 +62,17 @@ func ValidateEmail(value string) error {
 	return nil
 }
 
+// ValidateUsernameOrEmail validates input as either a username or email
+func ValidateUsernameOrEmail(value string) error {
+	if err := ValidateUsername(value); err == nil {
+		return nil
+	}
+	if err := ValidateEmail(value); err == nil {
+		return nil
+	}
+	return fmt.Errorf("input is neither a valid username nor a valid email address")
+}
+
 func ValidateEmailId(value int64) error {
 	if value <= 0 {
 		return fmt.Errorf("must be a positive integer")

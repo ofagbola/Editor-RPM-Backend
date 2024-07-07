@@ -40,7 +40,7 @@ func (server *Server) GetPatient(ctx context.Context, req *pb.GetPatientRequest)
 }
 
 func validateGetPatientRequest(req *pb.GetPatientRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateUsername(req.GetUsername()); err != nil {
+	if err := val.ValidateUsernameOrEmail(req.GetUsername()); err != nil {
 		violations = append(violations, fieldViolation("username", err))
 	}
 

@@ -85,7 +85,10 @@ func (server *Server) ResetPassword(ctx context.Context, req *pb.ResetPasswordRe
 }
 
 func validateResetPasswordRequest(req *pb.ResetPasswordRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-
+	if err := val.ValidateUsernameOrEmail(req.GetUsername()); err != nil {
+		violations = append(violations, fieldViolation("username", err))
+	}
+	
 	if err := val.ValidatePassword(req.GetPassword()); err != nil {
 		violations = append(violations, fieldViolation("password", err))
 
