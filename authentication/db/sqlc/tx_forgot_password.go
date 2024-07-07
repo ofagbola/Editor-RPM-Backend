@@ -2,17 +2,17 @@ package db
 
 import (
 	"context"
-
 	// "github.com/jackc/pgx/v5/pgtype"
 )
 
 type VerifyForgotPasswordTxParams struct {
-	EmailId    int64
+	// EmailId    int64
+	Username   string
 	SecretCode int64
 }
 
 type VerifyForgotPasswordTxResult struct {
-	User        User
+	User                 User
 	VerifyForgotPassword VerifyForgotPassword
 }
 
@@ -20,10 +20,11 @@ func (store *SQLStore) VerifyForgotPasswordTx(ctx context.Context, arg VerifyFor
 	var result VerifyForgotPasswordTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
-		var err error 
+		var err error
 
 		result.VerifyForgotPassword, err = q.UpdateVerifyForgotPassword(ctx, UpdateVerifyForgotPasswordParams{
-			ID:        arg.EmailId,
+			// ID:         arg.EmailId,
+			Username:   arg.Username,
 			SecretCode: arg.SecretCode,
 		})
 		if err != nil {

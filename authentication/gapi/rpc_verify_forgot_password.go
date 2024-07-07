@@ -8,18 +8,17 @@ import (
 	"github.com/ofagbola/Editor-RPM-Backend/authentication/pb"
 	"github.com/rs/zerolog/log"
 	// "github.com/hibiken/asynq"
-
 )
 
 func (server *Server) VerifyForgotPassword(ctx context.Context, req *pb.VerifyForgotPasswordRequest) (*pb.VerifyForgotPasswordResponse, error) {
 
-
 	txResult, err := server.store.VerifyForgotPasswordTx(ctx, db.VerifyForgotPasswordTxParams{
-		EmailId:    req.GetEmailId(),
+		// EmailId:    req.GetEmailId(),
+		Username:   req.GetUsername(),
 		SecretCode: req.GetSecretCode(),
 	})
 	if err != nil {
-		log.Fatal().Err(err).Msg( "failed to verify email")
+		log.Fatal().Err(err).Msg("failed to verify email")
 
 	}
 
@@ -28,4 +27,3 @@ func (server *Server) VerifyForgotPassword(ctx context.Context, req *pb.VerifyFo
 	}
 	return rsp, nil
 }
-

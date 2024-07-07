@@ -68,7 +68,8 @@ UPDATE verify_forgot_passwords
 SET
     is_used = TRUE
 WHERE
-    id = $1
+    -- id = @id
+    username = $1
     AND secret_code = $2
     AND is_used = FALSE
     AND expired_at > now()
@@ -76,12 +77,12 @@ RETURNING id, username, email, secret_code, is_used, created_at, expired_at
 `
 
 type UpdateVerifyForgotPasswordParams struct {
-	ID         int64 `json:"id"`
-	SecretCode int64 `json:"secret_code"`
+	Username   string `json:"username"`
+	SecretCode int64  `json:"secret_code"`
 }
 
 func (q *Queries) UpdateVerifyForgotPassword(ctx context.Context, arg UpdateVerifyForgotPasswordParams) (VerifyForgotPassword, error) {
-	row := q.db.QueryRow(ctx, updateVerifyForgotPassword, arg.ID, arg.SecretCode)
+	row := q.db.QueryRow(ctx, updateVerifyForgotPassword, arg.Username, arg.SecretCode)
 	var i VerifyForgotPassword
 	err := row.Scan(
 		&i.ID,

@@ -7,6 +7,7 @@ import (
 )
 
 type VerifyEmailTxParams struct {
+	// EmailId    int64
 	Username   string
 	SecretCode int64
 }

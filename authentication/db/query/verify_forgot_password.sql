@@ -20,7 +20,8 @@ UPDATE verify_forgot_passwords
 SET
     is_used = TRUE
 WHERE
-    id = @id
+    -- id = @id
+    username = @username
     AND secret_code = @secret_code
     AND is_used = FALSE
     AND expired_at > now()
