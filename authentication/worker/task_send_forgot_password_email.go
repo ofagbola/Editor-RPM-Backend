@@ -59,7 +59,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendForgotPasswordToEmail(ctx co
 		return fmt.Errorf("failed to create verify email: %w", err)
 	}
 
-	subject := "Welcome to Editor RPM"
+	subject := " Editor RPM Password Reset"
 	// TODO: replace this URL with an environment variable that points to a front-end page
 	verifyUrl := fmt.Sprintf("http://localhost:8089/v1/verify_forgot_password?email_id=%d&secret_code=%d",
 		forgotPassword.ID, forgotPassword.SecretCode)

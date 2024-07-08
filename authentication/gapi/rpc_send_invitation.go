@@ -15,7 +15,7 @@ import (
 )
 
 func (server *Server) SendInvitation(ctx context.Context, req *pb.SendInvitationRequest) (*pb.SendInvitationResponse, error) {
-	user, err := server.store.GetUser(ctx, req.GetUsername())
+	user, err := server.store.GetUser(ctx, req.GetSender())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
@@ -28,7 +28,7 @@ func (server *Server) SendInvitation(ctx context.Context, req *pb.SendInvitation
 	}
 
 	rsp := &pb.SendInvitationResponse{
-		// Successful: true,
+		Successful: true,
 	}
 	return rsp, nil
 }
@@ -37,7 +37,7 @@ func (server *Server) SendInvitation(ctx context.Context, req *pb.SendInvitation
 
 func (server *Server) SendInvitationEmail(ctx context.Context, user * db.User) error {
 	// Create the task payload
-	taskPayload := &worker.PayloadSendForgotPasswordToEmail{
+	taskPayload := &worker.PayloadSendInvitationEmail{
 		Username: user.Username,
 	}
 
@@ -49,7 +49,7 @@ func (server *Server) SendInvitationEmail(ctx context.Context, user * db.User) e
 	}
 
 	// Distribute the task using the task distributor
-	if err := server.taskDistributor.DistributeTaskSendForgotPasswordToEmail(ctx, taskPayload, opts...); err != nil {
+	if err := server.taskDistributor.DistributeTaskSendInvitationEmail(ctx, taskPayload, opts...); err != nil {
 		// Log and return an internal error status if the task distribution fails
 		log.Error().Err(err).Msg("Failed to distribute verify email task")
 		return status.Errorf(codes.Internal, "failed to distribute verify email task: %s", err)

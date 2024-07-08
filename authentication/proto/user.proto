@@ -18,6 +18,8 @@ message User {
     repeated string languages = 9;
     string ethnicity = 10;
     string phone_number = 11;
-    google.protobuf.Timestamp password_changed_at = 12;
-    google.protobuf.Timestamp created_at = 13;
+    bool is_email_verified = 12;
+    bool is_user_onboarded = 13;
+    google.protobuf.Timestamp password_changed_at = 14;
+    google.protobuf.Timestamp created_at = 15;
 }

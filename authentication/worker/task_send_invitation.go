@@ -44,6 +44,11 @@ func (processor *RedisTaskProcessor) ProcessTaskSendInvitationEmail(ctx context.
 		return fmt.Errorf("failed to unmarshal payload: %w", asynq.SkipRetry)
 	}
 
+	invitation, err := processor.store.GetInvitation(ctx, payload.Username)
+	if err != nil {
+		return fmt.Errorf("failed to get invitation: %w", err)
+	}
+
 	user, err := processor.store.GetUser(ctx, payload.Username)
 	if err != nil {
 		return fmt.Errorf("failed to get user: %w", err)
@@ -58,13 +63,14 @@ func (processor *RedisTaskProcessor) ProcessTaskSendInvitationEmail(ctx context.
 		return fmt.Errorf("failed to create invitation email: %w", err)
 	}
 
-	subject := "Welcome to Editor RPM"
+	senderFullName := user.FirstName + " " + user.LastName
+
+	subject := fmt.Sprintf("Invitation Request From %s",invitationEmail.Sender)
 	// TODO: replace this URL with an environment variable that points to a front-end page
-	invitationUrl := fmt.Sprintf("http://localhost:8089/v1/invitation_email?email_id=%d&secret_code=%d",
-		invitationEmail.ID, invitationEmail.SecretCode)
-	content := fmt.Sprintf(`Hello %s,<br/>Thank you for registering with us!<br/> Please <a href="%s">click here</a> to invitation your email address.<br/>
-	`, user.FirstName, invitationUrl)
-	to := []string{user.Email}
+	invitationUrl := fmt.Sprintf("http://localhost:8089/v1/invitation_email?sender=%s&secret_code=%d", invitationEmail.Sender, invitationEmail.SecretCode)
+	content := fmt.Sprintf(`Hello! you got an invitation addressed to %s, from <b>%s</b> to join Editor RPM as a connection.<br/> kindly Proceed by clicking <a href="%s">click here</a> to accept invitation.<br/> <h1>%d</h1>
+	`,invitation.RecepientEmail, senderFullName, invitationUrl, invitation.SecretCode)
+	to := []string{invitation.RecepientEmail}
 
 	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
 	if err != nil {
