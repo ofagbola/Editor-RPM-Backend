@@ -111,8 +111,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // MongoDB connection
+const mongodb_uri = `${process.env.MONGO_URI}?retryWrites=true&writeConcern=majority&authSource=admin`;
+
+console.log({ mongodb_uri });
+
 mongoose
-  .connect(process.env.MONGODB_URI, {
+  .connect(mongodb_uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -296,7 +300,7 @@ app.get("/fetch-and-save-garmin-data", async (req, res) => {
 // For FitBit
 app.get("/fitbit-callback", async (req, res) => {
   const code = req.query.code;
-  const userId = req.query.userId;
+  const username = req.query.username;
   const code_verifier = req.query.code_verifier;
 
   console.log("Code", code);
@@ -307,7 +311,7 @@ app.get("/fitbit-callback", async (req, res) => {
     const response = await axios.post(
       "https://api.fitbit.com/oauth2/token",
       querystring.stringify({
-        clientId: process.env.FITBIT_CLIENT_ID,
+        client_id: process.env.FITBIT_CLIENT_ID,
         grant_type: "authorization_code",
         redirect_uri: process.env.CALLBACK_URL,
         code: code,
@@ -329,38 +333,53 @@ app.get("/fitbit-callback", async (req, res) => {
     console.log("Access Token:", response.data.access_token);
     console.log("Refresh Token:", response.data.refresh_token);
 
-    const token_data = await Tokens.create({
-      userId: userId,
+    const filter = {
+      username,
+    };
+    const dataToInsert = {
+      username,
       accessToken: response.data.access_token,
       refreshToken: response.data.refresh_token,
       userIdFromProvider: response.data.user_id,
       expiresIn: response.data.expires_in,
       scope: response.data.scope, // Corrected from refresh_token to scope
       device: "FitBit",
-    });
+    };
+
+    const options = {
+      upsert: true,
+    };
+
+    const token_data = await Tokens.findOneAndUpdate(
+      filter,
+      dataToInsert,
+      options
+    );
 
     console.log("Token Data:", token_data);
 
-    res.send("Authorization successful! You can close this window.");
+    res.status(200).json({
+      message: "Authorization successful! You can close this window.",
+    });
   } catch (error) {
     console.error(
       "Error exchanging code for tokens:",
       error.response?.data?.errors,
       error.message
     );
-    res
-      .status(500)
-      .send(
-        "Authorization failed. Please check the server logs for more details."
-      );
+    res.status(500).json({
+      message:
+        "Authorization failed. Please check the server logs for more details.",
+    });
   }
 });
 
 app.get("/authorize-fitbit", async (req, res) => {
   const clientId = process.env.FITBIT_CLIENT_ID;
-  const redirectUri = encodeURIComponent(
-    "http://localhost:" + PORT + "/callback"
-  );
+  // const redirectUri = encodeURIComponent(
+  //   "http://localhost:" + PORT + "/callback"
+  // );
+  const redirectUri = process.env.CALLBACK_URL;
   const scope = encodeURIComponent(
     "activity cardio_fitness electrocardiogram heartrate location nutrition oxygen_saturation profile respiratory_rate settings sleep social temperature weight"
   );
@@ -440,7 +459,7 @@ app.get("/fetch-spo2-from-fitbit", async (req, res) => {
         .status(404)
         .send({ success: false, message: "User tokens not found" });
     }
-    console.log("user tokens: ", userTokens);
+    // console.log("user tokens: ", userTokens);
 
     const spo2Data = await fetchSpO2DataByDate(userTokens.accessToken);
     console.log("spo2 data: ", spo2Data);
@@ -476,16 +495,17 @@ app.get("/fetch-spo2-from-fitbit", async (req, res) => {
 });
 
 app.get("/fetch-heart-rate-from-fitbit", async (req, res) => {
-  const userId = req.query.userId;
-  if (!userId) {
+  const username = req.query.username;
+  if (!username) {
     return res.status(400).json({
       success: false,
-      message: "User ID is required",
+      message: "Username is required",
     });
   }
 
   try {
-    const userTokens = await Tokens.findOne({ userId: userId });
+    const userTokens = await Tokens.findOne({ username });
+    // console.log({ userTokens });
     if (!userTokens) {
       return res.status(404).json({
         success: false,
@@ -495,13 +515,15 @@ app.get("/fetch-heart-rate-from-fitbit", async (req, res) => {
 
     const heartRateData = await fetchRestingHeartRate(userTokens.accessToken);
 
+    console.log({ heartRateData });
+
     const newVital = await Vitals.create({
-      userId: userId,
+      username,
       dateTime: new Date(), // Ensure dateTime is a Date object
       device: "FitBit",
       metricType: "HeartRate",
       dateTimeFromProvider: new Date(heartRateData.dateTime), // Assuming dateTime is in a format that can be converted to Date
-      value: heartRateData.restingHeartRate,
+      value: heartRateData.heartRate,
     });
 
     res.json({

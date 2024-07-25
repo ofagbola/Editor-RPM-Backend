@@ -22,17 +22,17 @@ const VitalsSchema = new Schema(
     additionalData: Map,
     cows: {
       type: String,
-      enum: [0,1,2,4]
-    }
+      enum: [0, 1, 2, 4],
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Vitals = mongoose.model("Vitals", VitalsSchema);
 
 const TokensSchema = new Schema(
   {
-    userId: String,
+    username: String,
     userIdFromProvider: String,
     accessToken: String,
     refreshtoken: String,
@@ -44,7 +44,7 @@ const TokensSchema = new Schema(
       enum: ["Garmin", "FitBit", "Apple", "Other"],
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Tokens = mongoose.model("Tokens", TokensSchema);

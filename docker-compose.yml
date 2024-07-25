@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:latest
     ports:
-      - "6379:6379"    
+      - "6379:6379"
     networks:
       - authentication-network
     command: ["redis-server", "--bind", "redis", "--port", "6379"]
@@ -10,7 +10,7 @@ services:
   authentication_db:
     image: postgres:16-alpine
     env_file:
-       - ./authentication/app.env
+      - ./authentication/app.env
     ports:
       - "5442:5432"
     volumes:
@@ -32,8 +32,13 @@ services:
     depends_on:
       - authentication_db
       - redis
-    entrypoint: ["/app/wait-for.sh", "authentication_db:5432", "--", "/app/start.sh"]
-    command: [ "/app/main" ]
+    entrypoint:
+      ["/app/wait-for.sh", "authentication_db:5432", "--", "/app/start.sh"]
+    develop:
+      watch:
+        - action: rebuild
+          path: ./authentication/
+    command: ["/app/main"]
 
   notification_db:
     image: mongo:latest
@@ -42,7 +47,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     env_file:
-       - ./notification/.env
+      - ./notification/.env
     networks:
       - notification-network
 
@@ -59,13 +64,13 @@ services:
   questionnaire_db:
     image: postgres:16-alpine
     env_file:
-       - ./questionnaire/app.env
+      - ./questionnaire/app.env
     ports:
       - "5432:5432"
     volumes:
       - data-questionnaire-volume:/var/lib/postgresql/data
     networks:
-      - questionnaire-network      
+      - questionnaire-network
 
   questionnaire_service:
     build:
@@ -79,19 +84,20 @@ services:
       - DB_SOURCE=postgresql://root:hush@questionnaire_db:5432/questionnaire_service_db?sslmode=disable
     depends_on:
       - questionnaire_db
-    entrypoint: ["/app/wait-for.sh", "questionnaire_db:5432", "--", "/app/start.sh"]
-    command: [ "/app/main" ]
+    entrypoint:
+      ["/app/wait-for.sh", "questionnaire_db:5432", "--", "/app/start.sh"]
+    command: ["/app/main"]
 
   scheduler_db:
     image: postgres:16-alpine
     env_file:
-       - ./scheduler/app.env
+      - ./scheduler/app.env
     ports:
       - "5423:5432"
     volumes:
       - data-scheduler-volume:/var/lib/postgresql/data
     networks:
-      - scheduler-network      
+      - scheduler-network
 
   scheduler_service:
     build:
@@ -106,20 +112,52 @@ services:
     depends_on:
       - scheduler_db
     entrypoint: ["/app/wait-for.sh", "scheduler_db:5432", "--", "/app/start.sh"]
-    command: [ "/app/main" ]
+    command: ["/app/main"]
+
+  vitals:
+    build:
+      context: ./vitals
+    depends_on:
+      - vitals_db
+    ports:
+      - "5770:5770"
+    environment:
+      - PORT=5770
+      - MONGO_URI=mongodb://vitals_db:27017/vitals
+      - FITBIT_CLIENT_ID=23PGMS
+      - CALLBACK_URL=myapp://otherDevices
+      - FITBIT_CLIENT_SECRET=8a539943e844375cec08a29f8ed9467e
+    develop:
+      watch:
+        - action: rebuild
+          path: ./vitals/
+    networks:
+      - vitals-network
+
+  vitals_db:
+    image: mongo:latest
+    ports:
+      - "27020:27017"
+    volumes:
+      - data-vitals-volume:/data/db
+    networks:
+      - vitals-network
 
 networks:
   authentication-network:
-    driver: bridge  
+    driver: bridge
   notification-network:
-    driver: bridge          
+    driver: bridge
   questionnaire-network:
-    driver: bridge   
+    driver: bridge
   scheduler-network:
-    driver: bridge      
+    driver: bridge
+  vitals-network:
+    driver: bridge
 
 volumes:
   mongodb_data:
   data-questionnaire-volume:
   data-authentication-volume:
   data-scheduler-volume:
+  data-vitals-volume:
