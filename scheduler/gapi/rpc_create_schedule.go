@@ -14,8 +14,8 @@ func (server *Server) CreateSchedule(ctx context.Context, req *pb.CreateSchedule
 
 	arg := db.CreateScheduleTxParams{
 		CreateScheduleParams: db.CreateScheduleParams{
-			Recepient: req.GetRecepient(),
-			Initiator:    req.GetInitiator(),
+			Recipient: req.GetRecipient(),
+			Initiator: req.GetInitiator(),
 			TimeSlot:  req.GetTimeSlot(),
 		},
 		// TODO: notify user

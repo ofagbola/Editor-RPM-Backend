@@ -60,7 +60,7 @@
     "pbCreateScheduleRequest": {
       "type": "object",
       "properties": {
-        "recepient": {
+        "recipient": {
           "type": "string"
         },
         "initiator": {
@@ -86,7 +86,7 @@
           "type": "string",
           "format": "int64"
         },
-        "recepient": {
+        "recipient": {
           "type": "string"
         },
         "initiator": {

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package pb;
+import "google/protobuf/timestamp.proto";
+
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+message CreatePatientClinicianMappingRequest {
+    string sender = 1;
+    optional string recipient_username = 2;
+    string recipient_email = 3;
+
+}
+
+message CreatePatientClinicianMappingResponse {
+    PatientClinicianMapping patientClinicianMapping = 1;
+}
+
+message PatientClinicianMapping {
+    string sender = 1;
+    string recipient_username = 2;
+    string recipient_email = 3;
+    bool invite_accepted = 4;
+    google.protobuf.Timestamp created_at = 5;
+}

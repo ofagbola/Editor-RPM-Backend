@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+message User {
+    string username = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+    string role = 5;
+    string dob = 6;
+    string gender = 7;
+    string location = 8;
+    repeated string languages = 9;
+    string ethnicity = 10;
+    string phone_number = 11;
+    bool is_email_verified = 12;
+    bool is_user_onboarded = 13;
+    google.protobuf.Timestamp password_changed_at = 14;
+    google.protobuf.Timestamp created_at = 15;
+}

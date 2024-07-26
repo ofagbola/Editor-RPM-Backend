@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
+
+message Clinician {
+    repeated string credentials = 1;
+    repeated string specialties = 2;
+    string clinic_name = 3;
+    string clinic_id = 4;
+    string image = 5;
+    bool accept_patient = 6;
+    google.protobuf.Timestamp created_at = 7;
+    string username = 8;
+} 

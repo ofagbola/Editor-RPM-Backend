@@ -1,45 +1,40 @@
 services:
-  envoy:
-    image: envoyproxy/envoy-alpine:v1.14-latest
-    container_name: envoy
-    volumes:
-      - ./envoy.yaml:/etc/envoy/envoy.yaml
+  redis:
+    image: redis:latest
     ports:
-      - "8080:8080"
-      - "9901:9901"
-    command: ["envoy", "-c", "/etc/envoy/envoy.yaml"]
+      - "6379:6379"    
     networks:
-      - auth_network
-  auth_db:
-    image: postgres
+      - authentication-network
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
+
+  authentication_db:
+    image: postgres:16-alpine
     env_file:
-       - ./auth/.env
+       - ./authentication/app.env
     ports:
-      - "5435:5432"
+      - "5442:5432"
     volumes:
-      - pgdata2:/var/lib/postgresql/data
-      - ./auth/migrations:/docker-entrypoint-initdb.d
+      - data-authentication-volume:/var/lib/postgresql/data
     networks:
-      - auth_network
-  auth_service:
+      - authentication-network
+
+  authentication_service:
     build:
-      context: ./auth
-    depends_on:
-      - auth_db
-      - notification_service
-    develop:
-      watch:
-        - action: rebuild
-          path: "./auth/src/"
-          ignore:
-            - ./auth/node_modules/
-        - action: rebuild
-          path: "./auth/package.json"
+      context: ./authentication
     ports:
-      - "4000:4000"
-      - "5770:5770"
+      - "9098:9098"
+      - "8089:8089"
     networks:
-      - auth_network
+      - authentication-network
+    environment:
+      - DB_SOURCE=postgresql://root:hush@authentication_db:5432/authentication_service_db?sslmode=disable
+      - REDIS_ADDRESS=redis:6379
+    depends_on:
+      - authentication_db
+      - redis
+    entrypoint: ["/app/wait-for.sh", "authentication_db:5432", "--", "/app/start.sh"]
+    command: [ "/app/main" ]
+
   notification_db:
     image: mongo:latest
     ports:
@@ -49,7 +44,8 @@ services:
     env_file:
        - ./notification/.env
     networks:
-      - auth_network
+      - notification-network
+
   notification_service:
     build:
       context: ./notification
@@ -58,7 +54,8 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - auth_network
+      - notification-network
+
   questionnaire_db:
     image: postgres:16-alpine
     env_file:
@@ -69,6 +66,7 @@ services:
       - data-questionnaire-volume:/var/lib/postgresql/data
     networks:
       - questionnaire-network      
+
   questionnaire_service:
     build:
       context: ./questionnaire
@@ -83,6 +81,7 @@ services:
       - questionnaire_db
     entrypoint: ["/app/wait-for.sh", "questionnaire_db:5432", "--", "/app/start.sh"]
     command: [ "/app/main" ]
+
   scheduler_db:
     image: postgres:16-alpine
     env_file:
@@ -93,6 +92,7 @@ services:
       - data-scheduler-volume:/var/lib/postgresql/data
     networks:
       - scheduler-network      
+
   scheduler_service:
     build:
       context: ./scheduler
@@ -109,15 +109,17 @@ services:
     command: [ "/app/main" ]
 
 networks:
-  auth_network:
-    driver: bridge
-  questionnaire-network:
+  authentication-network:
     driver: bridge  
+  notification-network:
+    driver: bridge          
+  questionnaire-network:
+    driver: bridge   
   scheduler-network:
     driver: bridge      
+
 volumes:
-  pgdata2:
   mongodb_data:
-  data-volume:
   data-questionnaire-volume:
+  data-authentication-volume:
   data-scheduler-volume:
