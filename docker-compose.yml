@@ -127,12 +127,14 @@ services:
       - FITBIT_CLIENT_ID=23PGMS
       - CALLBACK_URL=myapp://otherDevices
       - FITBIT_CLIENT_SECRET=8a539943e844375cec08a29f8ed9467e
+      - AUTH_SERVICE=http://authentication_service:8089
     develop:
       watch:
         - action: rebuild
           path: ./vitals/
     networks:
       - vitals-network
+      - authentication-network
 
   vitals_db:
     image: mongo:latest

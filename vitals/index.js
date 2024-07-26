@@ -105,6 +105,7 @@ const {
   fetchSpO2DataByDate,
   fetchUserProfile,
 } = require("./utils/fitbitapi");
+const { authenticateUser } = require("./middlewares/authentication.middleware");
 
 // Initialize Express
 const app = express();
@@ -124,6 +125,8 @@ mongoose
   .catch((err) => console.log(err));
 
 app.use(express.json());
+
+app.use(authenticateUser);
 
 // For Garmin
 app.post("/authorize-garmin", async (req, res) => {

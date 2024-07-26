@@ -76,6 +76,8 @@ const fetchRestingHeartRate = async (accessToken) => {
   const currentTime = getCurrentTime();
   const timeTenMinutesAgo = getPastTimeInMinutes(1);
 
+  console.log({ currentTime, timeTenMinutesAgo });
+
   const options = {
     method: "get",
     url: `https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1sec/time/${timeTenMinutesAgo}/${currentTime}.json`,
