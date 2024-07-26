@@ -19,26 +19,26 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AuthenticationService_CreateUser_FullMethodName               = "/pb.AuthenticationService/CreateUser"
-	AuthenticationService_GetUser_FullMethodName                  = "/pb.AuthenticationService/GetUser"
-	AuthenticationService_GetProfile_FullMethodName               = "/pb.AuthenticationService/GetProfile"
-	AuthenticationService_RenewAccess_FullMethodName              = "/pb.AuthenticationService/RenewAccess"
-	AuthenticationService_UpdateUser_FullMethodName               = "/pb.AuthenticationService/UpdateUser"
-	AuthenticationService_CreateClinician_FullMethodName          = "/pb.AuthenticationService/CreateClinician"
-	AuthenticationService_GetClinician_FullMethodName             = "/pb.AuthenticationService/GetClinician"
-	AuthenticationService_UpdateClinician_FullMethodName          = "/pb.AuthenticationService/UpdateClinician"
-	AuthenticationService_CreatePatient_FullMethodName            = "/pb.AuthenticationService/CreatePatient"
-	AuthenticationService_GetPatient_FullMethodName               = "/pb.AuthenticationService/GetPatient"
-	AuthenticationService_UpdatePatient_FullMethodName            = "/pb.AuthenticationService/UpdatePatient"
-	AuthenticationService_LoginUser_FullMethodName                = "/pb.AuthenticationService/LoginUser"
-	AuthenticationService_VerifyEmail_FullMethodName              = "/pb.AuthenticationService/VerifyEmail"
-	AuthenticationService_GetVerifyEmailId_FullMethodName         = "/pb.AuthenticationService/GetVerifyEmailId"
-	AuthenticationService_ForgotPassword_FullMethodName           = "/pb.AuthenticationService/ForgotPassword"
-	AuthenticationService_VerifyForgotPassword_FullMethodName     = "/pb.AuthenticationService/VerifyForgotPassword"
-	AuthenticationService_GetForgotPasswordEmailId_FullMethodName = "/pb.AuthenticationService/GetForgotPasswordEmailId"
-	AuthenticationService_ResetPassword_FullMethodName            = "/pb.AuthenticationService/ResetPassword"
-	AuthenticationService_ChangePassword_FullMethodName           = "/pb.AuthenticationService/ChangePassword"
-	AuthenticationService_SendInvitation_FullMethodName           = "/pb.AuthenticationService/SendInvitation"
+	AuthenticationService_CreateUser_FullMethodName                    = "/pb.AuthenticationService/CreateUser"
+	AuthenticationService_GetUser_FullMethodName                       = "/pb.AuthenticationService/GetUser"
+	AuthenticationService_GetProfile_FullMethodName                    = "/pb.AuthenticationService/GetProfile"
+	AuthenticationService_RenewAccess_FullMethodName                   = "/pb.AuthenticationService/RenewAccess"
+	AuthenticationService_AuthStatus_FullMethodName                    = "/pb.AuthenticationService/AuthStatus"
+	AuthenticationService_UpdateUser_FullMethodName                    = "/pb.AuthenticationService/UpdateUser"
+	AuthenticationService_CreateClinician_FullMethodName               = "/pb.AuthenticationService/CreateClinician"
+	AuthenticationService_GetClinician_FullMethodName                  = "/pb.AuthenticationService/GetClinician"
+	AuthenticationService_UpdateClinician_FullMethodName               = "/pb.AuthenticationService/UpdateClinician"
+	AuthenticationService_CreatePatient_FullMethodName                 = "/pb.AuthenticationService/CreatePatient"
+	AuthenticationService_GetPatient_FullMethodName                    = "/pb.AuthenticationService/GetPatient"
+	AuthenticationService_UpdatePatient_FullMethodName                 = "/pb.AuthenticationService/UpdatePatient"
+	AuthenticationService_LoginUser_FullMethodName                     = "/pb.AuthenticationService/LoginUser"
+	AuthenticationService_VerifyEmail_FullMethodName                   = "/pb.AuthenticationService/VerifyEmail"
+	AuthenticationService_ForgotPassword_FullMethodName                = "/pb.AuthenticationService/ForgotPassword"
+	AuthenticationService_VerifyForgotPassword_FullMethodName          = "/pb.AuthenticationService/VerifyForgotPassword"
+	AuthenticationService_ResetPassword_FullMethodName                 = "/pb.AuthenticationService/ResetPassword"
+	AuthenticationService_ChangePassword_FullMethodName                = "/pb.AuthenticationService/ChangePassword"
+	AuthenticationService_CreatePatientClinicianMapping_FullMethodName = "/pb.AuthenticationService/CreatePatientClinicianMapping"
+	AuthenticationService_VerifyInvitation_FullMethodName              = "/pb.AuthenticationService/VerifyInvitation"
 )
 
 // AuthenticationServiceClient is the client API for AuthenticationService service.
@@ -49,6 +49,7 @@ type AuthenticationServiceClient interface {
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	GetProfile(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	RenewAccess(ctx context.Context, in *RenewAccessRequest, opts ...grpc.CallOption) (*RenewAccessResponse, error)
+	AuthStatus(ctx context.Context, in *AuthStatusRequest, opts ...grpc.CallOption) (*AuthStatusResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	CreateClinician(ctx context.Context, in *CreateClinicianRequest, opts ...grpc.CallOption) (*CreateClinicianResponse, error)
 	GetClinician(ctx context.Context, in *GetClinicianRequest, opts ...grpc.CallOption) (*GetClinicianResponse, error)
@@ -58,13 +59,12 @@ type AuthenticationServiceClient interface {
 	UpdatePatient(ctx context.Context, in *UpdatePatientRequest, opts ...grpc.CallOption) (*UpdatePatientResponse, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
-	GetVerifyEmailId(ctx context.Context, in *GetVerifyEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyEmailIdResponse, error)
 	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordResponse, error)
 	VerifyForgotPassword(ctx context.Context, in *VerifyForgotPasswordRequest, opts ...grpc.CallOption) (*VerifyForgotPasswordResponse, error)
-	GetForgotPasswordEmailId(ctx context.Context, in *GetVerifyForgotPasswordEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyForgotPasswordEmailIdResponse, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
-	SendInvitation(ctx context.Context, in *SendInvitationRequest, opts ...grpc.CallOption) (*SendInvitationResponse, error)
+	CreatePatientClinicianMapping(ctx context.Context, in *CreatePatientClinicianMappingRequest, opts ...grpc.CallOption) (*CreatePatientClinicianMappingResponse, error)
+	VerifyInvitation(ctx context.Context, in *VerifyInvitationRequest, opts ...grpc.CallOption) (*VerifyInvitationResponse, error)
 }
 
 type authenticationServiceClient struct {
@@ -105,6 +105,15 @@ func (c *authenticationServiceClient) GetProfile(ctx context.Context, in *GetUse
 func (c *authenticationServiceClient) RenewAccess(ctx context.Context, in *RenewAccessRequest, opts ...grpc.CallOption) (*RenewAccessResponse, error) {
 	out := new(RenewAccessResponse)
 	err := c.cc.Invoke(ctx, AuthenticationService_RenewAccess_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) AuthStatus(ctx context.Context, in *AuthStatusRequest, opts ...grpc.CallOption) (*AuthStatusResponse, error) {
+	out := new(AuthStatusResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_AuthStatus_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -192,15 +201,6 @@ func (c *authenticationServiceClient) VerifyEmail(ctx context.Context, in *Verif
 	return out, nil
 }
 
-func (c *authenticationServiceClient) GetVerifyEmailId(ctx context.Context, in *GetVerifyEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyEmailIdResponse, error) {
-	out := new(GetVerifyEmailIdResponse)
-	err := c.cc.Invoke(ctx, AuthenticationService_GetVerifyEmailId_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *authenticationServiceClient) ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordResponse, error) {
 	out := new(ForgotPasswordResponse)
 	err := c.cc.Invoke(ctx, AuthenticationService_ForgotPassword_FullMethodName, in, out, opts...)
@@ -213,15 +213,6 @@ func (c *authenticationServiceClient) ForgotPassword(ctx context.Context, in *Fo
 func (c *authenticationServiceClient) VerifyForgotPassword(ctx context.Context, in *VerifyForgotPasswordRequest, opts ...grpc.CallOption) (*VerifyForgotPasswordResponse, error) {
 	out := new(VerifyForgotPasswordResponse)
 	err := c.cc.Invoke(ctx, AuthenticationService_VerifyForgotPassword_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *authenticationServiceClient) GetForgotPasswordEmailId(ctx context.Context, in *GetVerifyForgotPasswordEmailIdRequest, opts ...grpc.CallOption) (*GetVerifyForgotPasswordEmailIdResponse, error) {
-	out := new(GetVerifyForgotPasswordEmailIdResponse)
-	err := c.cc.Invoke(ctx, AuthenticationService_GetForgotPasswordEmailId_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -246,9 +237,18 @@ func (c *authenticationServiceClient) ChangePassword(ctx context.Context, in *Ch
 	return out, nil
 }
 
-func (c *authenticationServiceClient) SendInvitation(ctx context.Context, in *SendInvitationRequest, opts ...grpc.CallOption) (*SendInvitationResponse, error) {
-	out := new(SendInvitationResponse)
-	err := c.cc.Invoke(ctx, AuthenticationService_SendInvitation_FullMethodName, in, out, opts...)
+func (c *authenticationServiceClient) CreatePatientClinicianMapping(ctx context.Context, in *CreatePatientClinicianMappingRequest, opts ...grpc.CallOption) (*CreatePatientClinicianMappingResponse, error) {
+	out := new(CreatePatientClinicianMappingResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_CreatePatientClinicianMapping_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authenticationServiceClient) VerifyInvitation(ctx context.Context, in *VerifyInvitationRequest, opts ...grpc.CallOption) (*VerifyInvitationResponse, error) {
+	out := new(VerifyInvitationResponse)
+	err := c.cc.Invoke(ctx, AuthenticationService_VerifyInvitation_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -263,6 +263,7 @@ type AuthenticationServiceServer interface {
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	GetProfile(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	RenewAccess(context.Context, *RenewAccessRequest) (*RenewAccessResponse, error)
+	AuthStatus(context.Context, *AuthStatusRequest) (*AuthStatusResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	CreateClinician(context.Context, *CreateClinicianRequest) (*CreateClinicianResponse, error)
 	GetClinician(context.Context, *GetClinicianRequest) (*GetClinicianResponse, error)
@@ -272,13 +273,12 @@ type AuthenticationServiceServer interface {
 	UpdatePatient(context.Context, *UpdatePatientRequest) (*UpdatePatientResponse, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
-	GetVerifyEmailId(context.Context, *GetVerifyEmailIdRequest) (*GetVerifyEmailIdResponse, error)
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error)
 	VerifyForgotPassword(context.Context, *VerifyForgotPasswordRequest) (*VerifyForgotPasswordResponse, error)
-	GetForgotPasswordEmailId(context.Context, *GetVerifyForgotPasswordEmailIdRequest) (*GetVerifyForgotPasswordEmailIdResponse, error)
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
-	SendInvitation(context.Context, *SendInvitationRequest) (*SendInvitationResponse, error)
+	CreatePatientClinicianMapping(context.Context, *CreatePatientClinicianMappingRequest) (*CreatePatientClinicianMappingResponse, error)
+	VerifyInvitation(context.Context, *VerifyInvitationRequest) (*VerifyInvitationResponse, error)
 	mustEmbedUnimplementedAuthenticationServiceServer()
 }
 
@@ -297,6 +297,9 @@ func (UnimplementedAuthenticationServiceServer) GetProfile(context.Context, *Get
 }
 func (UnimplementedAuthenticationServiceServer) RenewAccess(context.Context, *RenewAccessRequest) (*RenewAccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RenewAccess not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) AuthStatus(context.Context, *AuthStatusRequest) (*AuthStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthStatus not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
@@ -325,17 +328,11 @@ func (UnimplementedAuthenticationServiceServer) LoginUser(context.Context, *Logi
 func (UnimplementedAuthenticationServiceServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
 }
-func (UnimplementedAuthenticationServiceServer) GetVerifyEmailId(context.Context, *GetVerifyEmailIdRequest) (*GetVerifyEmailIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetVerifyEmailId not implemented")
-}
 func (UnimplementedAuthenticationServiceServer) ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ForgotPassword not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) VerifyForgotPassword(context.Context, *VerifyForgotPasswordRequest) (*VerifyForgotPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyForgotPassword not implemented")
-}
-func (UnimplementedAuthenticationServiceServer) GetForgotPasswordEmailId(context.Context, *GetVerifyForgotPasswordEmailIdRequest) (*GetVerifyForgotPasswordEmailIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetForgotPasswordEmailId not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
@@ -343,8 +340,11 @@ func (UnimplementedAuthenticationServiceServer) ResetPassword(context.Context, *
 func (UnimplementedAuthenticationServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
 }
-func (UnimplementedAuthenticationServiceServer) SendInvitation(context.Context, *SendInvitationRequest) (*SendInvitationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendInvitation not implemented")
+func (UnimplementedAuthenticationServiceServer) CreatePatientClinicianMapping(context.Context, *CreatePatientClinicianMappingRequest) (*CreatePatientClinicianMappingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePatientClinicianMapping not implemented")
+}
+func (UnimplementedAuthenticationServiceServer) VerifyInvitation(context.Context, *VerifyInvitationRequest) (*VerifyInvitationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyInvitation not implemented")
 }
 func (UnimplementedAuthenticationServiceServer) mustEmbedUnimplementedAuthenticationServiceServer() {}
 
@@ -427,6 +427,24 @@ func _AuthenticationService_RenewAccess_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServiceServer).RenewAccess(ctx, req.(*RenewAccessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_AuthStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).AuthStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_AuthStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).AuthStatus(ctx, req.(*AuthStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -593,24 +611,6 @@ func _AuthenticationService_VerifyEmail_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthenticationService_GetVerifyEmailId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetVerifyEmailIdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthenticationServiceServer).GetVerifyEmailId(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthenticationService_GetVerifyEmailId_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServiceServer).GetVerifyEmailId(ctx, req.(*GetVerifyEmailIdRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _AuthenticationService_ForgotPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ForgotPasswordRequest)
 	if err := dec(in); err != nil {
@@ -643,24 +643,6 @@ func _AuthenticationService_VerifyForgotPassword_Handler(srv interface{}, ctx co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServiceServer).VerifyForgotPassword(ctx, req.(*VerifyForgotPasswordRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AuthenticationService_GetForgotPasswordEmailId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetVerifyForgotPasswordEmailIdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthenticationServiceServer).GetForgotPasswordEmailId(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthenticationService_GetForgotPasswordEmailId_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServiceServer).GetForgotPasswordEmailId(ctx, req.(*GetVerifyForgotPasswordEmailIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -701,20 +683,38 @@ func _AuthenticationService_ChangePassword_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthenticationService_SendInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SendInvitationRequest)
+func _AuthenticationService_CreatePatientClinicianMapping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePatientClinicianMappingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthenticationServiceServer).SendInvitation(ctx, in)
+		return srv.(AuthenticationServiceServer).CreatePatientClinicianMapping(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthenticationService_SendInvitation_FullMethodName,
+		FullMethod: AuthenticationService_CreatePatientClinicianMapping_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServiceServer).SendInvitation(ctx, req.(*SendInvitationRequest))
+		return srv.(AuthenticationServiceServer).CreatePatientClinicianMapping(ctx, req.(*CreatePatientClinicianMappingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthenticationService_VerifyInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyInvitationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthenticationServiceServer).VerifyInvitation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthenticationService_VerifyInvitation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthenticationServiceServer).VerifyInvitation(ctx, req.(*VerifyInvitationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -741,6 +741,10 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RenewAccess",
 			Handler:    _AuthenticationService_RenewAccess_Handler,
+		},
+		{
+			MethodName: "AuthStatus",
+			Handler:    _AuthenticationService_AuthStatus_Handler,
 		},
 		{
 			MethodName: "UpdateUser",
@@ -779,20 +783,12 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthenticationService_VerifyEmail_Handler,
 		},
 		{
-			MethodName: "GetVerifyEmailId",
-			Handler:    _AuthenticationService_GetVerifyEmailId_Handler,
-		},
-		{
 			MethodName: "ForgotPassword",
 			Handler:    _AuthenticationService_ForgotPassword_Handler,
 		},
 		{
 			MethodName: "VerifyForgotPassword",
 			Handler:    _AuthenticationService_VerifyForgotPassword_Handler,
-		},
-		{
-			MethodName: "GetForgotPasswordEmailId",
-			Handler:    _AuthenticationService_GetForgotPasswordEmailId_Handler,
 		},
 		{
 			MethodName: "ResetPassword",
@@ -803,8 +799,12 @@ var AuthenticationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthenticationService_ChangePassword_Handler,
 		},
 		{
-			MethodName: "SendInvitation",
-			Handler:    _AuthenticationService_SendInvitation_Handler,
+			MethodName: "CreatePatientClinicianMapping",
+			Handler:    _AuthenticationService_CreatePatientClinicianMapping_Handler,
+		},
+		{
+			MethodName: "VerifyInvitation",
+			Handler:    _AuthenticationService_VerifyInvitation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

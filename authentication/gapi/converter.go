@@ -47,3 +47,13 @@ func convertClinician(clinician db.Clinician) *pb.Clinician {
 		CreatedAt:     timestamppb.New(clinician.CreatedAt),
 	}
 }
+
+func convertPatientClinicianMapping(patientClinicianMapping db.PatientClinicianMapping) *pb.PatientClinicianMapping {
+	return &pb.PatientClinicianMapping{
+		Sender:            patientClinicianMapping.Sender,
+		RecipientEmail:    patientClinicianMapping.RecipientEmail,
+		RecipientUsername: patientClinicianMapping.RecipientUsername,
+		InviteAccepted:    patientClinicianMapping.InviteAccepted,
+		CreatedAt:         timestamppb.New(patientClinicianMapping.CreatedAt),
+	}
+}

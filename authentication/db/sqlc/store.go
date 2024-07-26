@@ -10,10 +10,12 @@ import (
 type Store interface {
 	Querier
 	CreateUserTx(ctx context.Context, arg CreateUserTxParams) (CreateUserTxResult, error)
+	CreatePatientClinicianMappingTx(ctx context.Context, arg CreatePatientClinicianMappingTxParams) (CreatePatientClinicianMappingTxResult, error)
 	CreatePatientTx(ctx context.Context, arg CreatePatientTxParams) (CreatePatientTxResult, error)
 	CreateClinicianTx(ctx context.Context, arg CreateClinicianTxParams) (CreateClinicianTxResult, error)
 	VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParams) (VerifyEmailTxResult, error)
 	VerifyForgotPasswordTx(ctx context.Context, arg VerifyForgotPasswordTxParams) (VerifyForgotPasswordTxResult, error)
+	VerifyInvitationTx(ctx context.Context, arg VerifyInvitationTxParams) (VerifyInvitationTxResult, error)
 }
 
 // SQLStore provides all functions to execute SQL queries and transactions

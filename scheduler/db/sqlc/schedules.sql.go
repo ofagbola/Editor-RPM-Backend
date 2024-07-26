@@ -11,26 +11,26 @@ import (
 
 const createSchedule = `-- name: CreateSchedule :one
 INSERT INTO schedules ( 
-  recepient,
+  recipient,
   initiator,
   time_slot
 ) VALUES (
   $1, $2, $3
-) RETURNING id, recepient, initiator, time_slot, created_at
+) RETURNING id, recipient, initiator, time_slot, created_at
 `
 
 type CreateScheduleParams struct {
-	Recepient string `json:"recepient"`
+	Recipient string `json:"recipient"`
 	Initiator string `json:"initiator"`
 	TimeSlot  string `json:"time_slot"`
 }
 
 func (q *Queries) CreateSchedule(ctx context.Context, arg CreateScheduleParams) (Schedule, error) {
-	row := q.db.QueryRow(ctx, createSchedule, arg.Recepient, arg.Initiator, arg.TimeSlot)
+	row := q.db.QueryRow(ctx, createSchedule, arg.Recipient, arg.Initiator, arg.TimeSlot)
 	var i Schedule
 	err := row.Scan(
 		&i.ID,
-		&i.Recepient,
+		&i.Recipient,
 		&i.Initiator,
 		&i.TimeSlot,
 		&i.CreatedAt,
@@ -49,7 +49,7 @@ func (q *Queries) DeleteSchedule(ctx context.Context, id int64) error {
 }
 
 const getSchedule = `-- name: GetSchedule :one
-SELECT id, recepient, initiator, time_slot, created_at FROM schedules
+SELECT id, recipient, initiator, time_slot, created_at FROM schedules
 WHERE id = $1 LIMIT 1
 `
 
@@ -58,7 +58,7 @@ func (q *Queries) GetSchedule(ctx context.Context, id int64) (Schedule, error) {
 	var i Schedule
 	err := row.Scan(
 		&i.ID,
-		&i.Recepient,
+		&i.Recipient,
 		&i.Initiator,
 		&i.TimeSlot,
 		&i.CreatedAt,
@@ -67,7 +67,7 @@ func (q *Queries) GetSchedule(ctx context.Context, id int64) (Schedule, error) {
 }
 
 const listSchedules = `-- name: ListSchedules :many
-SELECT id, recepient, initiator, time_slot, created_at FROM schedules
+SELECT id, recipient, initiator, time_slot, created_at FROM schedules
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -89,7 +89,7 @@ func (q *Queries) ListSchedules(ctx context.Context, arg ListSchedulesParams) ([
 		var i Schedule
 		if err := rows.Scan(
 			&i.ID,
-			&i.Recepient,
+			&i.Recipient,
 			&i.Initiator,
 			&i.TimeSlot,
 			&i.CreatedAt,

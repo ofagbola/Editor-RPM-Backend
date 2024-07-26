@@ -1,6 +1,6 @@
 -- name: CreateSchedule :one
 INSERT INTO schedules ( 
-  recepient,
+  recipient,
   initiator,
   time_slot
 ) VALUES (

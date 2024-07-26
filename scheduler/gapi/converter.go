@@ -9,7 +9,7 @@ import (
 
 func convertSchedule(schedule db.Schedule) *pb.Schedule {
 	return &pb.Schedule{
-		Recepient: schedule.Recepient,
+		Recipient: schedule.Recipient,
 		Initiator: schedule.Initiator,
 		TimeSlot:  schedule.TimeSlot,
 		CreatedAt: timestamppb.New(schedule.CreatedAt),

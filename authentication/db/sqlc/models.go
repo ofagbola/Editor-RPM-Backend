@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Clinician struct {
@@ -23,17 +22,6 @@ type Clinician struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 
-type Invitation struct {
-	ID                int64       `json:"id"`
-	Sender            string      `json:"sender"`
-	RecepientUsername pgtype.Text `json:"recepient_username"`
-	RecepientEmail    string      `json:"recepient_email"`
-	SecretCode        int64       `json:"secret_code"`
-	IsAccepted        bool        `json:"is_accepted"`
-	CreatedAt         time.Time   `json:"created_at"`
-	ExpiredAt         time.Time   `json:"expired_at"`
-}
-
 type Patient struct {
 	ID                   int64     `json:"id"`
 	Username             string    `json:"username"`
@@ -44,6 +32,16 @@ type Patient struct {
 	CoPay                string    `json:"co_pay"`
 	Image                string    `json:"image"`
 	CreatedAt            time.Time `json:"created_at"`
+}
+
+type PatientClinicianMapping struct {
+	ID                int64     `json:"id"`
+	Sender            string    `json:"sender"`
+	RecipientUsername string    `json:"recipient_username"`
+	RecipientEmail    string    `json:"recipient_email"`
+	InviteAccepted    bool      `json:"invite_accepted"`
+	AcceptedDate      time.Time `json:"accepted_date"`
+	CreatedAt         time.Time `json:"created_at"`
 }
 
 type Session struct {
@@ -94,4 +92,15 @@ type VerifyForgotPassword struct {
 	IsUsed     bool      `json:"is_used"`
 	CreatedAt  time.Time `json:"created_at"`
 	ExpiredAt  time.Time `json:"expired_at"`
+}
+
+type VerifyInvitation struct {
+	ID                int64     `json:"id"`
+	Sender            string    `json:"sender"`
+	RecipientUsername string    `json:"recipient_username"`
+	RecipientEmail    string    `json:"recipient_email"`
+	SecretCode        int64     `json:"secret_code"`
+	IsUsed            bool      `json:"is_used"`
+	CreatedAt         time.Time `json:"created_at"`
+	ExpiredAt         time.Time `json:"expired_at"`
 }

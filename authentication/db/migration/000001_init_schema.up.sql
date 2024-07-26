@@ -29,13 +29,23 @@ CREATE TABLE "patients" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "invitations" (
+CREATE TABLE "patient_clinician_mappings" (
   "id" bigserial PRIMARY KEY,
   "sender" varchar NOT NULL,
-  "recepient_username" varchar,
-  "recepient_email" varchar NOT NULL,
+  "recipient_username" varchar NOT NULL DEFAULT '',
+  "recipient_email" varchar NOT NULL,
+  "invite_accepted" bool NOT NULL DEFAULT false,
+  "accepted_date" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "verify_invitations" (
+  "id" bigserial PRIMARY KEY,
+  "sender" varchar NOT NULL,
+  "recipient_username" varchar NOT NULL DEFAULT '',
+  "recipient_email" varchar NOT NULL,
   "secret_code" bigint NOT NULL,
-  "is_accepted" bool NOT NULL DEFAULT false,
+  "is_used" boolean NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "expired_at" timestamptz NOT NULL DEFAULT (now() + interval '60 minutes')
 );
@@ -85,7 +95,9 @@ CREATE TABLE "verify_forgot_passwords" (
 
 ALTER TABLE "patients" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
-ALTER TABLE "invitations" ADD FOREIGN KEY ("sender") REFERENCES "users" ("username");
+ALTER TABLE "patient_clinician_mappings" ADD FOREIGN KEY ("sender") REFERENCES "users" ("username");
+
+ALTER TABLE "verify_invitations" ADD FOREIGN KEY ("sender") REFERENCES "users" ("username");
 
 ALTER TABLE "clinicians" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 

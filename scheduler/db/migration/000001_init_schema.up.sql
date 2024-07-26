@@ -1,6 +1,6 @@
 CREATE TABLE "schedules" (
   "id" bigserial PRIMARY KEY,
-  "recepient" varchar NOT NULL,
+  "recipient" varchar NOT NULL,
   "initiator" varchar NOT NULL,
   "time_slot" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
@@ -8,4 +8,4 @@ CREATE TABLE "schedules" (
 
 CREATE INDEX ON "schedules" ("initiator");
 
-CREATE INDEX ON "schedules" ("recepient");
+CREATE INDEX ON "schedules" ("recipient");
