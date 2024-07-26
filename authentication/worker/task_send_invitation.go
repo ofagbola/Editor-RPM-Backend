@@ -14,7 +14,9 @@ import (
 const TaskSendInvitationEmail = "task:send_invitation_email"
 
 type PayloadSendInvitationEmail struct {
-	Username string `json:"username"`
+	Sender            string `json:"sender"`
+	RecipientUsername string `json:"recipient_username"`
+	RecipientEmail    string `json:"recipient_email"`
 }
 
 func (distributor *RedisTaskDistributor) DistributeTaskSendInvitationEmail(
@@ -44,33 +46,34 @@ func (processor *RedisTaskProcessor) ProcessTaskSendInvitationEmail(ctx context.
 		return fmt.Errorf("failed to unmarshal payload: %w", asynq.SkipRetry)
 	}
 
-	invitation, err := processor.store.GetInvitation(ctx, payload.Username)
+	patientClinicianMapping, err := processor.store.GetPatientClinicianMapping(ctx, payload.Sender)
 	if err != nil {
-		return fmt.Errorf("failed to get invitation: %w", err)
+		return fmt.Errorf("failed to get patientClinicianMapping: %w", err)
 	}
 
-	user, err := processor.store.GetUser(ctx, payload.Username)
-	if err != nil {
-		return fmt.Errorf("failed to get user: %w", err)
-	}
-
-	invitationEmail, err := processor.store.CreateInvitation(ctx, db.CreateInvitationParams{
-		Sender:         user.Username,
-		RecepientEmail: user.Email,
-		SecretCode:     util.Generate6DigitRandomInt(),
+	invitationEmail, err := processor.store.CreateVerifyInvitation(ctx, db.CreateVerifyInvitationParams{
+		Sender:            patientClinicianMapping.Sender,
+		RecipientEmail:    patientClinicianMapping.RecipientEmail,
+		RecipientUsername: patientClinicianMapping.RecipientUsername,
+		SecretCode:        util.Generate6DigitRandomInt(),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create invitation email: %w", err)
 	}
 
+	user, err := processor.store.GetUser(ctx, payload.Sender)
+	if err != nil {
+		return fmt.Errorf("failed to get user: %w", err)
+	}
+
 	senderFullName := user.FirstName + " " + user.LastName
 
-	subject := fmt.Sprintf("Invitation Request From %s",invitationEmail.Sender)
+	subject := fmt.Sprintf("Invitation Request From %s", invitationEmail.Sender)
 	// TODO: replace this URL with an environment variable that points to a front-end page
 	invitationUrl := fmt.Sprintf("http://localhost:8089/v1/invitation_email?sender=%s&secret_code=%d", invitationEmail.Sender, invitationEmail.SecretCode)
 	content := fmt.Sprintf(`Hello! you got an invitation addressed to %s, from <b>%s</b> to join Editor RPM as a connection.<br/> kindly Proceed by clicking <a href="%s">click here</a> to accept invitation.<br/> <h1>%d</h1>
-	`,invitation.RecepientEmail, senderFullName, invitationUrl, invitation.SecretCode)
-	to := []string{invitation.RecepientEmail}
+	`, invitationEmail.RecipientEmail, senderFullName, invitationUrl, invitationEmail.SecretCode)
+	to := []string{invitationEmail.RecipientEmail}
 
 	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
 	if err != nil {

@@ -54,6 +54,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 		Email:      user.Email,
 		SecretCode: util.Generate6DigitRandomInt(),
 	})
+	
 	if err != nil {
 		return fmt.Errorf("failed to create verify email: %w", err)
 	}

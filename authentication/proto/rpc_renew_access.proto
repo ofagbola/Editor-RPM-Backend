@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package pb;
 
-// import "user.proto";
 import "google/protobuf/timestamp.proto";
 option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
 

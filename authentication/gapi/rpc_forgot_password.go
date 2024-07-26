@@ -18,24 +18,32 @@ func (server *Server) ForgotPassword(ctx context.Context, req *pb.ForgotPassword
 	user, err := server.store.GetUser(ctx, req.GetUsername())
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
-			return nil, status.Errorf(codes.NotFound, "user not found")
+			return &pb.ForgotPasswordResponse{
+				Successful: false,
+				Error:      status.Errorf(codes.NotFound, "user not found").Error(),
+			}, nil
 		}
-		return nil, status.Errorf(codes.Internal, "failed to find user")
+		return &pb.ForgotPasswordResponse{
+			Successful: false,
+			Error:      status.Errorf(codes.Internal, "failed to find User: %v", err).Error(),
+		}, nil
 	}
 
 	if err := server.SendForgotPasswordEmail(ctx, &user); err != nil {
-		return nil, err
+		return &pb.ForgotPasswordResponse{
+			Successful: false,
+			Error:      status.Errorf(codes.Internal, "failed to send forgot password to user: %v", err).Error(),
+		}, nil
 	}
 
 	rsp := &pb.ForgotPasswordResponse{
 		Successful: true,
+		Error: "nil",
 	}
 	return rsp, nil
 }
 
-
-
-func (server *Server) SendForgotPasswordEmail(ctx context.Context, user * db.User) error {
+func (server *Server) SendForgotPasswordEmail(ctx context.Context, user *db.User) error {
 	// Create the task payload
 	taskPayload := &worker.PayloadSendForgotPasswordToEmail{
 		Username: user.Username,

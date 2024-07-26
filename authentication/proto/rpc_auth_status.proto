@@ -1,13 +1,14 @@
 syntax = "proto3";
 
 package pb;
+
 option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
 
-message ForgotPasswordRequest {
-    string username = 1;
+message AuthStatusRequest {
+    string refresh_token = 1;
 }
 
-message ForgotPasswordResponse {
-    bool successful = 1;
+message AuthStatusResponse {
+    bool is_authenticated = 1;
     string error = 2;
 }

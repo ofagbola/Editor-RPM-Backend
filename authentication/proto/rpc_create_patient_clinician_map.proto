@@ -8,17 +8,19 @@ option go_package = "github.com/ofagbola/Editor-RPM-Backend/authentication/pb";
 
 message CreatePatientClinicianMappingRequest {
     string sender = 1;
-    int64 secret_code = 2;
-    optional string recepient_username = 3;
-    string recepient_email = 4;
+    optional string recipient_username = 2;
+    string recipient_email = 3;
 
 }
 
 message CreatePatientClinicianMappingResponse {
+    PatientClinicianMapping patientClinicianMapping = 1;
+}
+
+message PatientClinicianMapping {
     string sender = 1;
-    int64 secret_code = 2;
-    string recepient_username = 3;
-    string recepient_email = 4;
-    bool invite_acceptance = 5;
-    google.protobuf.Timestamp created_at = 6;
+    string recipient_username = 2;
+    string recipient_email = 3;
+    bool invite_accepted = 4;
+    google.protobuf.Timestamp created_at = 5;
 }

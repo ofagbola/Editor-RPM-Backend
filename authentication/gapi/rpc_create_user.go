@@ -52,11 +52,11 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 				asynq.ProcessIn(10 * time.Second),
 				asynq.Queue(worker.QueueCritical),
 			}
-			
+
 			if err := server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...); err != nil {
 				return status.Errorf(codes.Internal, "failed to distribute verify email task: %s", err)
 			}
-			
+
 			return nil
 
 		},
@@ -69,7 +69,6 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
 	}
-
 
 	user, err := server.store.GetUser(ctx, req.GetUsername())
 	if err != nil {
@@ -111,10 +110,8 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, status.Errorf(codes.Internal, "failed to create session")
 	}
 
-
-
 	rsp := &pb.CreateUserResponse{
-		User: convertUser(txResult.User),
+		User:                  convertUser(txResult.User),
 		SessionId:             session.ID.String(),
 		AccessToken:           accessToken,
 		RefreshToken:          refreshToken,

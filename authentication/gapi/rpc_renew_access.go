@@ -22,9 +22,9 @@ func (server *Server) RenewAccess(ctx context.Context, req *pb.RenewAccessReques
 	session, err := server.store.GetSession(ctx, refreshPayload.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
-			return nil, status.Errorf(codes.NotFound, "Verify Email Id not found")
+			return nil, status.Errorf(codes.NotFound, "Session Id not found")
 		}
-		return nil, status.Errorf(codes.Internal, "failed to find verifyEmail")
+		return nil, status.Errorf(codes.Internal, "failed to find Session")
 	}
 
 	if session.IsBlocked {

@@ -21,6 +21,40 @@
     "application/json"
   ],
   "paths": {
+    "/v1/auth_status": {
+      "post": {
+        "summary": "get auth status",
+        "description": "Auth Status",
+        "operationId": "AuthenticationService_AuthStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbAuthStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbAuthStatusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
     "/v1/change_password": {
       "patch": {
         "summary": "change id",
@@ -123,6 +157,40 @@
         ]
       }
     },
+    "/v1/create_patient_clinician_mapping": {
+      "post": {
+        "summary": "send invitation",
+        "description": "send invitation to either clinician / patient to join network",
+        "operationId": "AuthenticationService_CreatePatientClinicianMapping",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreatePatientClinicianMappingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreatePatientClinicianMappingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
+    },
     "/v1/create_user": {
       "post": {
         "summary": "Create new user",
@@ -199,70 +267,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/pbGetClinicianResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "username",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AuthenticationService"
-        ]
-      }
-    },
-    "/v1/get_email_id": {
-      "get": {
-        "summary": "get verify email id",
-        "description": "Use this API to get verify user's email id",
-        "operationId": "AuthenticationService_GetVerifyEmailId",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/pbGetVerifyEmailIdResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "username",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AuthenticationService"
-        ]
-      }
-    },
-    "/v1/get_forgot_password_id": {
-      "get": {
-        "summary": "get forgot password (reset) email id",
-        "description": "Use this API to get user's email id for the reset password mail",
-        "operationId": "AuthenticationService_GetForgotPasswordEmailId",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/pbGetVerifyForgotPasswordEmailIdResponse"
             }
           },
           "default": {
@@ -483,40 +487,6 @@
         ]
       }
     },
-    "/v1/send_invitation": {
-      "post": {
-        "summary": "send invitation",
-        "description": "send invitation to either clinician / patient to join network",
-        "operationId": "AuthenticationService_SendInvitation",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/pbSendInvitationResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/pbSendInvitationRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AuthenticationService"
-        ]
-      }
-    },
     "/v1/update_clinician": {
       "patch": {
         "summary": "Update clinician",
@@ -698,9 +668,62 @@
           "AuthenticationService"
         ]
       }
+    },
+    "/v1/verify_invitation": {
+      "post": {
+        "summary": "send invitation",
+        "description": "verify invitation sen to join network",
+        "operationId": "AuthenticationService_VerifyInvitation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbVerifyInvitationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbVerifyInvitationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthenticationService"
+        ]
+      }
     }
   },
   "definitions": {
+    "pbAuthStatusRequest": {
+      "type": "object",
+      "properties": {
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "pbAuthStatusResponse": {
+      "type": "object",
+      "properties": {
+        "isAuthenticated": {
+          "type": "boolean"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
     "pbChangePasswordRequest": {
       "type": "object",
       "properties": {
@@ -793,6 +816,28 @@
       "properties": {
         "clinician": {
           "$ref": "#/definitions/pbClinician"
+        }
+      }
+    },
+    "pbCreatePatientClinicianMappingRequest": {
+      "type": "object",
+      "properties": {
+        "sender": {
+          "type": "string"
+        },
+        "recipientUsername": {
+          "type": "string"
+        },
+        "recipientEmail": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreatePatientClinicianMappingResponse": {
+      "type": "object",
+      "properties": {
+        "patientClinicianMapping": {
+          "$ref": "#/definitions/pbPatientClinicianMapping"
         }
       }
     },
@@ -904,6 +949,9 @@
       "properties": {
         "successful": {
           "type": "boolean"
+        },
+        "error": {
+          "type": "string"
         }
       }
     },
@@ -945,24 +993,6 @@
         "refreshTokenExpiresAt": {
           "type": "string",
           "format": "date-time"
-        }
-      }
-    },
-    "pbGetVerifyEmailIdResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
-        }
-      }
-    },
-    "pbGetVerifyForgotPasswordEmailIdResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64"
         }
       }
     },
@@ -1032,6 +1062,27 @@
         }
       }
     },
+    "pbPatientClinicianMapping": {
+      "type": "object",
+      "properties": {
+        "sender": {
+          "type": "string"
+        },
+        "recipientUsername": {
+          "type": "string"
+        },
+        "recipientEmail": {
+          "type": "string"
+        },
+        "inviteAccepted": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "pbRenewAccessRequest": {
       "type": "object",
       "properties": {
@@ -1068,32 +1119,6 @@
       "properties": {
         "user": {
           "$ref": "#/definitions/pbUser"
-        }
-      }
-    },
-    "pbSendInvitationRequest": {
-      "type": "object",
-      "properties": {
-        "sender": {
-          "type": "string"
-        },
-        "secretCode": {
-          "type": "string",
-          "format": "int64"
-        },
-        "recepientUsername": {
-          "type": "string"
-        },
-        "recepientEmail": {
-          "type": "string"
-        }
-      }
-    },
-    "pbSendInvitationResponse": {
-      "type": "object",
-      "properties": {
-        "successful": {
-          "type": "boolean"
         }
       }
     },
@@ -1281,6 +1306,32 @@
       "type": "object",
       "properties": {
         "isUsed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbVerifyInvitationRequest": {
+      "type": "object",
+      "properties": {
+        "secretCode": {
+          "type": "string",
+          "format": "int64"
+        },
+        "recipientUsername": {
+          "type": "string"
+        },
+        "recipientEmail": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        }
+      }
+    },
+    "pbVerifyInvitationResponse": {
+      "type": "object",
+      "properties": {
+        "inviteAccepted": {
           "type": "boolean"
         }
       }

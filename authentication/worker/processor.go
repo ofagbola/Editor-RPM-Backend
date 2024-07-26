@@ -58,6 +58,7 @@ func (processor *RedisTaskProcessor) Start() error {
 	mux := asynq.NewServeMux()
 
 	mux.HandleFunc(TaskSendVerifyEmail, processor.ProcessTaskSendVerifyEmail)
+	mux.HandleFunc(TaskSendInvitationEmail, processor.ProcessTaskSendInvitationEmail)
 	mux.HandleFunc(TaskSendForgotPasswordToEmail, processor.ProcessTaskSendForgotPasswordToEmail)
 
 	return processor.server.Start(mux)

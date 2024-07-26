@@ -26,7 +26,7 @@ type CreateScheduleRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Recepient string `protobuf:"bytes,1,opt,name=recepient,proto3" json:"recepient,omitempty"`
+	Recipient string `protobuf:"bytes,1,opt,name=recipient,proto3" json:"recipient,omitempty"`
 	Initiator string `protobuf:"bytes,2,opt,name=initiator,proto3" json:"initiator,omitempty"`
 	TimeSlot  string `protobuf:"bytes,3,opt,name=time_slot,json=timeSlot,proto3" json:"time_slot,omitempty"`
 }
@@ -63,9 +63,9 @@ func (*CreateScheduleRequest) Descriptor() ([]byte, []int) {
 	return file_rpc_create_schedule_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateScheduleRequest) GetRecepient() string {
+func (x *CreateScheduleRequest) GetRecipient() string {
 	if x != nil {
-		return x.Recepient
+		return x.Recipient
 	}
 	return ""
 }
@@ -137,7 +137,7 @@ type Schedule struct {
 	unknownFields protoimpl.UnknownFields
 
 	Id        int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Recepient string                 `protobuf:"bytes,2,opt,name=recepient,proto3" json:"recepient,omitempty"`
+	Recipient string                 `protobuf:"bytes,2,opt,name=recipient,proto3" json:"recipient,omitempty"`
 	Initiator string                 `protobuf:"bytes,3,opt,name=initiator,proto3" json:"initiator,omitempty"`
 	TimeSlot  string                 `protobuf:"bytes,4,opt,name=time_slot,json=timeSlot,proto3" json:"time_slot,omitempty"`
 	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
@@ -182,9 +182,9 @@ func (x *Schedule) GetId() int64 {
 	return 0
 }
 
-func (x *Schedule) GetRecepient() string {
+func (x *Schedule) GetRecipient() string {
 	if x != nil {
-		return x.Recepient
+		return x.Recipient
 	}
 	return ""
 }
