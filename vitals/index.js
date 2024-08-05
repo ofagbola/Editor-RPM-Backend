@@ -498,7 +498,8 @@ app.get("/fetch-spo2-from-fitbit", async (req, res) => {
 });
 
 app.get("/fetch-heart-rate-from-fitbit", async (req, res) => {
-  const username = req.query.username;
+  const { username, startTime, endTime } = req.query;
+
   if (!username) {
     return res.status(400).json({
       success: false,
@@ -516,9 +517,21 @@ app.get("/fetch-heart-rate-from-fitbit", async (req, res) => {
       });
     }
 
-    const heartRateData = await fetchRestingHeartRate(userTokens.accessToken);
+    const heartRateData = await fetchHeartRateIntraday(
+      userTokens.accessToken,
+      startTime,
+      endTime
+    );
 
     console.log({ heartRateData });
+
+    if (heartRateData?.status === 404) {
+      return res.json({
+        success: false,
+        message: "No data found",
+        status: 404,
+      });
+    }
 
     const newVital = await Vitals.create({
       username,
@@ -536,7 +549,14 @@ app.get("/fetch-heart-rate-from-fitbit", async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({
+    if (error.status === "no_match") {
+      return res.json({
+        success: false,
+        message: error.message,
+        status: error.status,
+      });
+    }
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch or save heart rate data",
       error: error.message,

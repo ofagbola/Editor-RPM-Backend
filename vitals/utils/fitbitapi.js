@@ -1,4 +1,3 @@
-const request = require("request");
 require("dotenv").config();
 
 const axios = require("axios");
@@ -72,15 +71,15 @@ const fetchUserProfile = (accessToken, date = "today") => {
     });
 };
 
-const fetchRestingHeartRate = async (accessToken) => {
-  const currentTime = getCurrentTime();
-  const timeTenMinutesAgo = getPastTimeInMinutes(1);
+const fetchHeartRateIntraday = async (accessToken, startTime, endTime) => {
+  // const currentTime = getCurrentTime();
+  // const timeTenMinutesAgo = getPastTimeInMinutes(1);
 
-  console.log({ currentTime, timeTenMinutesAgo });
+  console.log({ startTime, endTime });
 
   const options = {
     method: "get",
-    url: `https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1sec/time/${timeTenMinutesAgo}/${currentTime}.json`,
+    url: `https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1sec/time/${startTime}/${endTime}.json`,
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -123,12 +122,15 @@ const fetchRestingHeartRate = async (accessToken) => {
         heartRate: body["activities-heart"][0].value.restingHeartRate,
       };
     } else {
-      throw new Error(
-        "Heart rate data not found or the structure is not as expected."
-      );
+      return {
+        success: false,
+        status: 404,
+        message: "no match found",
+      };
     }
   } catch (error) {
     console.error("Error fetching heart rate data from Fitbit:", error);
+
     throw new Error(
       "Error fetching heart rate data from Fitbit: " +
         (error.response
@@ -138,28 +140,13 @@ const fetchRestingHeartRate = async (accessToken) => {
   }
 };
 
-module.exports = fetchRestingHeartRate; // Export the function if you're using modules
+// module.exports = fetchRestingHeartRate; // Export the function if you're using modules
 
 module.exports = {
   fetchSpO2DataByDate,
-  fetchRestingHeartRate,
+  fetchHeartRateIntraday,
   fetchUserProfile,
 };
-
-function getCurrentTime() {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
-}
-
-function getPastTimeInMinutes(minutesPassed) {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - +minutesPassed);
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
-}
 
 const datasetAverage = (data) => {
   if (data.length === 0) {
